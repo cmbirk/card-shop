@@ -1,0 +1,33 @@
+import { Canvas } from '@react-three/fiber';
+import { AdaptiveDpr } from '@react-three/drei';
+import { Shop } from './scene/Shop';
+import { StationController } from './scene/StationController';
+import { Waypoints } from './scene/Waypoints';
+import { Shopkeeper } from './scene/Shopkeeper';
+import { Basket3D } from './scene/Basket';
+import { CardInHand } from './scene/cards/CardInHand';
+import { UIOverlay } from './ui/UIOverlay';
+
+export default function App() {
+  return (
+    <>
+      <Canvas
+        shadows
+        dpr={[1, 2]}
+        camera={{ fov: 55, near: 0.05, far: 50, position: [0, 1.6, 9.2] }}
+        style={{ position: 'fixed', inset: 0 }}
+      >
+        <color attach="background" args={['#241a10']} />
+        <fog attach="fog" args={['#241a10', 10, 24]} />
+        <Shop />
+        <Shopkeeper />
+        <CardInHand />
+        <Basket3D />
+        <Waypoints />
+        <StationController />
+        <AdaptiveDpr pixelated />
+      </Canvas>
+      <UIOverlay />
+    </>
+  );
+}

@@ -1,0 +1,118 @@
+{
+  "comment": "Real-image pilot: 1894 Mayo Cut Plug football cards (public domain; MET/Commons Open Access scans). Mix of raw, PSA, TAG, SGC to validate slab/raw rendering. Replace with your own inventory scans.",
+  "cards": [
+    {
+      "id": "fb-real-mayo-dunlop",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "John Dunlop",
+      "team": "Harvard",
+      "year": 1894,
+      "setName": "Mayo Cut Plug",
+      "cardNumber": "N302",
+      "rarity": "premium",
+      "price": 45000,
+      "seed": 18941,
+      "images": { "front": "/cards/football/mayo-dunlop-f.jpg" },
+      "lore": {
+        "blurb": "The famous anonymous card of the Mayo set — issued with no name on the front.",
+        "funFact": "Collectors hunted for decades before the player was identified as John Dunlop of Harvard.",
+        "investmentNote": "blue-chip of this set"
+      }
+    },
+    {
+      "id": "fb-real-mayo-brewer",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Charlie Brewer",
+      "team": "Harvard",
+      "year": 1894,
+      "setName": "Mayo Cut Plug",
+      "cardNumber": "N302",
+      "rarity": "graded",
+      "grade": { "company": "PSA", "value": 4, "label": "PSA 4 VG-EX" },
+      "price": 38000,
+      "seed": 18942,
+      "images": { "front": "/cards/football/mayo-brewer-f.jpg" },
+      "lore": {
+        "blurb": "A crisp example from the first true football card set ever printed.",
+        "investmentNote": "steady riser"
+      }
+    },
+    {
+      "id": "fb-real-mayo-acton",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Edgar Acton",
+      "team": "Harvard",
+      "year": 1894,
+      "setName": "Mayo Cut Plug",
+      "cardNumber": "N302",
+      "rarity": "graded",
+      "grade": { "company": "SGC", "value": 3, "label": "SGC 3 VG" },
+      "price": 21000,
+      "seed": 18943,
+      "images": { "front": "/cards/football/mayo-acton-f.jpg" },
+      "lore": {
+        "blurb": "Tobacco-era cardboard with the wear to prove it survived 130 years.",
+        "investmentNote": "undervalued right now"
+      }
+    },
+    {
+      "id": "fb-real-mayo-beale",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Joseph Beale",
+      "team": "Harvard",
+      "year": 1894,
+      "setName": "Mayo Cut Plug",
+      "cardNumber": "N302",
+      "rarity": "graded",
+      "grade": { "company": "TAG", "value": 5, "label": "TAG 5 EX" },
+      "price": 26000,
+      "seed": 18944,
+      "images": { "front": "/cards/football/mayo-beale-f.jpg" },
+      "lore": {
+        "blurb": "TAG-graded with full transparency report — modern grading meets 1890s cardboard.",
+        "investmentNote": "sleeper pick among collectors"
+      }
+    },
+    {
+      "id": "fb-real-mayo-murphy",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Fred Murphy",
+      "team": "Yale",
+      "year": 1894,
+      "setName": "Mayo Cut Plug",
+      "cardNumber": "N302",
+      "rarity": "graded",
+      "grade": { "company": "PSA", "value": 2, "label": "PSA 2 GOOD" },
+      "price": 17500,
+      "seed": 18945,
+      "images": { "front": "/cards/football/mayo-murphy-f.jpg" },
+      "lore": {
+        "blurb": "Low-grade, big character — the kind of card that starts conversations.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      }
+    },
+    {
+      "id": "fb-real-mayo-stillman",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Philip Stillman",
+      "team": "Yale",
+      "year": 1894,
+      "setName": "Mayo Cut Plug",
+      "cardNumber": "N302",
+      "rarity": "premium",
+      "price": 19000,
+      "seed": 18946,
+      "images": { "front": "/cards/football/mayo-stillman-f.jpg" },
+      "lore": {
+        "blurb": "Raw and honest — never slabbed, straight from a turn-of-the-century album.",
+        "investmentNote": "steady riser"
+      }
+    }
+  ]
+}

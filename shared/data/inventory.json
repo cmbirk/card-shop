@@ -1,0 +1,1918 @@
+{
+  "cards": [
+    {
+      "id": "ba-2024-0",
+      "sport": "baseball",
+      "category": "rookies",
+      "playerName": "Marcus Mollusk",
+      "team": "Dayton Comets",
+      "year": 2024,
+      "setName": "Pennant Craze",
+      "cardNumber": "#366",
+      "rarity": "rare",
+      "price": 599,
+      "seed": 1055597598,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Pennant Craze. Rookie-year cards like this are where collections start.",
+        "investmentNote": "blue-chip of this set"
+      }
+    },
+    {
+      "id": "ba-2025-1",
+      "sport": "baseball",
+      "category": "rookies",
+      "playerName": "Dayton Cormorant",
+      "team": "Dayton Comets",
+      "year": 2025,
+      "setName": "Pennant Craze",
+      "cardNumber": "#192",
+      "rarity": "common",
+      "price": 2703,
+      "seed": 1881231277,
+      "lore": {
+        "blurb": "Dayton Cormorant's 2025 appearance for the Dayton Comets. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ba-2019-2",
+      "sport": "baseball",
+      "category": "rookies",
+      "playerName": "Elio Okafor-Reyes",
+      "team": "Harbor City Herons",
+      "year": 2019,
+      "setName": "Summit",
+      "cardNumber": "#221",
+      "rarity": "common",
+      "price": 2116,
+      "seed": 913197315,
+      "lore": {
+        "blurb": "A standout from the 2019 Summit run. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ba-2019-3",
+      "sport": "baseball",
+      "category": "rookies",
+      "playerName": "Rufus Ashby",
+      "team": "Harbor City Herons",
+      "year": 2019,
+      "setName": "Summit",
+      "cardNumber": "#388",
+      "rarity": "common",
+      "price": 2106,
+      "seed": 1206856485,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Summit. Rookie-year cards like this are where collections start.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light."
+      }
+    },
+    {
+      "id": "ba-2019-4",
+      "sport": "baseball",
+      "category": "rookies",
+      "playerName": "Wes Fontaine",
+      "team": "Bluff Creek Badgers",
+      "year": 2019,
+      "setName": "Grandstand",
+      "cardNumber": "#296",
+      "rarity": "common",
+      "price": 1977,
+      "seed": 1349342411,
+      "lore": {
+        "blurb": "Wes Fontaine's 2019 appearance for the Bluff Creek Badgers. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ba-1977-5",
+      "sport": "baseball",
+      "category": "vintage",
+      "playerName": "Otto Grady",
+      "team": "Harbor City Herons",
+      "year": 1977,
+      "setName": "Summit",
+      "cardNumber": "#240",
+      "rarity": "rare",
+      "price": 5359,
+      "seed": 1878922052,
+      "lore": {
+        "blurb": "A true vintage piece from 1977. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "steady riser"
+      }
+    },
+    {
+      "id": "ba-1964-6",
+      "sport": "baseball",
+      "category": "vintage",
+      "playerName": "Monty Slocum",
+      "team": "Bluff Creek Badgers",
+      "year": 1964,
+      "setName": "Summit",
+      "cardNumber": "#316",
+      "rarity": "common",
+      "price": 4325,
+      "seed": 1805294485,
+      "lore": {
+        "blurb": "A standout from the 1964 Summit run. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody."
+      }
+    },
+    {
+      "id": "ba-1973-7",
+      "sport": "baseball",
+      "category": "vintage",
+      "playerName": "Otto Ashby",
+      "team": "Bluff Creek Badgers",
+      "year": 1973,
+      "setName": "Dugout Heroes",
+      "cardNumber": "#85",
+      "rarity": "common",
+      "price": 3089,
+      "seed": 595009423,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Dugout Heroes. Corners this clean on a card this old are getting hard to find."
+      }
+    },
+    {
+      "id": "ba-1978-8",
+      "sport": "baseball",
+      "category": "vintage",
+      "playerName": "Zeke Vane",
+      "team": "Dayton Comets",
+      "year": 1978,
+      "setName": "Grandstand",
+      "cardNumber": "#350",
+      "rarity": "common",
+      "price": 4629,
+      "seed": 1033670780,
+      "lore": {
+        "blurb": "A standout from the 1978 Grandstand run. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "ba-2002-9",
+      "sport": "baseball",
+      "category": "stars",
+      "playerName": "Wes Ashby",
+      "team": "Bluff Creek Badgers",
+      "year": 2002,
+      "setName": "Pennant Craze",
+      "cardNumber": "#260",
+      "rarity": "premium",
+      "price": 8470,
+      "seed": 1454868130,
+      "lore": {
+        "blurb": "A standout from the 2002 Pennant Craze run. A dependable centerpiece for any team collection.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      },
+      "foil": true
+    },
+    {
+      "id": "ba-1986-10",
+      "sport": "baseball",
+      "category": "stars",
+      "playerName": "Ike Okafor-Reyes",
+      "team": "Dayton Comets",
+      "year": 1986,
+      "setName": "Pennant Craze",
+      "cardNumber": "#156",
+      "rarity": "premium",
+      "price": 11516,
+      "seed": 1631125419,
+      "lore": {
+        "blurb": "Ike Okafor-Reyes's 1986 appearance for the Dayton Comets. A dependable centerpiece for any team collection.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light.",
+        "investmentNote": "sleeper pick among collectors"
+      },
+      "foil": true
+    },
+    {
+      "id": "ba-1998-11",
+      "sport": "baseball",
+      "category": "stars",
+      "playerName": "Bo Tanager",
+      "team": "Salt Flat Sliders",
+      "year": 1998,
+      "setName": "Dugout Heroes",
+      "cardNumber": "#278",
+      "rarity": "rare",
+      "price": 2091,
+      "seed": 1739505013,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Dugout Heroes. A dependable centerpiece for any team collection.",
+        "investmentNote": "undervalued right now"
+      }
+    },
+    {
+      "id": "ba-1994-12",
+      "sport": "baseball",
+      "category": "stars",
+      "playerName": "Marcus Cormorant",
+      "team": "Harbor City Herons",
+      "year": 1994,
+      "setName": "Grandstand",
+      "cardNumber": "#115",
+      "rarity": "rare",
+      "price": 1163,
+      "seed": 1985362890,
+      "lore": {
+        "blurb": "Marcus Cormorant's 1994 appearance for the Harbor City Herons. A dependable centerpiece for any team collection.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody.",
+        "investmentNote": "hype-driven, volatile"
+      }
+    },
+    {
+      "id": "ba-1989-13",
+      "sport": "baseball",
+      "category": "stars",
+      "playerName": "Harlan Vex",
+      "team": "Salt Flat Sliders",
+      "year": 1989,
+      "setName": "Dugout Heroes",
+      "cardNumber": "#209",
+      "rarity": "common",
+      "price": 1249,
+      "seed": 784559028,
+      "lore": {
+        "blurb": "A collector favorite from 1989. A dependable centerpiece for any team collection."
+      }
+    },
+    {
+      "id": "ba-1996-14",
+      "sport": "baseball",
+      "category": "stars",
+      "playerName": "Wes Pemberton",
+      "team": "Harbor City Herons",
+      "year": 1996,
+      "setName": "Dugout Heroes",
+      "cardNumber": "#51",
+      "rarity": "common",
+      "price": 1855,
+      "seed": 1237394411,
+      "lore": {
+        "blurb": "Wes Pemberton's 1996 appearance for the Harbor City Herons. A dependable centerpiece for any team collection.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run."
+      }
+    },
+    {
+      "id": "ba-1998-15",
+      "sport": "baseball",
+      "category": "stars",
+      "playerName": "Nico Tanager",
+      "team": "Harbor City Herons",
+      "year": 1998,
+      "setName": "Summit",
+      "cardNumber": "#282",
+      "rarity": "common",
+      "price": 327,
+      "seed": 415030260,
+      "lore": {
+        "blurb": "A collector favorite from 1998. A dependable centerpiece for any team collection."
+      }
+    },
+    {
+      "id": "ba-2021-16",
+      "sport": "basketball",
+      "category": "rookies",
+      "playerName": "Wes Tanager",
+      "team": "Ridgeline Rockets",
+      "year": 2021,
+      "setName": "Crossover",
+      "cardNumber": "#127",
+      "rarity": "rare",
+      "price": 578,
+      "seed": 183349607,
+      "lore": {
+        "blurb": "A collector favorite from 2021. Rookie-year cards like this are where collections start.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find.",
+        "investmentNote": "sleeper pick among collectors"
+      }
+    },
+    {
+      "id": "ba-2024-17",
+      "sport": "basketball",
+      "category": "rookies",
+      "playerName": "Dayton Callister",
+      "team": "Pactown Pulse",
+      "year": 2024,
+      "setName": "Fastbreak",
+      "cardNumber": "#279",
+      "rarity": "common",
+      "price": 2481,
+      "seed": 1384965382,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Fastbreak. Rookie-year cards like this are where collections start.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "ba-2024-18",
+      "sport": "basketball",
+      "category": "rookies",
+      "playerName": "Tomas Pemberton",
+      "team": "Iron Valley Vipers",
+      "year": 2024,
+      "setName": "Fastbreak",
+      "cardNumber": "#200",
+      "rarity": "common",
+      "price": 1647,
+      "seed": 1749698134,
+      "lore": {
+        "blurb": "A collector favorite from 2024. Rookie-year cards like this are where collections start.",
+        "funFact": "The set designer hid their initials in the border pattern."
+      }
+    },
+    {
+      "id": "ba-2023-19",
+      "sport": "basketball",
+      "category": "rookies",
+      "playerName": "Flip Tanager",
+      "team": "Iron Valley Vipers",
+      "year": 2023,
+      "setName": "Hardwood Elite",
+      "cardNumber": "#377",
+      "rarity": "common",
+      "price": 1372,
+      "seed": 2061515084,
+      "lore": {
+        "blurb": "A collector favorite from 2023. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ba-2024-20",
+      "sport": "basketball",
+      "category": "rookies",
+      "playerName": "Flip Duckworth",
+      "team": "Iron Valley Vipers",
+      "year": 2024,
+      "setName": "Rim City",
+      "cardNumber": "#9",
+      "rarity": "common",
+      "price": 1300,
+      "seed": 1812740274,
+      "lore": {
+        "blurb": "A collector favorite from 2024. Rookie-year cards like this are where collections start.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run."
+      }
+    },
+    {
+      "id": "ba-1959-21",
+      "sport": "basketball",
+      "category": "vintage",
+      "playerName": "Jalen Duckworth",
+      "team": "Iron Valley Vipers",
+      "year": 1959,
+      "setName": "Fastbreak",
+      "cardNumber": "#370",
+      "rarity": "rare",
+      "price": 4560,
+      "seed": 1679162586,
+      "lore": {
+        "blurb": "A standout from the 1959 Fastbreak run. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "sleeper pick among collectors"
+      }
+    },
+    {
+      "id": "ba-1977-22",
+      "sport": "basketball",
+      "category": "vintage",
+      "playerName": "Sterling Callister",
+      "team": "Pactown Pulse",
+      "year": 1977,
+      "setName": "Fastbreak",
+      "cardNumber": "#308",
+      "rarity": "common",
+      "price": 4028,
+      "seed": 699989270,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Fastbreak. Corners this clean on a card this old are getting hard to find."
+      }
+    },
+    {
+      "id": "ba-1962-23",
+      "sport": "basketball",
+      "category": "vintage",
+      "playerName": "Wes Vane",
+      "team": "Iron Valley Vipers",
+      "year": 1962,
+      "setName": "Crossover",
+      "cardNumber": "#293",
+      "rarity": "common",
+      "price": 3699,
+      "seed": 928589974,
+      "lore": {
+        "blurb": "A standout from the 1962 Crossover run. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run."
+      }
+    },
+    {
+      "id": "ba-1971-24",
+      "sport": "basketball",
+      "category": "vintage",
+      "playerName": "Rufus Marsh",
+      "team": "Ridgeline Rockets",
+      "year": 1971,
+      "setName": "Rim City",
+      "cardNumber": "#126",
+      "rarity": "common",
+      "price": 2605,
+      "seed": 546459490,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Rim City. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "ba-2003-25",
+      "sport": "basketball",
+      "category": "stars",
+      "playerName": "Dayton Vex",
+      "team": "Iron Valley Vipers",
+      "year": 2003,
+      "setName": "Hardwood Elite",
+      "cardNumber": "#56",
+      "rarity": "premium",
+      "price": 11279,
+      "seed": 587803440,
+      "lore": {
+        "blurb": "Dayton Vex's 2003 appearance for the Iron Valley Vipers. A dependable centerpiece for any team collection.",
+        "investmentNote": "undervalued right now"
+      },
+      "foil": true
+    },
+    {
+      "id": "ba-2004-26",
+      "sport": "basketball",
+      "category": "stars",
+      "playerName": "Harlan Cormorant",
+      "team": "Coast Range Cyclones",
+      "year": 2004,
+      "setName": "Rim City",
+      "cardNumber": "#342",
+      "rarity": "premium",
+      "price": 5490,
+      "seed": 412954469,
+      "lore": {
+        "blurb": "A standout from the 2004 Rim City run. A dependable centerpiece for any team collection.",
+        "funFact": "Card shop legend: a mint copy once traded hands for a used lawnmower.",
+        "investmentNote": "blue-chip of this set"
+      },
+      "foil": true
+    },
+    {
+      "id": "ba-1987-27",
+      "sport": "basketball",
+      "category": "stars",
+      "playerName": "Dez Slocum",
+      "team": "Ridgeline Rockets",
+      "year": 1987,
+      "setName": "Hardwood Elite",
+      "cardNumber": "#360",
+      "rarity": "rare",
+      "price": 1728,
+      "seed": 2062166953,
+      "lore": {
+        "blurb": "A standout from the 1987 Hardwood Elite run. A dependable centerpiece for any team collection.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      }
+    },
+    {
+      "id": "ba-1985-28",
+      "sport": "basketball",
+      "category": "stars",
+      "playerName": "Elio Marsh",
+      "team": "Pactown Pulse",
+      "year": 1985,
+      "setName": "Fastbreak",
+      "cardNumber": "#314",
+      "rarity": "rare",
+      "price": 1928,
+      "seed": 1032378510,
+      "lore": {
+        "blurb": "Elio Marsh's 1985 appearance for the Pactown Pulse. A dependable centerpiece for any team collection.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "sleeper pick among collectors"
+      }
+    },
+    {
+      "id": "ba-2004-29",
+      "sport": "basketball",
+      "category": "stars",
+      "playerName": "Flip Pemberton",
+      "team": "Coast Range Cyclones",
+      "year": 2004,
+      "setName": "Fastbreak",
+      "cardNumber": "#373",
+      "rarity": "common",
+      "price": 499,
+      "seed": 1219299027,
+      "lore": {
+        "blurb": "A collector favorite from 2004. A dependable centerpiece for any team collection."
+      }
+    },
+    {
+      "id": "ba-1988-30",
+      "sport": "basketball",
+      "category": "stars",
+      "playerName": "Cal Bellweather",
+      "team": "Coast Range Cyclones",
+      "year": 1988,
+      "setName": "Hardwood Elite",
+      "cardNumber": "#239",
+      "rarity": "common",
+      "price": 509,
+      "seed": 1737490444,
+      "lore": {
+        "blurb": "A standout from the 1988 Hardwood Elite run. A dependable centerpiece for any team collection.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run."
+      }
+    },
+    {
+      "id": "ba-1995-31",
+      "sport": "basketball",
+      "category": "stars",
+      "playerName": "Nico Quill",
+      "team": "Iron Valley Vipers",
+      "year": 1995,
+      "setName": "Crossover",
+      "cardNumber": "#85",
+      "rarity": "common",
+      "price": 1906,
+      "seed": 1896267081,
+      "lore": {
+        "blurb": "A collector favorite from 1995. A dependable centerpiece for any team collection.",
+        "funFact": "The set designer hid their initials in the border pattern."
+      }
+    },
+    {
+      "id": "fo-2019-32",
+      "sport": "football",
+      "category": "rookies",
+      "playerName": "Tomas Pemberton",
+      "team": "Mesa Verde Mustangs",
+      "year": 2019,
+      "setName": "Red Zone",
+      "cardNumber": "#31",
+      "rarity": "rare",
+      "price": 1600,
+      "seed": 1426167751,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Red Zone. Rookie-year cards like this are where collections start.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      }
+    },
+    {
+      "id": "fo-2024-33",
+      "sport": "football",
+      "category": "rookies",
+      "playerName": "Otto Mollusk",
+      "team": "Thornfield Thunder",
+      "year": 2024,
+      "setName": "End Around",
+      "cardNumber": "#131",
+      "rarity": "common",
+      "price": 1785,
+      "seed": 1733257687,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in End Around. Rookie-year cards like this are where collections start.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light."
+      }
+    },
+    {
+      "id": "fo-2022-34",
+      "sport": "football",
+      "category": "rookies",
+      "playerName": "Flip Cormorant",
+      "team": "Mesa Verde Mustangs",
+      "year": 2022,
+      "setName": "Red Zone",
+      "cardNumber": "#174",
+      "rarity": "common",
+      "price": 1024,
+      "seed": 681296779,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Red Zone. Rookie-year cards like this are where collections start.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "fo-2021-35",
+      "sport": "football",
+      "category": "rookies",
+      "playerName": "Dayton Strand",
+      "team": "Mesa Verde Mustangs",
+      "year": 2021,
+      "setName": "Gridiron Vault",
+      "cardNumber": "#16",
+      "rarity": "common",
+      "price": 2820,
+      "seed": 19078511,
+      "lore": {
+        "blurb": "A standout from the 2021 Gridiron Vault run. Rookie-year cards like this are where collections start.",
+        "funFact": "Card shop legend: a mint copy once traded hands for a used lawnmower."
+      }
+    },
+    {
+      "id": "fo-2019-36",
+      "sport": "football",
+      "category": "rookies",
+      "playerName": "Harlan Halloway",
+      "team": "Thornfield Thunder",
+      "year": 2019,
+      "setName": "Red Zone",
+      "cardNumber": "#219",
+      "rarity": "common",
+      "price": 2721,
+      "seed": 1035804661,
+      "lore": {
+        "blurb": "Harlan Halloway's 2019 appearance for the Thornfield Thunder. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "fo-1963-37",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Zeke Vex",
+      "team": "Granite Bay Grizzlies",
+      "year": 1963,
+      "setName": "Gridiron Vault",
+      "cardNumber": "#277",
+      "rarity": "rare",
+      "price": 4324,
+      "seed": 199390172,
+      "lore": {
+        "blurb": "A true vintage piece from 1963. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody.",
+        "investmentNote": "blue-chip of this set"
+      }
+    },
+    {
+      "id": "fo-1962-38",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Otto Grady",
+      "team": "Port Alder Pikes",
+      "year": 1962,
+      "setName": "Red Zone",
+      "cardNumber": "#151",
+      "rarity": "common",
+      "price": 5023,
+      "seed": 1707622190,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Red Zone. Corners this clean on a card this old are getting hard to find."
+      }
+    },
+    {
+      "id": "fo-1965-39",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Jalen Pemberton",
+      "team": "Thornfield Thunder",
+      "year": 1965,
+      "setName": "Red Zone",
+      "cardNumber": "#243",
+      "rarity": "common",
+      "price": 1315,
+      "seed": 1362297606,
+      "lore": {
+        "blurb": "Jalen Pemberton's 1965 appearance for the Thornfield Thunder. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The set designer hid their initials in the border pattern."
+      }
+    },
+    {
+      "id": "fo-1969-40",
+      "sport": "football",
+      "category": "vintage",
+      "playerName": "Cal Fontaine",
+      "team": "Granite Bay Grizzlies",
+      "year": 1969,
+      "setName": "Gridiron Vault",
+      "cardNumber": "#390",
+      "rarity": "common",
+      "price": 3328,
+      "seed": 1241138072,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Gridiron Vault. Corners this clean on a card this old are getting hard to find."
+      }
+    },
+    {
+      "id": "fo-2007-41",
+      "sport": "football",
+      "category": "stars",
+      "playerName": "Zeke Grady",
+      "team": "Port Alder Pikes",
+      "year": 2007,
+      "setName": "Blitz Premium",
+      "cardNumber": "#91",
+      "rarity": "premium",
+      "price": 3784,
+      "seed": 1853566991,
+      "lore": {
+        "blurb": "Zeke Grady's 2007 appearance for the Port Alder Pikes. A dependable centerpiece for any team collection.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      },
+      "foil": true
+    },
+    {
+      "id": "fo-1999-42",
+      "sport": "football",
+      "category": "stars",
+      "playerName": "Flip Marsh",
+      "team": "Mesa Verde Mustangs",
+      "year": 1999,
+      "setName": "End Around",
+      "cardNumber": "#96",
+      "rarity": "premium",
+      "price": 7971,
+      "seed": 1222126189,
+      "lore": {
+        "blurb": "Flip Marsh's 1999 appearance for the Mesa Verde Mustangs. A dependable centerpiece for any team collection.",
+        "investmentNote": "blue-chip of this set"
+      },
+      "foil": true
+    },
+    {
+      "id": "fo-1985-43",
+      "sport": "football",
+      "category": "stars",
+      "playerName": "Ike Halloway",
+      "team": "Port Alder Pikes",
+      "year": 1985,
+      "setName": "Gridiron Vault",
+      "cardNumber": "#94",
+      "rarity": "rare",
+      "price": 2184,
+      "seed": 44511231,
+      "lore": {
+        "blurb": "A collector favorite from 1985. A dependable centerpiece for any team collection.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      }
+    },
+    {
+      "id": "fo-2003-44",
+      "sport": "football",
+      "category": "stars",
+      "playerName": "Jalen Ashby",
+      "team": "Mesa Verde Mustangs",
+      "year": 2003,
+      "setName": "End Around",
+      "cardNumber": "#125",
+      "rarity": "rare",
+      "price": 1799,
+      "seed": 501926978,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in End Around. A dependable centerpiece for any team collection.",
+        "investmentNote": "sleeper pick among collectors"
+      }
+    },
+    {
+      "id": "fo-2000-45",
+      "sport": "football",
+      "category": "stars",
+      "playerName": "Tomas Pemberton",
+      "team": "Mesa Verde Mustangs",
+      "year": 2000,
+      "setName": "End Around",
+      "cardNumber": "#118",
+      "rarity": "common",
+      "price": 512,
+      "seed": 76900053,
+      "lore": {
+        "blurb": "A collector favorite from 2000. A dependable centerpiece for any team collection."
+      }
+    },
+    {
+      "id": "fo-2004-46",
+      "sport": "football",
+      "category": "stars",
+      "playerName": "Harlan Slocum",
+      "team": "Port Alder Pikes",
+      "year": 2004,
+      "setName": "End Around",
+      "cardNumber": "#228",
+      "rarity": "common",
+      "price": 1665,
+      "seed": 831707727,
+      "lore": {
+        "blurb": "A standout from the 2004 End Around run. A dependable centerpiece for any team collection."
+      }
+    },
+    {
+      "id": "fo-1996-47",
+      "sport": "football",
+      "category": "stars",
+      "playerName": "Nico Vex",
+      "team": "Mesa Verde Mustangs",
+      "year": 1996,
+      "setName": "Red Zone",
+      "cardNumber": "#195",
+      "rarity": "common",
+      "price": 2240,
+      "seed": 563475839,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Red Zone. A dependable centerpiece for any team collection.",
+        "funFact": "The set designer hid their initials in the border pattern."
+      }
+    },
+    {
+      "id": "ho-2025-48",
+      "sport": "hockey",
+      "category": "rookies",
+      "playerName": "Nico Duckworth",
+      "team": "North Bend Narwhals",
+      "year": 2025,
+      "setName": "Blue Line",
+      "cardNumber": "#138",
+      "rarity": "rare",
+      "price": 571,
+      "seed": 38693727,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Blue Line. Rookie-year cards like this are where collections start.",
+        "investmentNote": "hype-driven, volatile"
+      }
+    },
+    {
+      "id": "ho-2022-49",
+      "sport": "hockey",
+      "category": "rookies",
+      "playerName": "Cal Marsh",
+      "team": "North Bend Narwhals",
+      "year": 2022,
+      "setName": "Blue Line",
+      "cardNumber": "#312",
+      "rarity": "common",
+      "price": 2509,
+      "seed": 761510615,
+      "lore": {
+        "blurb": "A standout from the 2022 Blue Line run. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ho-2020-50",
+      "sport": "hockey",
+      "category": "rookies",
+      "playerName": "Ike Marsh",
+      "team": "Cedar Rapids Chill",
+      "year": 2020,
+      "setName": "Frozen Pond",
+      "cardNumber": "#376",
+      "rarity": "common",
+      "price": 2709,
+      "seed": 1596698963,
+      "lore": {
+        "blurb": "A standout from the 2020 Frozen Pond run. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ho-2021-51",
+      "sport": "hockey",
+      "category": "rookies",
+      "playerName": "Ike Cormorant",
+      "team": "North Bend Narwhals",
+      "year": 2021,
+      "setName": "Ice Works",
+      "cardNumber": "#100",
+      "rarity": "common",
+      "price": 1778,
+      "seed": 1273989468,
+      "lore": {
+        "blurb": "A collector favorite from 2021. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ho-2022-52",
+      "sport": "hockey",
+      "category": "rookies",
+      "playerName": "Ambrose Ashby",
+      "team": "North Bend Narwhals",
+      "year": 2022,
+      "setName": "Ice Works",
+      "cardNumber": "#331",
+      "rarity": "common",
+      "price": 1363,
+      "seed": 1601409158,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Ice Works. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "ho-1967-53",
+      "sport": "hockey",
+      "category": "vintage",
+      "playerName": "Flip Halloway",
+      "team": "Cedar Rapids Chill",
+      "year": 1967,
+      "setName": "Blue Line",
+      "cardNumber": "#19",
+      "rarity": "rare",
+      "price": 3327,
+      "seed": 705274098,
+      "lore": {
+        "blurb": "A standout from the 1967 Blue Line run. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody.",
+        "investmentNote": "sleeper pick among collectors"
+      }
+    },
+    {
+      "id": "ho-1979-54",
+      "sport": "hockey",
+      "category": "vintage",
+      "playerName": "Tomas Duckworth",
+      "team": "Cedar Rapids Chill",
+      "year": 1979,
+      "setName": "Frozen Pond",
+      "cardNumber": "#377",
+      "rarity": "common",
+      "price": 1146,
+      "seed": 574926351,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Frozen Pond. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The set designer hid their initials in the border pattern."
+      }
+    },
+    {
+      "id": "ho-1978-55",
+      "sport": "hockey",
+      "category": "vintage",
+      "playerName": "Harlan Vex",
+      "team": "Lakemont Lynx",
+      "year": 1978,
+      "setName": "Power Play",
+      "cardNumber": "#88",
+      "rarity": "common",
+      "price": 2678,
+      "seed": 1719127884,
+      "lore": {
+        "blurb": "A true vintage piece from 1978. Corners this clean on a card this old are getting hard to find."
+      }
+    },
+    {
+      "id": "ho-1971-56",
+      "sport": "hockey",
+      "category": "vintage",
+      "playerName": "Otto Duckworth",
+      "team": "North Bend Narwhals",
+      "year": 1971,
+      "setName": "Ice Works",
+      "cardNumber": "#230",
+      "rarity": "common",
+      "price": 4197,
+      "seed": 480456952,
+      "lore": {
+        "blurb": "A true vintage piece from 1971. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "Card shop legend: a mint copy once traded hands for a used lawnmower."
+      }
+    },
+    {
+      "id": "ho-2004-57",
+      "sport": "hockey",
+      "category": "stars",
+      "playerName": "Flip Cormorant",
+      "team": "Frostburg Foxes",
+      "year": 2004,
+      "setName": "Frozen Pond",
+      "cardNumber": "#374",
+      "rarity": "premium",
+      "price": 10620,
+      "seed": 1739152626,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Frozen Pond. A dependable centerpiece for any team collection.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody.",
+        "investmentNote": "hype-driven, volatile"
+      },
+      "foil": true
+    },
+    {
+      "id": "ho-1986-58",
+      "sport": "hockey",
+      "category": "stars",
+      "playerName": "Ambrose Quill",
+      "team": "Lakemont Lynx",
+      "year": 1986,
+      "setName": "Power Play",
+      "cardNumber": "#117",
+      "rarity": "premium",
+      "price": 5866,
+      "seed": 692302041,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Power Play. A dependable centerpiece for any team collection.",
+        "investmentNote": "blue-chip of this set"
+      },
+      "foil": true
+    },
+    {
+      "id": "ho-1987-59",
+      "sport": "hockey",
+      "category": "stars",
+      "playerName": "Wes Quill",
+      "team": "Cedar Rapids Chill",
+      "year": 1987,
+      "setName": "Blue Line",
+      "cardNumber": "#190",
+      "rarity": "rare",
+      "price": 1043,
+      "seed": 99115000,
+      "lore": {
+        "blurb": "A collector favorite from 1987. A dependable centerpiece for any team collection.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "undervalued right now"
+      }
+    },
+    {
+      "id": "ho-2004-60",
+      "sport": "hockey",
+      "category": "stars",
+      "playerName": "Monty Vex",
+      "team": "Cedar Rapids Chill",
+      "year": 2004,
+      "setName": "Ice Works",
+      "cardNumber": "#365",
+      "rarity": "rare",
+      "price": 649,
+      "seed": 560668779,
+      "lore": {
+        "blurb": "A standout from the 2004 Ice Works run. A dependable centerpiece for any team collection.",
+        "funFact": "Card shop legend: a mint copy once traded hands for a used lawnmower.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      }
+    },
+    {
+      "id": "ho-2014-61",
+      "sport": "hockey",
+      "category": "stars",
+      "playerName": "Dayton Grady",
+      "team": "North Bend Narwhals",
+      "year": 2014,
+      "setName": "Frozen Pond",
+      "cardNumber": "#16",
+      "rarity": "common",
+      "price": 1015,
+      "seed": 1229782907,
+      "lore": {
+        "blurb": "Dayton Grady's 2014 appearance for the North Bend Narwhals. A dependable centerpiece for any team collection.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody."
+      }
+    },
+    {
+      "id": "ho-2012-62",
+      "sport": "hockey",
+      "category": "stars",
+      "playerName": "Harlan Ferro",
+      "team": "North Bend Narwhals",
+      "year": 2012,
+      "setName": "Frozen Pond",
+      "cardNumber": "#336",
+      "rarity": "common",
+      "price": 779,
+      "seed": 698578368,
+      "lore": {
+        "blurb": "A collector favorite from 2012. A dependable centerpiece for any team collection."
+      }
+    },
+    {
+      "id": "ho-2004-63",
+      "sport": "hockey",
+      "category": "stars",
+      "playerName": "Zeke Slocum",
+      "team": "North Bend Narwhals",
+      "year": 2004,
+      "setName": "Ice Works",
+      "cardNumber": "#337",
+      "rarity": "common",
+      "price": 1532,
+      "seed": 387403234,
+      "lore": {
+        "blurb": "A standout from the 2004 Ice Works run. A dependable centerpiece for any team collection.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light."
+      }
+    },
+    {
+      "id": "tc-2018-64",
+      "sport": "tcg",
+      "category": "rookies",
+      "playerName": "Ray Vex",
+      "team": "Hollow Star Order",
+      "year": 2018,
+      "setName": "Hollow Stars",
+      "cardNumber": "#219",
+      "rarity": "rare",
+      "price": 1704,
+      "seed": 1908373463,
+      "lore": {
+        "blurb": "A standout from the 2018 Hollow Stars run. Rookie-year cards like this are where collections start.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody.",
+        "investmentNote": "hype-driven, volatile"
+      }
+    },
+    {
+      "id": "tc-2020-65",
+      "sport": "tcg",
+      "category": "rookies",
+      "playerName": "Dez Fontaine",
+      "team": "Tidecaller Guild",
+      "year": 2020,
+      "setName": "Embers & Omens",
+      "cardNumber": "#224",
+      "rarity": "common",
+      "price": 3383,
+      "seed": 720212369,
+      "lore": {
+        "blurb": "A collector favorite from 2020. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "tc-2021-66",
+      "sport": "tcg",
+      "category": "rookies",
+      "playerName": "Flip Duckworth",
+      "team": "Verdant Court",
+      "year": 2021,
+      "setName": "Tidebound",
+      "cardNumber": "#291",
+      "rarity": "common",
+      "price": 2431,
+      "seed": 2133075561,
+      "lore": {
+        "blurb": "A standout from the 2021 Tidebound run. Rookie-year cards like this are where collections start.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light."
+      }
+    },
+    {
+      "id": "tc-2019-67",
+      "sport": "tcg",
+      "category": "rookies",
+      "playerName": "Tomas Vane",
+      "team": "Embermaw Clan",
+      "year": 2019,
+      "setName": "Embers & Omens",
+      "cardNumber": "#218",
+      "rarity": "common",
+      "price": 872,
+      "seed": 262387733,
+      "lore": {
+        "blurb": "A standout from the 2019 Embers & Omens run. Rookie-year cards like this are where collections start."
+      }
+    },
+    {
+      "id": "tc-2025-68",
+      "sport": "tcg",
+      "category": "rookies",
+      "playerName": "Nico Pemberton",
+      "team": "Embermaw Clan",
+      "year": 2025,
+      "setName": "Tidebound",
+      "cardNumber": "#270",
+      "rarity": "common",
+      "price": 1395,
+      "seed": 1302676821,
+      "lore": {
+        "blurb": "A standout from the 2025 Tidebound run. Rookie-year cards like this are where collections start.",
+        "funFact": "Card shop legend: a mint copy once traded hands for a used lawnmower."
+      }
+    },
+    {
+      "id": "tc-1958-69",
+      "sport": "tcg",
+      "category": "vintage",
+      "playerName": "Flip Tanager",
+      "team": "Embermaw Clan",
+      "year": 1958,
+      "setName": "Verdant Rites",
+      "cardNumber": "#234",
+      "rarity": "rare",
+      "price": 3585,
+      "seed": 589814828,
+      "lore": {
+        "blurb": "A true vintage piece from 1958. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "hype-driven, volatile"
+      }
+    },
+    {
+      "id": "tc-1979-70",
+      "sport": "tcg",
+      "category": "vintage",
+      "playerName": "Ike Bellweather",
+      "team": "Embermaw Clan",
+      "year": 1979,
+      "setName": "Tidebound",
+      "cardNumber": "#352",
+      "rarity": "common",
+      "price": 1118,
+      "seed": 2098094397,
+      "lore": {
+        "blurb": "A standout from the 1979 Tidebound run. Corners this clean on a card this old are getting hard to find."
+      }
+    },
+    {
+      "id": "tc-1965-71",
+      "sport": "tcg",
+      "category": "vintage",
+      "playerName": "Otto Vex",
+      "team": "Embermaw Clan",
+      "year": 1965,
+      "setName": "Tidebound",
+      "cardNumber": "#33",
+      "rarity": "common",
+      "price": 2816,
+      "seed": 1965402409,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Tidebound. Corners this clean on a card this old are getting hard to find.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "tc-1963-72",
+      "sport": "tcg",
+      "category": "vintage",
+      "playerName": "Monty Okafor-Reyes",
+      "team": "Verdant Court",
+      "year": 1963,
+      "setName": "Embers & Omens",
+      "cardNumber": "#328",
+      "rarity": "common",
+      "price": 2503,
+      "seed": 1096348816,
+      "lore": {
+        "blurb": "A standout from the 1963 Embers & Omens run. Corners this clean on a card this old are getting hard to find."
+      }
+    },
+    {
+      "id": "tc-1988-73",
+      "sport": "tcg",
+      "category": "stars",
+      "playerName": "Ambrose Vane",
+      "team": "Embermaw Clan",
+      "year": 1988,
+      "setName": "Embers & Omens",
+      "cardNumber": "#283",
+      "rarity": "premium",
+      "price": 4789,
+      "seed": 1263225944,
+      "lore": {
+        "blurb": "A collector favorite from 1988. A dependable centerpiece for any team collection.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run.",
+        "investmentNote": "blue-chip of this set"
+      },
+      "foil": true
+    },
+    {
+      "id": "tc-2013-74",
+      "sport": "tcg",
+      "category": "stars",
+      "playerName": "Rufus Okafor-Reyes",
+      "team": "Embermaw Clan",
+      "year": 2013,
+      "setName": "Embers & Omens",
+      "cardNumber": "#346",
+      "rarity": "premium",
+      "price": 7888,
+      "seed": 169395126,
+      "lore": {
+        "blurb": "A standout from the 2013 Embers & Omens run. A dependable centerpiece for any team collection.",
+        "investmentNote": "hype-driven, volatile"
+      },
+      "foil": true
+    },
+    {
+      "id": "tc-1988-75",
+      "sport": "tcg",
+      "category": "stars",
+      "playerName": "Wes Cormorant",
+      "team": "Hollow Star Order",
+      "year": 1988,
+      "setName": "Embers & Omens",
+      "cardNumber": "#153",
+      "rarity": "rare",
+      "price": 1760,
+      "seed": 253189514,
+      "lore": {
+        "blurb": "Wes Cormorant's 1988 appearance for the Hollow Star Order. A dependable centerpiece for any team collection.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run.",
+        "investmentNote": "hype-driven, volatile"
+      }
+    },
+    {
+      "id": "tc-1989-76",
+      "sport": "tcg",
+      "category": "stars",
+      "playerName": "Elio Marsh",
+      "team": "Embermaw Clan",
+      "year": 1989,
+      "setName": "Tidebound",
+      "cardNumber": "#69",
+      "rarity": "rare",
+      "price": 1408,
+      "seed": 703291023,
+      "lore": {
+        "blurb": "A collector favorite from 1989. A dependable centerpiece for any team collection.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "hype-driven, volatile"
+      }
+    },
+    {
+      "id": "tc-2004-77",
+      "sport": "tcg",
+      "category": "stars",
+      "playerName": "Otto Marsh",
+      "team": "Tidecaller Guild",
+      "year": 2004,
+      "setName": "Embers & Omens",
+      "cardNumber": "#172",
+      "rarity": "common",
+      "price": 2403,
+      "seed": 1691589925,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Embers & Omens. A dependable centerpiece for any team collection.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light."
+      }
+    },
+    {
+      "id": "tc-2002-78",
+      "sport": "tcg",
+      "category": "stars",
+      "playerName": "Ray Fontaine",
+      "team": "Verdant Court",
+      "year": 2002,
+      "setName": "Verdant Rites",
+      "cardNumber": "#319",
+      "rarity": "common",
+      "price": 961,
+      "seed": 1233136036,
+      "lore": {
+        "blurb": "A standout from the 2002 Verdant Rites run. A dependable centerpiece for any team collection.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody."
+      }
+    },
+    {
+      "id": "tc-2009-79",
+      "sport": "tcg",
+      "category": "stars",
+      "playerName": "Ike Ferro",
+      "team": "Tidecaller Guild",
+      "year": 2009,
+      "setName": "Embers & Omens",
+      "cardNumber": "#183",
+      "rarity": "common",
+      "price": 1973,
+      "seed": 376582139,
+      "lore": {
+        "blurb": "A collector favorite from 2009. A dependable centerpiece for any team collection."
+      }
+    },
+    {
+      "id": "tc-2001-80",
+      "sport": "tcg",
+      "category": "graded-slabs",
+      "playerName": "Harlan Cormorant",
+      "team": "Embermaw Clan",
+      "year": 2001,
+      "setName": "Hollow Stars",
+      "cardNumber": "#152",
+      "rarity": "graded",
+      "price": 21203,
+      "seed": 1367614238,
+      "lore": {
+        "blurb": "A standout from the 2001 Hollow Stars run. Professionally graded and sealed — the real deal.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light.",
+        "investmentNote": "hype-driven, volatile"
+      },
+      "featured": true,
+      "grade": {
+        "company": "BGS",
+        "value": 7,
+        "label": "BGS 7"
+      }
+    },
+    {
+      "id": "fo-2000-81",
+      "sport": "football",
+      "category": "graded-slabs",
+      "playerName": "Nico Fontaine",
+      "team": "Port Alder Pikes",
+      "year": 2000,
+      "setName": "Gridiron Vault",
+      "cardNumber": "#317",
+      "rarity": "graded",
+      "price": 35836,
+      "seed": 2016476937,
+      "lore": {
+        "blurb": "A standout from the 2000 Gridiron Vault run. Professionally graded and sealed — the real deal.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find.",
+        "investmentNote": "sleeper pick among collectors"
+      },
+      "featured": true,
+      "grade": {
+        "company": "BGS",
+        "value": 7,
+        "label": "BGS 7"
+      }
+    },
+    {
+      "id": "tc-1999-82",
+      "sport": "tcg",
+      "category": "graded-slabs",
+      "playerName": "Otto Marsh",
+      "team": "Verdant Court",
+      "year": 1999,
+      "setName": "Embers & Omens",
+      "cardNumber": "#289",
+      "rarity": "graded",
+      "price": 48382,
+      "seed": 701317414,
+      "lore": {
+        "blurb": "A standout from the 1999 Embers & Omens run. Professionally graded and sealed — the real deal.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "sleeper pick among collectors"
+      },
+      "featured": true,
+      "grade": {
+        "company": "PSA",
+        "value": 7,
+        "label": "PSA 7"
+      }
+    },
+    {
+      "id": "ba-1989-83",
+      "sport": "basketball",
+      "category": "graded-slabs",
+      "playerName": "Rufus Marsh",
+      "team": "Ridgeline Rockets",
+      "year": 1989,
+      "setName": "Hardwood Elite",
+      "cardNumber": "#319",
+      "rarity": "graded",
+      "price": 49923,
+      "seed": 770499422,
+      "lore": {
+        "blurb": "A standout from the 1989 Hardwood Elite run. Professionally graded and sealed — the real deal.",
+        "funFact": "The set designer hid their initials in the border pattern.",
+        "investmentNote": "sleeper pick among collectors"
+      },
+      "featured": true,
+      "grade": {
+        "company": "BGS",
+        "value": 8,
+        "label": "BGS 8"
+      }
+    },
+    {
+      "id": "ba-1991-84",
+      "sport": "basketball",
+      "category": "graded-slabs",
+      "playerName": "Rufus Slocum",
+      "team": "Pactown Pulse",
+      "year": 1991,
+      "setName": "Fastbreak",
+      "cardNumber": "#371",
+      "rarity": "graded",
+      "price": 40814,
+      "seed": 1783564670,
+      "lore": {
+        "blurb": "A standout from the 1991 Fastbreak run. Professionally graded and sealed — the real deal.",
+        "funFact": "The photographer caught this shot during a rain delay, which is why the lighting looks moody.",
+        "investmentNote": "sleeper pick among collectors"
+      },
+      "featured": true,
+      "grade": {
+        "company": "BGS",
+        "value": 10,
+        "label": "BGS 10 GEM MINT"
+      }
+    },
+    {
+      "id": "ba-2013-85",
+      "sport": "baseball",
+      "category": "graded-slabs",
+      "playerName": "Ray Pemberton",
+      "team": "Salt Flat Sliders",
+      "year": 2013,
+      "setName": "Dugout Heroes",
+      "cardNumber": "#93",
+      "rarity": "graded",
+      "price": 39886,
+      "seed": 2082484595,
+      "lore": {
+        "blurb": "Ray Pemberton's 2013 appearance for the Salt Flat Sliders. Professionally graded and sealed — the real deal.",
+        "investmentNote": "blue-chip of this set"
+      },
+      "featured": true,
+      "grade": {
+        "company": "BGS",
+        "value": 9,
+        "label": "BGS 9 MINT"
+      }
+    },
+    {
+      "id": "ho-2014-86",
+      "sport": "hockey",
+      "category": "graded-slabs",
+      "playerName": "Elio Ashby",
+      "team": "Frostburg Foxes",
+      "year": 2014,
+      "setName": "Ice Works",
+      "cardNumber": "#32",
+      "rarity": "premium",
+      "price": 11917,
+      "seed": 42117183,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Ice Works. Professionally graded and sealed — the real deal.",
+        "investmentNote": "hype-driven, volatile"
+      },
+      "foil": true,
+      "featured": true
+    },
+    {
+      "id": "ba-2000-87",
+      "sport": "basketball",
+      "category": "graded-slabs",
+      "playerName": "Ike Mollusk",
+      "team": "Ridgeline Rockets",
+      "year": 2000,
+      "setName": "Crossover",
+      "cardNumber": "#287",
+      "rarity": "premium",
+      "price": 7283,
+      "seed": 1920957617,
+      "lore": {
+        "blurb": "A collector favorite from 2000. Professionally graded and sealed — the real deal.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run.",
+        "investmentNote": "peaked in the 90s, holding steady"
+      },
+      "foil": true,
+      "featured": true
+    },
+    {
+      "id": "ba-1985-88",
+      "sport": "baseball",
+      "category": "graded-slabs",
+      "playerName": "Bo Bellweather",
+      "team": "Bluff Creek Badgers",
+      "year": 1985,
+      "setName": "Pennant Craze",
+      "cardNumber": "#133",
+      "rarity": "premium",
+      "price": 12158,
+      "seed": 986726134,
+      "lore": {
+        "blurb": "A standout from the 1985 Pennant Craze run. Professionally graded and sealed — the real deal.",
+        "investmentNote": "hype-driven, volatile"
+      },
+      "foil": true,
+      "featured": true
+    },
+    {
+      "id": "ho-1988-89",
+      "sport": "hockey",
+      "category": "graded-slabs",
+      "playerName": "Zeke Duckworth",
+      "team": "North Bend Narwhals",
+      "year": 1988,
+      "setName": "Frozen Pond",
+      "cardNumber": "#51",
+      "rarity": "premium",
+      "price": 13842,
+      "seed": 1745691574,
+      "lore": {
+        "blurb": "A collector favorite from 1988. Professionally graded and sealed — the real deal.",
+        "investmentNote": "undervalued right now"
+      },
+      "foil": true,
+      "featured": true
+    },
+    {
+      "id": "fo-1999-90",
+      "sport": "football",
+      "category": "budget-box",
+      "playerName": "Ray Vex",
+      "team": "Mesa Verde Mustangs",
+      "year": 1999,
+      "setName": "Red Zone",
+      "cardNumber": "#242",
+      "rarity": "common",
+      "price": 86,
+      "seed": 1109816617,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Red Zone. Nothing fancy, but every binder needs its role players.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "ba-1990-91",
+      "sport": "baseball",
+      "category": "budget-box",
+      "playerName": "Ike Vane",
+      "team": "Salt Flat Sliders",
+      "year": 1990,
+      "setName": "Summit",
+      "cardNumber": "#144",
+      "rarity": "common",
+      "price": 166,
+      "seed": 1478889686,
+      "lore": {
+        "blurb": "Ike Vane's 1990 appearance for the Salt Flat Sliders. Nothing fancy, but every binder needs its role players."
+      }
+    },
+    {
+      "id": "tc-2005-92",
+      "sport": "tcg",
+      "category": "budget-box",
+      "playerName": "Nico Okafor-Reyes",
+      "team": "Verdant Court",
+      "year": 2005,
+      "setName": "Verdant Rites",
+      "cardNumber": "#106",
+      "rarity": "common",
+      "price": 131,
+      "seed": 1461413200,
+      "lore": {
+        "blurb": "A collector favorite from 2005. Nothing fancy, but every binder needs its role players.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "tc-1988-93",
+      "sport": "tcg",
+      "category": "budget-box",
+      "playerName": "Jalen Duckworth",
+      "team": "Verdant Court",
+      "year": 1988,
+      "setName": "Hollow Stars",
+      "cardNumber": "#218",
+      "rarity": "common",
+      "price": 256,
+      "seed": 186771738,
+      "lore": {
+        "blurb": "A collector favorite from 1988. Nothing fancy, but every binder needs its role players.",
+        "funFact": "Rumor says a warehouse flood destroyed half this print run."
+      }
+    },
+    {
+      "id": "ho-1999-94",
+      "sport": "hockey",
+      "category": "budget-box",
+      "playerName": "Ambrose Ferro",
+      "team": "Cedar Rapids Chill",
+      "year": 1999,
+      "setName": "Frozen Pond",
+      "cardNumber": "#79",
+      "rarity": "common",
+      "price": 270,
+      "seed": 950042478,
+      "lore": {
+        "blurb": "A collector favorite from 1999. Nothing fancy, but every binder needs its role players."
+      }
+    },
+    {
+      "id": "ba-1993-95",
+      "sport": "baseball",
+      "category": "budget-box",
+      "playerName": "Flip Vex",
+      "team": "Harbor City Herons",
+      "year": 1993,
+      "setName": "Pennant Craze",
+      "cardNumber": "#173",
+      "rarity": "common",
+      "price": 350,
+      "seed": 1935632562,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Pennant Craze. Nothing fancy, but every binder needs its role players."
+      }
+    },
+    {
+      "id": "ho-1992-96",
+      "sport": "hockey",
+      "category": "budget-box",
+      "playerName": "Zeke Bellweather",
+      "team": "Lakemont Lynx",
+      "year": 1992,
+      "setName": "Ice Works",
+      "cardNumber": "#265",
+      "rarity": "common",
+      "price": 138,
+      "seed": 1831085736,
+      "lore": {
+        "blurb": "A collector favorite from 1992. Nothing fancy, but every binder needs its role players.",
+        "funFact": "The set designer hid their initials in the border pattern."
+      }
+    },
+    {
+      "id": "ba-2001-97",
+      "sport": "basketball",
+      "category": "budget-box",
+      "playerName": "Ray Callister",
+      "team": "Ridgeline Rockets",
+      "year": 2001,
+      "setName": "Hardwood Elite",
+      "cardNumber": "#42",
+      "rarity": "common",
+      "price": 198,
+      "seed": 1755516892,
+      "lore": {
+        "blurb": "A standout from the 2001 Hardwood Elite run. Nothing fancy, but every binder needs its role players."
+      }
+    },
+    {
+      "id": "ho-1994-98",
+      "sport": "hockey",
+      "category": "budget-box",
+      "playerName": "Monty Vex",
+      "team": "Lakemont Lynx",
+      "year": 1994,
+      "setName": "Blue Line",
+      "cardNumber": "#38",
+      "rarity": "common",
+      "price": 349,
+      "seed": 1239285963,
+      "lore": {
+        "blurb": "A collector favorite from 1994. Nothing fancy, but every binder needs its role players.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light."
+      }
+    },
+    {
+      "id": "ho-2001-99",
+      "sport": "hockey",
+      "category": "budget-box",
+      "playerName": "Bo Vane",
+      "team": "Frostburg Foxes",
+      "year": 2001,
+      "setName": "Blue Line",
+      "cardNumber": "#315",
+      "rarity": "common",
+      "price": 153,
+      "seed": 1643716454,
+      "lore": {
+        "blurb": "A collector favorite from 2001. Nothing fancy, but every binder needs its role players."
+      }
+    },
+    {
+      "id": "tc-2004-100",
+      "sport": "tcg",
+      "category": "budget-box-b",
+      "playerName": "Flip Duckworth",
+      "team": "Verdant Court",
+      "year": 2004,
+      "setName": "Verdant Rites",
+      "cardNumber": "#392",
+      "rarity": "common",
+      "price": 135,
+      "seed": 38498915,
+      "lore": {
+        "blurb": "A standout from the 2004 Verdant Rites run. A dollar-bin diamond if you squint.",
+        "funFact": "Card shop legend: a mint copy once traded hands for a used lawnmower."
+      }
+    },
+    {
+      "id": "ba-1993-101",
+      "sport": "basketball",
+      "category": "budget-box-b",
+      "playerName": "Marcus Grady",
+      "team": "Iron Valley Vipers",
+      "year": 1993,
+      "setName": "Crossover",
+      "cardNumber": "#254",
+      "rarity": "common",
+      "price": 189,
+      "seed": 223904024,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Crossover. A dollar-bin diamond if you squint.",
+        "funFact": "Print runs from this year are notorious for off-center cuts — a well-centered copy is a find."
+      }
+    },
+    {
+      "id": "fo-1990-102",
+      "sport": "football",
+      "category": "budget-box-b",
+      "playerName": "Harlan Halloway",
+      "team": "Mesa Verde Mustangs",
+      "year": 1990,
+      "setName": "Blitz Premium",
+      "cardNumber": "#101",
+      "rarity": "common",
+      "price": 218,
+      "seed": 229219648,
+      "lore": {
+        "blurb": "Harlan Halloway's 1990 appearance for the Mesa Verde Mustangs. A dollar-bin diamond if you squint."
+      }
+    },
+    {
+      "id": "ba-1993-103",
+      "sport": "basketball",
+      "category": "budget-box-b",
+      "playerName": "Harlan Strand",
+      "team": "Ridgeline Rockets",
+      "year": 1993,
+      "setName": "Hardwood Elite",
+      "cardNumber": "#309",
+      "rarity": "common",
+      "price": 284,
+      "seed": 1154334862,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Hardwood Elite. A dollar-bin diamond if you squint.",
+        "funFact": "The set designer hid their initials in the border pattern."
+      }
+    },
+    {
+      "id": "tc-2001-104",
+      "sport": "tcg",
+      "category": "budget-box-b",
+      "playerName": "Ambrose Ferro",
+      "team": "Tidecaller Guild",
+      "year": 2001,
+      "setName": "Tidebound",
+      "cardNumber": "#361",
+      "rarity": "common",
+      "price": 194,
+      "seed": 467813546,
+      "lore": {
+        "blurb": "Ambrose Ferro's 2001 appearance for the Tidecaller Guild. A dollar-bin diamond if you squint."
+      }
+    },
+    {
+      "id": "fo-1993-105",
+      "sport": "football",
+      "category": "budget-box-b",
+      "playerName": "Harlan Duckworth",
+      "team": "Mesa Verde Mustangs",
+      "year": 1993,
+      "setName": "Blitz Premium",
+      "cardNumber": "#393",
+      "rarity": "common",
+      "price": 51,
+      "seed": 395925204,
+      "lore": {
+        "blurb": "Harlan Duckworth's 1993 appearance for the Mesa Verde Mustangs. A dollar-bin diamond if you squint."
+      }
+    },
+    {
+      "id": "tc-2000-106",
+      "sport": "tcg",
+      "category": "budget-box-b",
+      "playerName": "Jalen Grady",
+      "team": "Verdant Court",
+      "year": 2000,
+      "setName": "Verdant Rites",
+      "cardNumber": "#229",
+      "rarity": "common",
+      "price": 66,
+      "seed": 1918699685,
+      "lore": {
+        "blurb": "A collector favorite from 2000. A dollar-bin diamond if you squint.",
+        "funFact": "This set introduced the foil stamp that every kid tried to tilt under the light."
+      }
+    },
+    {
+      "id": "tc-1996-107",
+      "sport": "tcg",
+      "category": "budget-box-b",
+      "playerName": "Ike Ashby",
+      "team": "Tidecaller Guild",
+      "year": 1996,
+      "setName": "Verdant Rites",
+      "cardNumber": "#231",
+      "rarity": "common",
+      "price": 328,
+      "seed": 107942329,
+      "lore": {
+        "blurb": "Ike Ashby's 1996 appearance for the Tidecaller Guild. A dollar-bin diamond if you squint."
+      }
+    },
+    {
+      "id": "ba-2000-108",
+      "sport": "baseball",
+      "category": "budget-box-b",
+      "playerName": "Rufus Quill",
+      "team": "Salt Flat Sliders",
+      "year": 2000,
+      "setName": "Dugout Heroes",
+      "cardNumber": "#270",
+      "rarity": "common",
+      "price": 244,
+      "seed": 1626731359,
+      "lore": {
+        "blurb": "One of the more talked-about pulls in Dugout Heroes. A dollar-bin diamond if you squint."
+      }
+    },
+    {
+      "id": "ba-2011-109",
+      "sport": "basketball",
+      "category": "budget-box-b",
+      "playerName": "Wes Brisket",
+      "team": "Coast Range Cyclones",
+      "year": 2011,
+      "setName": "Crossover",
+      "cardNumber": "#21",
+      "rarity": "common",
+      "price": 278,
+      "seed": 1099351091,
+      "lore": {
+        "blurb": "A standout from the 2011 Crossover run. A dollar-bin diamond if you squint."
+      }
+    }
+  ]
+}
