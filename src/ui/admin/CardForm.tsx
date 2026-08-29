@@ -174,7 +174,14 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           </label>
           <label>
             Sport
-            <select value={card.sport} onChange={(e) => patch({ sport: e.target.value as Card['sport'] })}>
+            <select
+              value={card.sport}
+              onChange={(e) => {
+                const sport = e.target.value as Card['sport'];
+                // a new card's generated id carries the sport prefix — keep it in step until first save
+                patch(isNew ? { sport, id: newCardId(sport) } : { sport });
+              }}
+            >
               {SPORTS.map((s) => (
                 <option key={s}>{s}</option>
               ))}

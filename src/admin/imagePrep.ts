@@ -19,10 +19,31 @@ async function decodeNative(file: Blob): Promise<ImageBitmap | null> {
   }
 }
 
-async function decodeHeic(file: File): Promise<Blob> {
-  const { default: heic2any } = await import('heic2any');
-  const out = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.95 });
-  return Array.isArray(out) ? out[0] : out;
+/**
+ * HEIC → bitmap. Two WASM decoders in a chain: heic-to (libheif 1.19 — handles newer iPhone
+ * variants: 48 MP, 10-bit, multi-image) first, heic2any (older libheif) as a fallback.
+ * Both are lazy chunks; only the first HEIC pays for the load.
+ */
+async function decodeHeic(file: File): Promise<ImageBitmap> {
+  const errors: string[] = [];
+  try {
+    const { heicTo } = await import('heic-to');
+    return await heicTo({ blob: file, type: 'bitmap' });
+  } catch (e) {
+    errors.push(`heic-to: ${(e as Error).message ?? e}`);
+  }
+  try {
+    const { default: heic2any } = await import('heic2any');
+    const out = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.95 });
+    const bmp = await decodeNative(Array.isArray(out) ? out[0] : out);
+    if (bmp) return bmp;
+    errors.push('heic2any: produced an unreadable JPEG');
+  } catch (e) {
+    const err = e as { message?: string; code?: number };
+    errors.push(`heic2any: ${err.message ?? err.code ?? e}`);
+  }
+  console.warn('[imagePrep] HEIC decode failed', errors);
+  throw new Error(`Couldn't decode this HEIC (${errors[0]}). Workaround: in Photos, File → Export → Export 1 Photo as JPEG, then drop that.`);
 }
 
 /** Any dropped image → a ≤1600px JPEG File. Throws a readable error for non-images. */
@@ -31,7 +52,7 @@ export async function prepareScan(file: File, onStage?: (s: string) => void): Pr
   let bitmap = await decodeNative(file);
   if (!bitmap && isHeic(file)) {
     onStage?.('converting HEIC…');
-    bitmap = await decodeNative(await decodeHeic(file));
+    bitmap = await decodeHeic(file);
   }
   if (!bitmap) throw new Error(`Couldn't read "${file.name}".`);
   onStage?.('resizing…');
