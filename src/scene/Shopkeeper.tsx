@@ -43,7 +43,8 @@ export function Shopkeeper() {
   const headRest = useRef(new THREE.Quaternion());
   const look = useRef({ yaw: 0, pitch: 0 });
 
-  // shadows, no frustum-culling on the skinned mesh (its bounds don't follow the animation), find the head bone
+  // shadows, no frustum-culling on the skinned mesh (its bounds don't follow the animation),
+  // sanitize Meshy materials, find the head bone
   useEffect(() => {
     scene.traverse((o) => {
       if ((o as THREE.Mesh).isMesh) {
@@ -51,6 +52,24 @@ export function Shopkeeper() {
         m.castShadow = true;
         m.receiveShadow = true;
         m.frustumCulled = false;
+        // Meshy exports parts (cap, hair, shirt seams) as alpha-BLEND, which
+        // don't write depth → faces sort by draw order and tear from some
+        // angles. Force opaque with depth-write; convert any real cutout
+        // (hair) to alphaTest. Also tame the over-shiny PBR that blows out
+        // under the shop's env lighting.
+        const mats = Array.isArray(m.material) ? m.material : [m.material];
+        for (const mat of mats) {
+          const s = mat as THREE.MeshStandardMaterial;
+          if (s.transparent) {
+            s.transparent = false;
+            s.alphaTest = 0.5; // blend → cutout, keeps hair edges
+          }
+          s.depthWrite = true;
+          s.side = THREE.FrontSide;
+          if (s.roughness !== undefined) s.roughness = Math.max(s.roughness, 0.65);
+          if (s.metalness !== undefined) s.metalness = Math.min(s.metalness, 0.05);
+          s.needsUpdate = true;
+        }
       }
       if ((o as THREE.Bone).isBone && o.name === 'Head') headBone.current = o as THREE.Bone;
     });

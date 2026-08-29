@@ -35,7 +35,7 @@ function NavEffects() {
     const ui = useUIStore.getState();
     const dlg = useDialogueStore.getState();
     if (currentStation === 'entry' && prev === 'outside') {
-      dlg.greet(); // Mel says hello in-world (speech bubble) as you walk in
+      dlg.greet(); // Chris says hello in-world (speech bubble) as you walk in
     }
     if (currentStation === 'counter') {
       if (ui.checkoutPhase === 'browsing') ui.setPhase('atCounter');

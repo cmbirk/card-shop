@@ -26,7 +26,7 @@ export function ChatWindow() {
   return (
     <div className="chat-window">
       <div className="chat-header">
-        <span>Mel — GEM</span>
+        <span>Chris — GEM</span>
         <button onClick={() => useDialogueStore.getState().close()} title="Close">✕</button>
       </div>
       <div className="chat-messages" ref={scrollRef}>
@@ -59,7 +59,7 @@ export function ChatWindow() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask Mel anything…"
+          placeholder="Ask Chris anything…"
           disabled={isStreaming}
         />
         <button className="btn" type="submit" disabled={isStreaming || !input.trim()}>

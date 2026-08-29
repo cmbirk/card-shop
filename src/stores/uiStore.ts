@@ -22,20 +22,25 @@ export const useUIStore = create<UIState>((set, get) => ({
   soldIds: [],
   lastReceipt: null,
   tantrumCount: 0,
-  setPhase: (p) => set({ checkoutPhase: p }),
-  completePurchase: (items, total) =>
+  setPhase: (p) => {
+    if (p === 'reviewing') useDialogueStore.getState().gesture$('nod'); // Chris nods you toward the register
+    set({ checkoutPhase: p });
+  },
+  completePurchase: (items, total) => {
+    useDialogueStore.getState().gesture$('checkout'); // rings it up
     set((s) => ({
       soldIds: [...s.soldIds, ...items],
       lastReceipt: { items, total },
       checkoutPhase: 'receipt',
-    })),
+    }));
+  },
   dismissReceipt: () => set({ checkoutPhase: 'atCounter', lastReceipt: null }),
   tantrum: () => {
     set({ checkoutPhase: 'browsing', tantrumCount: get().tantrumCount + 1 });
     sfx.tantrum();
-    useDialogueStore
-      .getState()
-      .say("Whoa hey — easy on the merchandise, friend! …No harm done, I'll restock 'em. Come back when the wallet's feeling braver.");
+    const dlg = useDialogueStore.getState();
+    dlg.gesture$('shrug'); // oh well
+    dlg.say("Whoa hey — easy on the merchandise, friend! …No harm done, I'll restock 'em. Come back when the wallet's feeling braver.");
     setTimeout(() => useNavStore.getState().goTo('outside'), 1400);
     setTimeout(() => useBasketStore.getState().clear(), 2800);
   },

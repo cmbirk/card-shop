@@ -100,7 +100,7 @@ export function CheckoutModal() {
               <span>TOTAL</span>
               <span>{formatCents(receipt.total)}</span>
             </div>
-            <div className="r-center">Come again soon — Mel</div>
+            <div className="r-center">Come again soon — Chris</div>
           </div>
           <div className="modal-actions">
             <button className="btn" onClick={() => useUIStore.getState().dismissReceipt()}>

@@ -45,7 +45,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
         {
           role: 'assistant' as const,
           content:
-            "Hey there, welcome to GEM! Name's Mel. Browse all you like — holler if you want to know what something's worth, or bring your basket up when you're ready.",
+            "Hey there, welcome to GEM! Name's Chris. Browse all you like — holler if you want to know what something's worth, or bring your basket up when you're ready.",
         },
       ],
     }));
@@ -78,7 +78,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
       set((s) => ({
         messages: [
           ...s.messages,
-          { role: 'assistant', content: "*(Mel is wrestling with the register — the intercom's out. Try me again in a minute.)*" },
+          { role: 'assistant', content: "*(Chris is wrestling with the register — the intercom's out. Try me again in a minute.)*" },
         ],
         streamingText: '',
         isStreaming: false,
