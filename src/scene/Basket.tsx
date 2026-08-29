@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { CARD_SIZE } from '@shared/data/shopLayout';
@@ -8,108 +8,158 @@ import { useUIStore } from '../stores/uiStore';
 import { inventoryById } from '../systems/inventory';
 import { getCardVisual } from './cards/atlas';
 import { mulberry32, spread } from '../systems/rng';
-import { FEEL } from '../feel';
 
-const wireMat = new THREE.MeshStandardMaterial({ color: '#7a5a3f', roughness: 0.6, metalness: 0.3 });
-const rimMat = new THREE.MeshStandardMaterial({ color: '#5c4033', roughness: 0.7 });
+// A woven shopping basket rigidly pinned to the bottom-right of the view
+// (no damped follow, so it never floats) and tilted toward the viewer so
+// you can see what's inside. Lives in the main scene so it composes with
+// postprocessing (a separate HUD pass would be painted over by the composer).
 
-const _target = new THREE.Vector3();
-const _quat = new THREE.Quaternion();
+function makeWeaveTexture(): THREE.CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 128;
+  c.height = 128;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#8a5a34';
+  ctx.fillRect(0, 0, 128, 128);
+  const s = 16;
+  for (let y = 0; y < 128; y += s) {
+    for (let x = 0; x < 128; x += s) {
+      const horiz = ((x / s + y / s) & 1) === 0;
+      ctx.fillStyle = horiz ? '#9c6a3e' : '#79492a';
+      ctx.fillRect(x + 1, y + 1, s - 2, s - 2);
+      ctx.fillStyle = 'rgba(255,225,180,0.18)';
+      if (horiz) ctx.fillRect(x + 1, y + 2, s - 2, 3);
+      else ctx.fillRect(x + 2, y + 1, 3, s - 2);
+      ctx.fillStyle = 'rgba(40,20,8,0.35)';
+      ctx.fillRect(x, y, s, 1);
+      ctx.fillRect(x, y, 1, s);
+    }
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(6, 2);
+  tex.anisotropy = 4;
+  return tex;
+}
 
-/** The hand basket — follows the camera with a lag so it swings on glides. */
-export function Basket3D() {
-  const group = useRef<THREE.Group>(null!);
+const rimMat = new THREE.MeshStandardMaterial({ color: '#5c3a20', roughness: 0.55, metalness: 0.05 });
+
+function BasketMesh() {
   const items = useBasketStore((s) => s.items);
-  const tantrumCount = useUIStore((s) => s.tantrumCount);
-  const throwState = useRef({ seen: 0, active: false, t: 0, start: new THREE.Vector3(), floor: new THREE.Vector3() });
-  const visible = items.slice(0, 6);
+  const weave = useMemo(() => makeWeaveTexture(), []);
+  const bodyMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ map: weave, roughness: 0.8, side: THREE.DoubleSide }),
+    [weave],
+  );
+
+  const visible = items.slice(0, 7);
   const overflow = items.length - visible.length;
 
-  useFrame((state, dt) => {
-    const g = group.current;
-    if (!g) return;
-    const cam = state.camera;
-    const ts = throwState.current;
-
-    // customer stormed off — basket gets hurled to the floor
-    if (tantrumCount !== ts.seen) {
-      ts.seen = tantrumCount;
-      ts.active = true;
-      ts.t = 0;
-      ts.start.copy(g.position);
-      cam.getWorldDirection(_target);
-      ts.floor.set(cam.position.x + _target.x * 0.9, 0.06, cam.position.z + _target.z * 0.9);
-    }
-    if (ts.active) {
-      ts.t += dt / 0.55;
-      const k = Math.min(ts.t, 1);
-      g.position.lerpVectors(ts.start, ts.floor, k * k); // accelerating throw-down
-      g.rotation.set(0, g.rotation.y, k * 1.9); // tips over on impact
-      if (useBasketStore.getState().items.length === 0) {
-        // Mel restocked — basket back in hand on the way out
-        ts.active = false;
-        g.rotation.set(0, 0, 0);
-      }
-      return;
-    }
-
-    _target
-      .set(FEEL.basketAnchor[0], FEEL.basketAnchor[1], FEEL.basketAnchor[2])
-      .applyQuaternion(cam.quaternion)
-      .add(cam.position);
-    // damped follow — the lag IS the charm
-    g.position.x = THREE.MathUtils.damp(g.position.x, _target.x, FEEL.basketLambda, dt);
-    g.position.y = THREE.MathUtils.damp(g.position.y, _target.y, FEEL.basketLambda, dt);
-    g.position.z = THREE.MathUtils.damp(g.position.z, _target.z, FEEL.basketLambda, dt);
-    _quat.copy(cam.quaternion);
-    g.quaternion.slerp(_quat, 1 - Math.exp(-FEEL.basketLambda * dt));
-  });
-
+  // cards stand upright, fanned, faces toward the viewer
   const minis = useMemo(
     () =>
       visible.map((id, i) => {
-        const rand = mulberry32(inventoryById.get(id)!.seed + 3);
+        const rand = mulberry32((inventoryById.get(id)?.seed ?? i) + 3);
+        const t = visible.length === 1 ? 0 : i / (visible.length - 1) - 0.5;
         return {
           id,
-          x: (i - (visible.length - 1) / 2) * 0.02,
-          z: -0.02 + i * 0.008,
-          rot: [-1.15 + spread(rand) * 0.1, spread(rand) * 0.15, spread(rand) * 0.2] as [number, number, number],
+          x: t * 0.055,
+          y: 0.04 - Math.abs(t) * 0.004, // stand up out of the basket
+          z: -0.014 + i * 0.004,
+          // counter the basket's forward tilt so faces point at the viewer, fanned
+          rot: [0.52 + spread(rand) * 0.04, t * 0.4 + spread(rand) * 0.05, spread(rand) * 0.02] as [number, number, number],
         };
       }),
     [visible],
   );
 
   return (
-    <group ref={group} scale={FEEL.basketScale}>
-      {/* basket body */}
-      <mesh material={wireMat}>
-        <cylinderGeometry args={[0.085, 0.065, 0.09, 12, 1, true]} />
+    <group>
+      {/* tapered woven body (open top) */}
+      <mesh material={bodyMat}>
+        <cylinderGeometry args={[0.048, 0.034, 0.045, 24, 1, true]} />
       </mesh>
-      <mesh material={wireMat} position-y={-0.045}>
-        <circleGeometry args={[0.065, 12]} />
+      <mesh material={bodyMat} position-y={-0.0225} rotation-x={-Math.PI / 2}>
+        <circleGeometry args={[0.034, 24]} />
       </mesh>
-      <mesh material={rimMat} position-y={0.045} rotation-x={Math.PI / 2}>
-        <torusGeometry args={[0.085, 0.007, 8, 20]} />
+      {/* rolled rim */}
+      <mesh material={rimMat} position-y={0.0225} rotation-x={Math.PI / 2}>
+        <torusGeometry args={[0.048, 0.005, 10, 28]} />
       </mesh>
-      {/* handle */}
-      <mesh material={rimMat} position-y={0.06} rotation-y={Math.PI / 2}>
-        <torusGeometry args={[0.07, 0.005, 6, 16, Math.PI]} />
-      </mesh>
-      {/* your haul, visibly in the basket */}
+      {/* two folding side handles */}
+      {[-1, 1].map((s) => (
+        <mesh key={s} material={rimMat} position={[s * 0.038, 0.038, 0]} rotation-y={Math.PI / 2}>
+          <torusGeometry args={[0.019, 0.0028, 8, 18, Math.PI]} />
+        </mesh>
+      ))}
+
+      {/* contents, standing up */}
       {minis.map((m) => {
         const visual = getCardVisual(m.id);
         return (
-          <group key={m.id} position={[m.x, 0.03, m.z]} rotation={m.rot} scale={0.85}>
+          <group key={m.id} position={[m.x, m.y, m.z]} rotation={m.rot} scale={0.5}>
             <mesh geometry={visual.frontGeometry} material={visual.frontMaterial} position-z={CARD_SIZE.t / 2} />
             <mesh geometry={visual.backGeometry} material={visual.backMaterial} position-z={-CARD_SIZE.t / 2} rotation-y={Math.PI} />
           </group>
         );
       })}
       {overflow > 0 && (
-        <Html position={[0, 0.12, 0]} center distanceFactor={1.2} style={{ pointerEvents: 'none' }}>
+        <Html position={[0.045, 0.05, 0]} center distanceFactor={0.35} style={{ pointerEvents: 'none' }}>
           <div className="basket-overflow">+{overflow}</div>
         </Html>
       )}
+    </group>
+  );
+}
+
+const _local = new THREE.Matrix4();
+const _pos = new THREE.Vector3();
+const _rot = new THREE.Quaternion();
+const _euler = new THREE.Euler();
+const _scl = new THREE.Vector3();
+const DIST = 0.5; // distance in front of the camera
+const MARGIN_X = 0.13;
+const MARGIN_Y = 0.17; // extra so it clears the basket pill
+
+/** Rigidly pins the basket to the bottom-right of the camera frustum, tilted forward. */
+export function Basket3D() {
+  const group = useRef<THREE.Group>(null!);
+  const { camera, size } = useThree();
+  const tantrumCount = useUIStore((s) => s.tantrumCount);
+  const anim = useRef({ seen: 0, drop: 0 });
+
+  useFrame((_, dt) => {
+    const g = group.current;
+    if (!g) return;
+    const cam = camera as THREE.PerspectiveCamera;
+    // bottom-right corner of the frustum at DIST
+    const halfH = DIST * Math.tan((cam.fov * Math.PI) / 360);
+    const halfW = halfH * (size.width / size.height);
+
+    const a = anim.current;
+    if (tantrumCount !== a.seen) {
+      a.seen = tantrumCount;
+      a.drop = 1;
+    }
+    if (a.drop > 0 && useBasketStore.getState().items.length > 0) a.drop = Math.min(a.drop + dt * 1.5, 2);
+    else if (a.drop > 0) a.drop = Math.max(a.drop - dt * 2, 0);
+    const dropY = a.drop > 0 ? -Math.sin(Math.min(a.drop, 1) * Math.PI * 0.5) * (halfH * 2.4) : 0;
+    const spin = a.drop * 3;
+
+    _pos.set(halfW - MARGIN_X, -halfH + MARGIN_Y + dropY, -DIST);
+    _euler.set(-0.42, -0.32, spin); // tip opening toward viewer to show contents
+    _rot.setFromEuler(_euler);
+    _scl.setScalar(0.82);
+    _local.compose(_pos, _rot, _scl);
+    g.matrixAutoUpdate = false;
+    g.matrix.multiplyMatrices(cam.matrixWorld, _local);
+    g.matrixWorldNeedsUpdate = true;
+  });
+
+  return (
+    <group ref={group}>
+      <BasketMesh />
     </group>
   );
 }

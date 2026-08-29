@@ -5,11 +5,18 @@ import { useBasketStore } from './basketStore';
 
 const HISTORY_CAP = 40; // ~20 turns
 
+export type MelGesture = 'wave' | 'nod' | 'shrug' | 'checkout';
+
 interface DialogueState {
   messages: ChatMessage[];
   streamingText: string;
   isStreaming: boolean;
   isOpen: boolean;
+  /** One-shot body-language cue for the 3D Mel (consumed by <Shopkeeper/>). */
+  gesture: MelGesture | null;
+  gestureId: number;
+  /** Fire a one-shot gesture (nod, shrug, wave, checkout). Idle/talk are automatic. */
+  gesture$: (g: MelGesture) => void;
   /** Local canned greeting on first counter visit — works with no API at all. */
   greet: () => void;
   /** Append a scripted line from Mel (shows as his in-world bubble when chat is closed). */
@@ -26,9 +33,14 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
   streamingText: '',
   isStreaming: false,
   isOpen: false,
+  gesture: null,
+  gestureId: 0,
+  gesture$: (g) => set((s) => ({ gesture: g, gestureId: s.gestureId + 1 })),
   greet: () => {
     if (get().messages.length > 0) return;
-    set({
+    set((s) => ({
+      gesture: 'wave',
+      gestureId: s.gestureId + 1,
       messages: [
         {
           role: 'assistant' as const,
@@ -36,7 +48,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
             "Hey there, welcome to GEM! Name's Mel. Browse all you like — holler if you want to know what something's worth, or bring your basket up when you're ready.",
         },
       ],
-    });
+    }));
   },
   say: (text) => set((s) => ({ messages: [...s.messages, { role: 'assistant' as const, content: text }] })),
   open: () => set({ isOpen: true }),
