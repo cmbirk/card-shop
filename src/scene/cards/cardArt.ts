@@ -246,66 +246,157 @@ export function drawCardFront(ctx: CanvasRenderingContext2D, card: Card, x: numb
   ctx.restore();
 }
 
-interface SlabStyle {
-  bg: string;
-  fg: string;
-  accent: string;
-  logo: string;
+/** Grade number + word ("9.5", "GEM MINT") split out of a label like "BGS 9.5 GEM MINT". */
+function gradeParts(card: Card): { num: string; word: string } {
+  if (!card.grade) return { num: '', word: '' };
+  const word = card.grade.label
+    .replace(new RegExp(`^${card.grade.company}\\s*`), '')
+    .replace(new RegExp(`^${card.grade.value}\\s*`), '')
+    .trim();
+  return { num: String(card.grade.value), word };
 }
 
-const SLAB_STYLES: Record<string, SlabStyle> = {
-  PSA: { bg: '#f4f3ef', fg: '#1a1a1a', accent: '#c8102e', logo: '#c8102e' },
-  BGS: { bg: '#d9dde3', fg: '#12233f', accent: '#c9a227', logo: '#12233f' },
-  TAG: { bg: '#121519', fg: '#f2f2f2', accent: '#18b7a6', logo: '#18b7a6' },
-  SGC: { bg: '#15130f', fg: '#f2e9d8', accent: '#b8892b', logo: '#b8892b' },
-};
+/** Fake QR block — visual filler for TAG labels, deterministic per cert. */
+function drawQR(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, seed: number) {
+  const rand = mulberry32(seed);
+  const cells = 9;
+  const c = size / cells;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x, y, size, size);
+  ctx.fillStyle = '#000000';
+  for (let i = 0; i < cells; i++)
+    for (let j = 0; j < cells; j++) {
+      const finder = (i < 3 && j < 3) || (i < 3 && j > cells - 4) || (i > cells - 4 && j < 3);
+      if (finder ? (i % 2 === 0 || j % 2 === 0) : rand() > 0.5) ctx.fillRect(x + i * c, y + j * c, c, c);
+    }
+}
 
-/** Landscape grading-label strip that sits at the top of a slab (like a real PSA/TAG flip). */
+/** Landscape grading-label strip that sits at the top of a slab, styled per grader. */
 export function drawSlabLabel(ctx: CanvasRenderingContext2D, card: Card, w: number, h: number) {
-  const s = SLAB_STYLES[card.grade?.company ?? 'PSA'] ?? SLAB_STYLES.PSA;
   const u = w / 512;
-  ctx.fillStyle = s.bg;
-  ctx.fillRect(0, 0, w, h);
-  // left accent bar
-  ctx.fillStyle = s.accent;
-  ctx.fillRect(0, 0, 10 * u, h);
-
-  // left column: card identity, small caps
-  ctx.fillStyle = s.fg;
-  ctx.textAlign = 'left';
+  const company = card.grade?.company ?? 'PSA';
+  const { num, word } = gradeParts(card);
   ctx.textBaseline = 'middle';
-  const lx = 26 * u;
-  ctx.font = `bold ${26 * u}px Arial, sans-serif`;
-  ctx.fillText(`${card.year} ${card.setName}`.toUpperCase().slice(0, 30), lx, h * 0.28);
-  ctx.font = `bold ${30 * u}px Arial, sans-serif`;
-  ctx.fillText(card.playerName.toUpperCase().slice(0, 26), lx, h * 0.56);
-  ctx.font = `${22 * u}px Arial, sans-serif`;
-  ctx.fillStyle = s.accent;
-  const line3 = [card.cardNumber, card.grade?.certNumber ? `CERT ${card.grade.certNumber}` : '']
-    .filter(Boolean)
-    .join('   ');
-  ctx.fillText(line3.toUpperCase().slice(0, 34), lx, h * 0.82);
 
-  // right block: company logo + big grade
-  const rx = w - 14 * u;
-  ctx.textAlign = 'right';
-  ctx.fillStyle = s.logo;
-  ctx.font = `900 ${34 * u}px Arial, sans-serif`;
-  ctx.fillText(card.grade?.company ?? 'PSA', rx, h * 0.3);
-  ctx.fillStyle = s.fg;
-  ctx.font = `900 ${52 * u}px Arial, sans-serif`;
-  const gradeTxt = card.grade
-    ? `${card.grade.value}${card.grade.label.replace(new RegExp(`^${card.grade.company}\\s*${card.grade.value}\\s*`), '').trim() ? ' ' + card.grade.label.replace(new RegExp(`^${card.grade.company}\\s*${card.grade.value}\\s*`), '').trim() : ''}`
-    : '';
-  ctx.fillText(gradeTxt.slice(0, 12), rx, h * 0.68);
+  const idLines = [
+    `${card.year} ${card.setName}`.toUpperCase(),
+    `${card.cardNumber} ${card.playerName}`.toUpperCase(),
+    card.grade?.certNumber ? String(card.grade.certNumber) : '',
+  ];
 
-  // hairline divider under label
-  ctx.strokeStyle = s.accent;
-  ctx.lineWidth = 3 * u;
-  ctx.beginPath();
-  ctx.moveTo(0, h - 2 * u);
-  ctx.lineTo(w, h - 2 * u);
-  ctx.stroke();
+  if (company === 'BGS') {
+    // gold foil label, Beckett B on left, grade block on right
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, '#e8cf8a');
+    g.addColorStop(0.5, '#cBad63');
+    g.addColorStop(1, '#a8863d');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    // Beckett B roundel
+    const bx = 44 * u;
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.arc(bx, h * 0.42, 30 * u, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e8cf8a';
+    ctx.font = `900 ${34 * u}px Georgia, serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('B', bx, h * 0.42);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = `bold ${16 * u}px Arial, sans-serif`;
+    ctx.fillText('BECKETT', bx, h * 0.82);
+    // card identity
+    ctx.fillStyle = '#1a1a1a';
+    ctx.textAlign = 'left';
+    const lx = 88 * u;
+    ctx.font = `bold ${20 * u}px Arial, sans-serif`;
+    idLines.slice(0, 2).forEach((t, i) => ctx.fillText(t.slice(0, 30), lx, h * (0.32 + i * 0.28)));
+    ctx.font = `${15 * u}px Arial, sans-serif`;
+    ctx.fillText(idLines[2], lx, h * 0.86);
+    // grade block, right
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(w - 118 * u, 0, 118 * u, h);
+    ctx.fillStyle = '#e8cf8a';
+    ctx.textAlign = 'center';
+    ctx.font = `900 ${54 * u}px Arial, sans-serif`;
+    ctx.fillText(num, w - 59 * u, h * 0.42);
+    ctx.font = `bold ${18 * u}px Arial, sans-serif`;
+    ctx.fillText(word.slice(0, 10), w - 59 * u, h * 0.8);
+  } else if (company === 'TAG') {
+    // black label, TAG logo top-left, QR + grade right
+    ctx.fillStyle = '#0c0e11';
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#f2f2f2';
+    ctx.lineWidth = 2.5 * u;
+    ctx.strokeRect(20 * u, 12 * u, 74 * u, 34 * u);
+    ctx.fillStyle = '#f2f2f2';
+    ctx.font = `900 ${26 * u}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('TAG', 57 * u, 30 * u);
+    // identity
+    ctx.textAlign = 'left';
+    ctx.font = `bold ${19 * u}px Arial, sans-serif`;
+    idLines.slice(0, 2).forEach((t, i) => ctx.fillText(t.slice(0, 30), 22 * u, h * (0.58 + i * 0.24)));
+    // QR + cert + grade, right
+    if (card.grade?.certNumber) drawQR(ctx, w - 176 * u, 14 * u, h * 0.62, card.seed);
+    ctx.fillStyle = '#9aa3ab';
+    ctx.font = `${13 * u}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText(String(card.grade?.certNumber ?? '').slice(0, 10), w - 176 * u + h * 0.31, h * 0.86);
+    ctx.fillStyle = '#f2f2f2';
+    ctx.textAlign = 'center';
+    ctx.font = `900 ${50 * u}px Arial, sans-serif`;
+    ctx.fillText(num, w - 46 * u, h * 0.4);
+    ctx.font = `bold ${16 * u}px Arial, sans-serif`;
+    ctx.fillText(word.slice(0, 10), w - 46 * u, h * 0.78);
+  } else if (company === 'SGC') {
+    // black label with tuxedo-gold accents
+    ctx.fillStyle = '#0f0d0a';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#c79a3b';
+    ctx.fillRect(0, 0, 8 * u, h);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#f2e9d8';
+    ctx.font = `900 ${30 * u}px Georgia, serif`;
+    ctx.fillText('SGC', 26 * u, h * 0.34);
+    ctx.font = `bold ${19 * u}px Arial, sans-serif`;
+    idLines.slice(0, 2).forEach((t, i) => ctx.fillText(t.slice(0, 26), 120 * u, h * (0.32 + i * 0.3)));
+    ctx.font = `${14 * u}px Arial, sans-serif`;
+    ctx.fillText(idLines[2], 120 * u, h * 0.85);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#c79a3b';
+    ctx.font = `900 ${52 * u}px Arial, sans-serif`;
+    ctx.fillText(num, w - 60 * u, h * 0.44);
+    ctx.fillStyle = '#f2e9d8';
+    ctx.font = `bold ${17 * u}px Arial, sans-serif`;
+    ctx.fillText(word.slice(0, 10), w - 60 * u, h * 0.82);
+  } else {
+    // PSA: white label, red logo left, red grade right
+    ctx.fillStyle = '#f6f5f1';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#c8102e';
+    ctx.textAlign = 'left';
+    ctx.font = `900 ${30 * u}px Arial, sans-serif`;
+    ctx.fillText('PSA', 22 * u, h * 0.3);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = `bold ${20 * u}px Arial, sans-serif`;
+    ctx.fillText(idLines[0].slice(0, 30), 22 * u, h * 0.58);
+    ctx.font = `bold ${18 * u}px Arial, sans-serif`;
+    ctx.fillText(idLines[1].slice(0, 32), 22 * u, h * 0.82);
+    // red grade block
+    ctx.fillStyle = '#c8102e';
+    ctx.fillRect(w - 120 * u, 0, 120 * u, h);
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.font = `900 ${52 * u}px Arial, sans-serif`;
+    ctx.fillText(num, w - 60 * u, h * 0.42);
+    ctx.font = `bold ${17 * u}px Arial, sans-serif`;
+    ctx.fillText(word.slice(0, 10), w - 60 * u, h * 0.8);
+    ctx.fillStyle = '#7a7a76';
+    ctx.font = `${13 * u}px monospace`;
+    ctx.textAlign = 'right';
+    ctx.fillText(String(card.grade?.certNumber ?? ''), w - 128 * u, h * 0.9);
+  }
 }
 
 /** Slab label as a texture material (cached). */

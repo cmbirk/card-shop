@@ -227,6 +227,31 @@
         "blurb": "2022 MEWTWO VSTAR, TAG-graded 10 (PRISTINE) with a full Digital Image & Grading report.",
         "funFact": "Verify the DIG report at my.taggrading.com/card/K6679119."
       }
+    },
+    {
+      "id": "ba-bgs-0009370783",
+      "sport": "baseball",
+      "category": "graded-slabs",
+      "playerName": "Carlos Correa",
+      "team": "Houston Astros",
+      "year": 2013,
+      "setName": "Bowman Chrome Draft Top Prospects",
+      "cardNumber": "#TP10",
+      "rarity": "graded",
+      "grade": {
+        "company": "BGS",
+        "value": 9.5,
+        "label": "BGS 9.5 GEM MINT",
+        "certNumber": "0009370783"
+      },
+      "price": 24000,
+      "seed": 9370783,
+      "featured": true,
+      "lore": {
+        "blurb": "Carlos Correa's 2013 Bowman Chrome Draft rookie, BGS 9.5 Gem Mint.",
+        "funFact": "A half-point off the coveted BGS 10 Black Label.",
+        "investmentNote": "blue-chip rookie"
+      }
     }
   ]
 }
