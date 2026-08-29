@@ -12,12 +12,16 @@ import { UIOverlay } from './ui/UIOverlay';
 import { loadInventory } from './systems/inventory';
 import { useAuthStore } from './stores/authStore';
 import { ErrorBoundary } from './ui/ErrorBoundary';
+import { resumeCheckout } from './systems/checkoutReturn';
 
 export default function App() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     useAuthStore.getState().init(); // restore persisted session, watch auth changes
-    loadInventory().then(() => setReady(true));
+    loadInventory().then(() => {
+      setReady(true);
+      void resumeCheckout(); // ?checkout=success|cancel after Stripe
+    });
   }, []);
 
   if (!ready) {

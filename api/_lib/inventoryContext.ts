@@ -28,9 +28,15 @@ export async function getInventory(): Promise<{ cards: Card[]; cardsById: Map<st
     try {
       // deterministic order — unordered SELECT can shuffle rows between fetches,
       // changing the system-prompt bytes and silently invalidating the prompt cache
+      // sold and live-reserved cards are off the floor; a lapsed reservation reads as available
       const { data, error } = await supa.from('cards').select('*').neq('status', 'sold').order('id');
       if (error) throw error;
-      if (data && data.length) cards = (data as CardRow[]).map(rowToCard);
+      if (data && data.length) {
+        const now = Date.now();
+        cards = (data as (CardRow & { reserved_until?: string | null })[])
+          .filter((r) => r.status !== 'reserved' || (r.reserved_until != null && new Date(r.reserved_until).getTime() < now))
+          .map((r) => rowToCard(r.status === 'reserved' ? { ...r, status: 'available' } : r));
+      }
     } catch (err) {
       console.warn('[grounding] Supabase read failed, using bundled data:', (err as Error).message);
     }

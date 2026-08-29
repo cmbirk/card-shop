@@ -4,17 +4,25 @@ import { useBasketStore } from './basketStore';
 import { useDialogueStore } from './dialogueStore';
 import { sfx } from '../systems/sfx';
 
-export type CheckoutPhase = 'browsing' | 'atCounter' | 'moodCheck' | 'reviewing' | 'receipt';
+export type CheckoutPhase = 'browsing' | 'atCounter' | 'moodCheck' | 'reviewing' | 'paying' | 'receipt';
+
+export interface Receipt {
+  items: { id: string; name: string; price: number }[];
+  total: number;
+  orderId: string | null;
+  testMode: boolean;
+}
 
 interface UIState {
   checkoutPhase: CheckoutPhase;
   soldIds: string[]; // purchased this session — stay off shelves
-  lastReceipt: { items: string[]; total: number } | null;
+  lastReceipt: Receipt | null;
   tantrumCount: number; // increments when the customer storms out; the hold pile gets swept off the counter
   signInOpen: boolean; // guestbook sign-in panel
   adminOpen: boolean; // back-office admin panel
   setPhase: (p: CheckoutPhase) => void;
-  completePurchase: (items: string[], total: number) => void;
+  /** Show the receipt for a paid order (or a dry-run one) and mark its cards gone for the session. */
+  completePurchase: (receipt: Receipt) => void;
   dismissReceipt: () => void;
   tantrum: () => void;
   setSignInOpen: (v: boolean) => void;
@@ -34,11 +42,11 @@ export const useUIStore = create<UIState>((set, get) => ({
     if (p === 'reviewing') useDialogueStore.getState().gesture$('nod'); // Chris nods you toward the register
     set({ checkoutPhase: p });
   },
-  completePurchase: (items, total) => {
+  completePurchase: (receipt) => {
     useDialogueStore.getState().gesture$('checkout'); // rings it up
     set((s) => ({
-      soldIds: [...s.soldIds, ...items],
-      lastReceipt: { items, total },
+      soldIds: [...s.soldIds, ...receipt.items.map((i) => i.id)],
+      lastReceipt: receipt,
       checkoutPhase: 'receipt',
     }));
   },

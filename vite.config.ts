@@ -14,6 +14,9 @@ function apiDev(): Plugin {
     configureServer(server) {
       server.middlewares.use('/api/chat', (req, res) => void handle(server, '/api/chat.ts', req, res));
       server.middlewares.use('/api/health', (req, res) => void handle(server, '/api/health.ts', req, res));
+      server.middlewares.use('/api/checkout', (req, res) => void handle(server, '/api/checkout.ts', req, res));
+      server.middlewares.use('/api/stripe-webhook', (req, res) => void handle(server, '/api/stripe-webhook.ts', req, res));
+      server.middlewares.use('/api/orders', (req, res) => void handle(server, '/api/orders.ts', req, res));
     },
   };
 }
@@ -67,8 +70,11 @@ export default defineConfig(({ mode }) => {
     'VITE_SUPABASE_URL',
     'VITE_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
+    'STRIPE_SECRET_KEY',
+    'STRIPE_WEBHOOK_SECRET',
+    'PUBLIC_ORIGIN',
   ]) {
-    process.env[k] ??= env[k];
+    if (env[k]) process.env[k] ??= env[k]; // never assign undefined — process.env would store "undefined"
   }
 
   return {

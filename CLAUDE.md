@@ -13,6 +13,7 @@ functions) · Supabase (Postgres inventory + Auth + Storage) · Claude (Haiku 4.
 shared/            used by BOTH client and api — types.ts, cardMapping.ts (row↔Card), data/
 api/               Vercel serverless (see the Vercel gotcha below)
   chat.ts          POST /api/chat → SSE stream from Claude; verifies the Supabase JWT first
+  checkout.ts / stripe-webhook.ts / orders.ts — Stripe Checkout (see gotcha below)
   _lib/            shopkeeper.ts (persona + grounding), inventoryContext.ts, auth.ts (token gate)
 supabase/          schema in migrations/ (apply with npm run db:push); seed.mjs; SETUP.md
 src/
@@ -43,6 +44,11 @@ src/
   the caller's token so anonymous users can't spend Anthropic tokens.
 - **Meshy GLB characters** (Chris, Maya) export `alphaMode=BLEND` + `doubleSided` → tearing/bleed.
   Sanitize on load: opaque + alphaTest, `FrontSide`, mipmaps off, roughness≥0.65 (see `Shopkeeper.tsx`).
+- **Stripe: the webhook is the only writer of `sold`.** `/api/checkout` snapshots prices from the DB
+  (never the client), reserves via the `reserve_cards` SQL function (atomic, lapsed reservations
+  count as available), and `/api/stripe-webhook` verifies the signature over `req.text()` — never
+  `req.json()` first. New env vars must be added to the surfaced list in `vite.config.ts` AND
+  guarded (`if (env[k])`) — assigning `undefined` to `process.env` stores the string "undefined".
 - **Prompt-cache stability:** the shopkeeper system prompt must be byte-stable across a conversation,
   so the Supabase grounding read is `ORDER BY id` and volatile basket context rides the user turn.
 

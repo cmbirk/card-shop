@@ -85,6 +85,8 @@ export type Database = {
           rarity: string
           raw_condition: string | null
           relic: string
+          reserved_order: string | null
+          reserved_until: string | null
           section: string | null
           seed: number
           serial_number: number | null
@@ -127,6 +129,8 @@ export type Database = {
           rarity?: string
           raw_condition?: string | null
           relic?: string
+          reserved_order?: string | null
+          reserved_until?: string | null
           section?: string | null
           seed?: number
           serial_number?: number | null
@@ -169,6 +173,8 @@ export type Database = {
           rarity?: string
           raw_condition?: string | null
           relic?: string
+          reserved_order?: string | null
+          reserved_until?: string | null
           section?: string | null
           seed?: number
           serial_number?: number | null
@@ -180,6 +186,45 @@ export type Database = {
           updated_at?: string
           variation?: string | null
           year?: number
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          paid_at: string | null
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          test_mode: boolean
+          total: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items: Json
+          paid_at?: string | null
+          status: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          test_mode?: boolean
+          total: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          paid_at?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          test_mode?: boolean
+          total?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -341,6 +386,11 @@ export type Database = {
     }
     Functions: {
       is_admin: { Args: { uid: string }; Returns: boolean }
+      release_order: { Args: { order_id: string }; Returns: undefined }
+      reserve_cards: {
+        Args: { ids: string[]; order_id: string; ttl: string }
+        Returns: string[]
+      }
     }
     Enums: {
       [_ in never]: never

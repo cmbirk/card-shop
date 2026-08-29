@@ -87,7 +87,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     const newHere = useAuthStore.getState().firstVisit && !welcomed;
     const content =
       SOFT_OPENING && newHere
-        ? "Hey there, welcome to GEM! Name's Chris. Full disclosure — we're still getting the shop ready to open, so the register's not ringing up sales just yet. But browse all you like: pick things up, ask me about anything, and I'll hold whatever catches your eye up front for when we open."
+        ? "Hey there, welcome to GEM! Name's Chris. Full disclosure — we're still getting the shop ready to open, so the register's in test mode: nothing's charged and nothing ships. But browse all you like, pick things up, ask me about anything, and if you want to try the register, I'll walk you through it."
         : "Hey there, welcome to GEM! Name's Chris. Browse all you like — holler if you want to know what something's worth, or hand me anything you like and I'll hold it up front for you.";
     try {
       localStorage.setItem('gem.welcomed', '1');

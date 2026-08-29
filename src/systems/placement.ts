@@ -21,6 +21,8 @@ function matches(card: Card, fixture: Fixture): boolean {
   // personal (not-for-sale) cards only ever go in a fixture that asks for them
   if (a.status) return card.status === a.status;
   if (card.status === 'personal') return false;
+  // reserved (someone's at the register with it) and sold cards leave the floor
+  if (card.status === 'reserved' || card.status === 'sold') return false;
   if (a.featured) return !!card.featured;
   if (card.featured) return false;
   if (a.sport && card.sport !== a.sport) return false;

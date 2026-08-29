@@ -940,3 +940,45 @@
   opacity: 0.6;
   word-break: break-all;
 }
+
+/* ---- register ---- */
+.modal.paying {
+  width: min(300px, 90vw);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+}
+.modal.paying p {
+  margin: 0;
+  color: var(--gold);
+  font-family: Georgia, serif;
+}
+.receipt {
+  position: relative;
+}
+.r-stamp {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  transform: rotate(-12deg);
+  border: 2px solid #a63d40;
+  color: #a63d40;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 2px 6px;
+  opacity: 0.8;
+}
+.r-order {
+  font-size: 10px;
+  opacity: 0.6;
+}
+.soft-open-note code {
+  font-family: ui-monospace, monospace;
+  background: rgba(255, 217, 122, 0.12);
+  padding: 1px 4px;
+  border-radius: 3px;
+}

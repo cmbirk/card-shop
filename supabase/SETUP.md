@@ -83,6 +83,14 @@ inspected but not bought, and Chris will talk about it but never price it. Set i
 panel's Status dropdown. The check constraint in `20260829120000_personal_status.sql` limits
 `status` to available / reserved / sold / personal.
 
+## 4e. Stripe (test mode)
+`.env.local` + Vercel: `STRIPE_SECRET_KEY` (sk_test), `VITE_STRIPE_PUBLISHABLE_KEY`, and
+`STRIPE_WEBHOOK_SECRET`. For prod, add a webhook endpoint in the Stripe dashboard →
+`https://gemcardshop.com/api/stripe-webhook` with events `checkout.session.completed` and
+`checkout.session.expired`, and paste its signing secret into Vercel. Locally a throwaway
+`whsec_localdev_…` value works for synthetic signed events. Migration `20260830100000_orders.sql`
+adds `orders`, `reserve_cards()` / `release_order()`. Test card: 4242 4242 4242 4242.
+
 ## 5. Seed + generate types
 ```
 ! npm run db:seed             # migrate the 120 bundled cards into the DB

@@ -96,6 +96,10 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   provided). **Users:** everyone who's signed the guestbook (`profiles`, maintained by DB
   triggers) with an Admin toggle. Saves re-place the shelves live. Non-admins who click the door
   get waved off by Chris.
+- **Checkout is real Stripe (test mode during the soft opening).** "Try the register" reserves the
+  cards atomically, opens hosted Stripe Checkout priced from the database, and the webhook is the
+  only thing that marks cards sold; orders are snapshotted in an `orders` table for the receipt
+  (stamped TEST while `test_mode`). Cancelling or letting the session expire puts the cards back.
 - **Hold pile, not a basket.** Cards you want fly to a pile on the counter — Chris holds them up
   front — with a small HUD chip; at the counter, click a pile card to put it back, then check out.
 - **Sign-in: Google or email magic link.** Both resolve to one Supabase user per email.
