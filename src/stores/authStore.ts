@@ -1,0 +1,81 @@
+import { create } from 'zustand';
+import type { Session, User } from '@supabase/supabase-js';
+import { supabase, supabaseConfigured } from '../lib/supabase';
+
+interface AuthState {
+  session: Session | null;
+  user: User | null;
+  isAdmin: boolean;
+  ready: boolean; // initial session check finished
+  magicSent: boolean; // magic-link email dispatched
+  authError: string | null;
+  init: () => void;
+  signInWithGoogle: () => Promise<void>;
+  signInWithMagicLink: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
+
+async function checkAdmin(userId: string | undefined): Promise<boolean> {
+  if (!supabase || !userId) return false;
+  const { data } = await supabase.from('admins').select('user_id').eq('user_id', userId).maybeSingle();
+  return !!data;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  session: null,
+  user: null,
+  isAdmin: false,
+  // When Supabase isn't configured (local dev before setup), treat as "ready"
+  // and let the app run ungated so nothing is bricked.
+  ready: !supabaseConfigured,
+  magicSent: false,
+  authError: null,
+
+  init: () => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(async ({ data }) => {
+      const session = data.session;
+      set({ session, user: session?.user ?? null, isAdmin: await checkAdmin(session?.user?.id), ready: true });
+    });
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      set({
+        session,
+        user: session?.user ?? null,
+        isAdmin: await checkAdmin(session?.user?.id),
+        ready: true,
+        magicSent: false,
+      });
+    });
+  },
+
+  signInWithGoogle: async () => {
+    if (!supabase) return;
+    set({ authError: null });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) set({ authError: error.message });
+  },
+
+  signInWithMagicLink: async (email) => {
+    if (!supabase) return;
+    set({ authError: null });
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: window.location.origin },
+    });
+    if (error) set({ authError: error.message });
+    else set({ magicSent: true });
+  },
+
+  signOut: async () => {
+    await supabase?.auth.signOut();
+    set({ session: null, user: null, isAdmin: false, magicSent: false });
+  },
+}));
+
+/** The current access token, for authorizing API calls (e.g. /api/chat). */
+export function accessToken(): string | null {
+  return useAuthStore.getState().session?.access_token ?? null;
+}

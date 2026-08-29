@@ -380,6 +380,63 @@
   }
 }
 
+/* ---- sign-in (guestbook) ---- */
+.modal.signin {
+  width: min(380px, 92vw);
+  text-align: center;
+}
+.signin-sheet-head {
+  margin-bottom: 14px;
+}
+.signin-title {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  color: var(--gold);
+}
+.signin-sub {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 4px;
+}
+.signin-lead {
+  font-size: 13px;
+  opacity: 0.85;
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+.signin-magic {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.signin-magic input {
+  background: rgba(242, 232, 213, 0.08);
+  border: 1px solid var(--wood);
+  border-radius: 8px;
+  color: var(--cream);
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  text-align: center;
+}
+.signin-magic input:focus {
+  border-color: var(--gold);
+}
+.signin-sent {
+  padding: 10px 0 4px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.signin-error {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 8px;
+}
+.signin-close {
+  margin-top: 14px;
+  width: 100%;
+}
+
 /* ---- speech dots ---- */
 .speech-dots {
   background: #fff;

@@ -11,10 +11,14 @@ interface UIState {
   soldIds: string[]; // purchased this session — stay off shelves
   lastReceipt: { items: string[]; total: number } | null;
   tantrumCount: number; // increments when the customer storms out; Basket3D reacts
+  signInOpen: boolean; // guestbook sign-in panel
+  adminOpen: boolean; // back-office admin panel
   setPhase: (p: CheckoutPhase) => void;
   completePurchase: (items: string[], total: number) => void;
   dismissReceipt: () => void;
   tantrum: () => void;
+  setSignInOpen: (v: boolean) => void;
+  setAdminOpen: (v: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
@@ -22,6 +26,10 @@ export const useUIStore = create<UIState>((set, get) => ({
   soldIds: [],
   lastReceipt: null,
   tantrumCount: 0,
+  signInOpen: false,
+  adminOpen: false,
+  setSignInOpen: (v) => set({ signInOpen: v }),
+  setAdminOpen: (v) => set({ adminOpen: v }),
   setPhase: (p) => {
     if (p === 'reviewing') useDialogueStore.getState().gesture$('nod'); // Chris nods you toward the register
     set({ checkoutPhase: p });

@@ -5,6 +5,9 @@ import { ROOM } from '@shared/data/shopLayout';
 import { MAT, makeLabelMaterial } from './materials';
 import { PBR } from './pbr';
 import { useNavStore } from '../stores/navStore';
+import { useAuthStore } from '../stores/authStore';
+import { useUIStore } from '../stores/uiStore';
+import { supabaseConfigured } from '../lib/supabase';
 
 const brickMat = PBR.brick;
 const trimMat = new THREE.MeshStandardMaterial({ color: '#24483c', roughness: 0.9 });
@@ -14,6 +17,58 @@ const glassGlowMat = new THREE.MeshBasicMaterial({ color: '#ffdfae' });
 function block(e: { stopPropagation: () => void }) {
   // facade must swallow raycasts so window clicks don't reach shelves inside
   e.stopPropagation();
+}
+
+const clipboardMat = new THREE.MeshStandardMaterial({ color: '#7a5a3f', roughness: 0.7 });
+const clipMat = new THREE.MeshStandardMaterial({ color: '#9a9a9a', metalness: 0.7, roughness: 0.4 });
+
+/** A guestbook clipboard mounted beside the door — click to open the sign-in panel. */
+function SignInSheet() {
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered);
+  const signedIn = useAuthStore((s) => !!s.session);
+  return (
+    <group
+      position={[1.05, 1.25, 0.06]}
+      rotation={[0, -0.25, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        setHovered(false);
+        useUIStore.getState().setSignInOpen(true);
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHovered(true);
+      }}
+      onPointerOut={() => setHovered(false)}
+    >
+      <mesh material={clipboardMat} castShadow>
+        <boxGeometry args={[0.34, 0.46, 0.02]} />
+      </mesh>
+      <mesh material={MAT.cream} position={[0, -0.02, 0.012]}>
+        <planeGeometry args={[0.28, 0.38]} />
+      </mesh>
+      <mesh material={clipMat} position={[0, 0.2, 0.02]}>
+        <boxGeometry args={[0.12, 0.05, 0.03]} />
+      </mesh>
+      <mesh
+        material={makeLabelMaterial(signedIn ? 'Signed in ✓' : 'Sign in here', {
+          bg: '#efe6c8',
+          fg: signedIn ? '#2e5e4e' : '#a63d40',
+          size: 44,
+        })}
+        position={[0, 0.02, 0.014]}
+      >
+        <planeGeometry args={[0.25, 0.09]} />
+      </mesh>
+      {hovered && !signedIn && (
+        <mesh position={[0, 0, 0.008]}>
+          <planeGeometry args={[0.38, 0.5]} />
+          <meshBasicMaterial color="#ffd97a" transparent opacity={0.25} />
+        </mesh>
+      )}
+    </group>
+  );
 }
 
 /** Exterior storefront — what you see on page load. Click the door to come in. */
@@ -88,6 +143,12 @@ export function Facade() {
         onClick={(e) => {
           e.stopPropagation();
           setDoorHovered(false);
+          // sign-in on entry: unauthenticated visitors get the guestbook first
+          const auth = useAuthStore.getState();
+          if (supabaseConfigured && !auth.session) {
+            useUIStore.getState().setSignInOpen(true);
+            return;
+          }
           useNavStore.getState().goTo('entry');
         }}
         onPointerOver={(e) => {
@@ -121,6 +182,9 @@ export function Facade() {
           </mesh>
         )}
       </group>
+
+      {/* guestbook sign-in sheet — mounted by the door; click to sign in */}
+      <SignInSheet />
 
       {/* sidewalk + doormat */}
       <mesh material={sidewalkMat} position={[0, 0.002, 2.2]} rotation-x={-Math.PI / 2} onClick={block}>

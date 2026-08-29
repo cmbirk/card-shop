@@ -1,5 +1,6 @@
 import type { ChatRequest } from '../shared/types';
 import { runShopkeeper } from './_lib/shopkeeper';
+import { requireUser } from './_lib/auth';
 
 export const maxDuration = 60;
 
@@ -11,6 +12,14 @@ function sse(event: string, data: unknown): Uint8Array {
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
+  }
+  // gate LLM spend: only signed-in visitors may talk to Chris
+  const auth = await requireUser(req);
+  if (!auth.ok) {
+    return new Response(JSON.stringify({ error: 'sign in to chat' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
   let body: ChatRequest;
   try {

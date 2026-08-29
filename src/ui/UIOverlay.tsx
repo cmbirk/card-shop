@@ -7,6 +7,7 @@ import { BasketPanel } from './BasketPanel';
 import { InspectHud } from './InspectHud';
 import { ChatWindow } from './ChatWindow';
 import { CheckoutModal } from './CheckoutModal';
+import { SignInPanel } from './SignInPanel';
 
 /** Non-visual: wires station arrival to checkout phase + shopkeeper dialogue. */
 function NavEffects() {
@@ -75,6 +76,7 @@ export function UIOverlay() {
       <InspectHud />
       <ChatWindow />
       <CheckoutModal />
+      <SignInPanel />
     </div>
   );
 }

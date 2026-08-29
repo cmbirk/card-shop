@@ -11,10 +11,12 @@ import { Basket3D } from './scene/Basket';
 import { CardInHand } from './scene/cards/CardInHand';
 import { UIOverlay } from './ui/UIOverlay';
 import { loadInventory } from './systems/inventory';
+import { useAuthStore } from './stores/authStore';
 
 export default function App() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
+    useAuthStore.getState().init(); // restore persisted session, watch auth changes
     loadInventory().then(() => setReady(true));
   }, []);
 

@@ -1,4 +1,5 @@
 import type { ChatRequest } from '@shared/types';
+import { accessToken } from '../stores/authStore';
 
 /** POST /api/chat, read the SSE stream, invoke onDelta per chunk, resolve with full text. */
 export async function streamChat(
@@ -6,9 +7,13 @@ export async function streamChat(
   onDelta: (text: string) => void,
   signal?: AbortSignal,
 ): Promise<string> {
+  const token = accessToken();
   const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify(body),
     signal,
   });

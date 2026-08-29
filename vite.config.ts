@@ -52,10 +52,17 @@ async function handle(server: ViteDevServer, file: string, req: IncomingMessage,
 }
 
 export default defineConfig(({ mode }) => {
-  // surface .env.local vars (ANTHROPIC_API_KEY etc.) to the dev-mounted api handlers
+  // surface .env.local vars to the dev-mounted api handlers (they read process.env)
   const env = loadEnv(mode, root, '');
-  process.env.ANTHROPIC_API_KEY ??= env.ANTHROPIC_API_KEY;
-  process.env.SHOPKEEPER_MODEL ??= env.SHOPKEEPER_MODEL;
+  for (const k of [
+    'ANTHROPIC_API_KEY',
+    'SHOPKEEPER_MODEL',
+    'VITE_SUPABASE_URL',
+    'VITE_SUPABASE_ANON_KEY',
+    'SUPABASE_SERVICE_ROLE_KEY',
+  ]) {
+    process.env[k] ??= env[k];
+  }
 
   return {
     plugins: [react(), apiDev()],
