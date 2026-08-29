@@ -1,12 +1,14 @@
 import * as THREE from 'three';
+import { PBR } from './pbr';
 
-// Cozy hobby-shop palette — flat colors, one shared material per role.
+// Cozy hobby-shop palette. Structural surfaces use CC0 PBR texture sets
+// (see pbr.ts); accents stay flat-colored.
 export const MAT = {
-  floor: new THREE.MeshStandardMaterial({ color: '#8b5e3c', roughness: 0.9 }),
-  wall: new THREE.MeshStandardMaterial({ color: '#f2e8d5', roughness: 0.95 }),
-  wainscot: new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 0.9 }),
-  walnut: new THREE.MeshStandardMaterial({ color: '#5c4033', roughness: 0.85 }),
-  wornTop: new THREE.MeshStandardMaterial({ color: '#7a5a3f', roughness: 0.75 }),
+  floor: PBR.floor,
+  wall: PBR.wall,
+  wainscot: PBR.wainscot,
+  walnut: PBR.wood,
+  wornTop: PBR.woodTop,
   green: new THREE.MeshStandardMaterial({ color: '#2e5e4e', roughness: 0.9 }),
   cream: new THREE.MeshStandardMaterial({ color: '#efe6c8', roughness: 0.9 }),
   dark: new THREE.MeshStandardMaterial({ color: '#2b2b2b', roughness: 0.6 }),
@@ -22,30 +24,6 @@ export const MAT = {
   skin: new THREE.MeshStandardMaterial({ color: '#e0b08c', roughness: 0.8 }),
   flannel: new THREE.MeshStandardMaterial({ color: '#a63d40', roughness: 0.95 }),
 };
-
-/** Plank-stripe canvas texture for the floor — cheap wood feel, no assets. */
-export function makeFloorMaterial(): THREE.MeshStandardMaterial {
-  const c = document.createElement('canvas');
-  c.width = 256;
-  c.height = 256;
-  const ctx = c.getContext('2d')!;
-  ctx.fillStyle = '#8b5e3c';
-  ctx.fillRect(0, 0, 256, 256);
-  for (let i = 0; i < 8; i++) {
-    const y = i * 32;
-    ctx.fillStyle = i % 2 ? '#84573630' : '#93684530';
-    ctx.fillRect(0, y, 256, 32);
-    ctx.fillStyle = '#5c403366';
-    ctx.fillRect(0, y, 256, 2);
-    // plank end seams, offset per row
-    ctx.fillRect(((i * 96) % 256) + 24, y, 2, 32);
-  }
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(5, 4);
-  return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 });
-}
 
 const labelCache = new Map<string, THREE.MeshBasicMaterial>();
 

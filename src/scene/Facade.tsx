@@ -3,9 +3,10 @@ import { useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { ROOM } from '@shared/data/shopLayout';
 import { MAT, makeLabelMaterial } from './materials';
+import { PBR } from './pbr';
 import { useNavStore } from '../stores/navStore';
 
-const brickMat = new THREE.MeshStandardMaterial({ color: '#6e4433', roughness: 0.95 });
+const brickMat = PBR.brick;
 const trimMat = new THREE.MeshStandardMaterial({ color: '#24483c', roughness: 0.9 });
 const sidewalkMat = new THREE.MeshStandardMaterial({ color: '#5a5a60', roughness: 1 });
 const glassGlowMat = new THREE.MeshBasicMaterial({ color: '#ffdfae' });

@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber';
 import { AdaptiveDpr } from '@react-three/drei';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { Shop } from './scene/Shop';
 import { StationController } from './scene/StationController';
 import { Waypoints } from './scene/Waypoints';
@@ -26,6 +27,10 @@ export default function App() {
         <Waypoints />
         <StationController />
         <AdaptiveDpr pixelated />
+        <EffectComposer>
+          <Bloom luminanceThreshold={0.95} intensity={0.35} mipmapBlur />
+          <Vignette eskil={false} offset={0.25} darkness={0.55} />
+        </EffectComposer>
       </Canvas>
       <UIOverlay />
     </>

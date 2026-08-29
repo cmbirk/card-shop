@@ -96,12 +96,18 @@ export function Shopkeeper() {
         <mesh material={apronMat} position={[0, 0.75, 0.14]}>
           <cylinderGeometry args={[0.26, 0.3, 0.68, 16, 1, true, -Math.PI / 3, (Math.PI * 2) / 3]} />
         </mesh>
-        {/* arms resting */}
+        {/* arms resting on the counter, hands and all */}
         <mesh material={MAT.flannel} position={[-0.36, 1, 0.12]} rotation={[0.5, 0, 0.6]}>
           <capsuleGeometry args={[0.07, 0.4, 6, 10]} />
         </mesh>
         <mesh material={MAT.flannel} position={[0.36, 1, 0.12]} rotation={[0.5, 0, -0.6]}>
           <capsuleGeometry args={[0.07, 0.4, 6, 10]} />
+        </mesh>
+        <mesh material={MAT.skin} position={[-0.46, 0.94, 0.28]}>
+          <sphereGeometry args={[0.06, 12, 10]} />
+        </mesh>
+        <mesh material={MAT.skin} position={[0.46, 0.94, 0.28]}>
+          <sphereGeometry args={[0.06, 12, 10]} />
         </mesh>
       </group>
       {/* head */}
@@ -123,15 +129,28 @@ export function Shopkeeper() {
         <mesh material={glassesMat} position={[0.08, 0.03, 0.21]}>
           <torusGeometry args={[0.05, 0.006, 8, 20]} />
         </mesh>
-        {/* mouth */}
-        <mesh ref={mouth} material={eyeMat} position={[0, -0.09, 0.2]}>
-          <boxGeometry args={[0.07, 0.02, 0.01]} />
+        {/* nose + mustache + ears */}
+        <mesh material={MAT.skin} position={[0, -0.02, 0.215]}>
+          <sphereGeometry args={[0.035, 12, 10]} />
         </mesh>
-        {/* cap */}
+        <mesh material={eyeMat} position={[0, -0.065, 0.205]} rotation-x={0.1}>
+          <boxGeometry args={[0.09, 0.018, 0.02]} />
+        </mesh>
+        <mesh material={MAT.skin} position={[-0.21, 0, 0.02]}>
+          <sphereGeometry args={[0.04, 10, 8]} />
+        </mesh>
+        <mesh material={MAT.skin} position={[0.21, 0, 0.02]}>
+          <sphereGeometry args={[0.04, 10, 8]} />
+        </mesh>
+        {/* mouth */}
+        <mesh ref={mouth} material={eyeMat} position={[0, -0.1, 0.2]}>
+          <boxGeometry args={[0.06, 0.018, 0.01]} />
+        </mesh>
+        {/* cap — brim up off the brow */}
         <mesh material={capMat} position={[0, 0.12, 0]}>
           <sphereGeometry args={[0.225, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2.4]} />
         </mesh>
-        <mesh material={capMat} position={[0, 0.1, 0.2]} rotation-x={-0.2}>
+        <mesh material={capMat} position={[0, 0.165, 0.21]} rotation-x={-0.45}>
           <cylinderGeometry args={[0.12, 0.15, 0.02, 16, 1, false, -Math.PI / 2, Math.PI]} />
         </mesh>
         {/* speech indicator while the reply streams */}

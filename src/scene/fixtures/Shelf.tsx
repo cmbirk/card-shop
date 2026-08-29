@@ -20,12 +20,24 @@ export function Shelf({ fixture, cards }: { fixture: Fixture; cards: PlacedCard[
       <mesh material={MAT.walnut} position={[0, 0.95, -0.18]}>
         <boxGeometry args={[2, 1.9, 0.03]} />
       </mesh>
-      {/* boards */}
+      {/* boards with a front lip */}
       {ROW_Y.map((y) => (
-        <mesh key={y} material={MAT.wornTop} position={[0, y, 0]} castShadow>
-          <boxGeometry args={[2, 0.03, 0.38]} />
-        </mesh>
+        <group key={y}>
+          <mesh material={MAT.wornTop} position={[0, y, 0]} castShadow>
+            <boxGeometry args={[2, 0.03, 0.38]} />
+          </mesh>
+          <mesh material={MAT.walnut} position={[0, y - 0.008, 0.19]}>
+            <boxGeometry args={[2, 0.045, 0.012]} />
+          </mesh>
+        </group>
       ))}
+      {/* crown + kick base */}
+      <mesh material={MAT.walnut} position={[0, 1.93, 0.02]} castShadow>
+        <boxGeometry args={[2.12, 0.07, 0.46]} />
+      </mesh>
+      <mesh material={MAT.walnut} position={[0, 0.08, 0.01]}>
+        <boxGeometry args={[2.08, 0.16, 0.44]} />
+      </mesh>
       {/* sign */}
       <mesh material={makeLabelMaterial(fixture.label, { bg: '#2e5e4e' })} position={[0, 2.05, 0.05]}>
         <planeGeometry args={[1.2, 0.3]} />

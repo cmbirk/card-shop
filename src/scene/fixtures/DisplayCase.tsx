@@ -26,6 +26,12 @@ export function DisplayCase({ cards }: { cards: PlacedCard[] }) {
       <mesh material={MAT.wornTop} position={[0, 1.01, 0]}>
         <boxGeometry args={[1.64, 0.03, 0.64]} />
       </mesh>
+      {/* dark metal frame along the glass edges */}
+      {([[-0.8, 0.3], [0.8, 0.3], [-0.8, -0.3], [0.8, -0.3]] as const).map(([x, z]) => (
+        <mesh key={`${x}${z}`} material={MAT.dark} position={[x, 0.75, z]}>
+          <boxGeometry args={[0.025, 0.52, 0.025]} />
+        </mesh>
+      ))}
       {/* interior glow — the good stuff literally glows */}
       <pointLight position={[0, 0.95, 0]} intensity={2} distance={1.6} color="#ffd9a0" />
       <mesh material={makeLabelMaterial('The Good Stuff', { bg: '#3b2a1a', fg: '#ffd97a', size: 42 })} position={[0, 1.25, 0.1]}>

@@ -1,12 +1,12 @@
 import { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { ContactShadows, useCursor } from '@react-three/drei';
+import { ContactShadows, Environment, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { shopLayout, ROOM } from '@shared/data/shopLayout';
 import type { Fixture } from '@shared/types';
 import { inventory } from '../systems/inventory';
 import { assignCards } from '../systems/placement';
-import { MAT, makeFloorMaterial, makeLabelMaterial } from './materials';
+import { MAT, makeLabelMaterial } from './materials';
 import { Shelf } from './fixtures/Shelf';
 import { DisplayCase } from './fixtures/DisplayCase';
 import { Counter } from './fixtures/Counter';
@@ -14,6 +14,7 @@ import { Bin } from './fixtures/Bin';
 import { useNavStore } from './../stores/navStore';
 import { useInspectStore } from '../stores/inspectStore';
 import { Facade } from './Facade';
+import { WallArt } from './WallArt';
 
 function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false);
@@ -110,7 +111,6 @@ function Pennant({ x, z, hue, rot }: { x: number; z: number; hue: number; rot: n
 }
 
 export function Shop() {
-  const floorMat = useMemo(() => makeFloorMaterial(), []);
   const placed = useMemo(() => assignCards(inventory, shopLayout), []);
   const inspecting = useInspectStore((s) => s.mode !== 'idle');
 
@@ -120,16 +120,18 @@ export function Shop() {
 
   return (
     <group>
+      {/* image-based lighting — most of the material realism comes from this */}
+      <Environment files="/hdri/artist_workshop_1k.hdr" environmentIntensity={0.55} />
       {/* ambient dims while inspecting to focus the eye */}
-      <ambientLight intensity={inspecting ? 0.28 : 0.42} color="#fff2df" />
-      <hemisphereLight intensity={0.35} color="#fff6e8" groundColor="#6b4a2f" />
+      <ambientLight intensity={inspecting ? 0.12 : 0.2} color="#fff2df" />
       {/* warm key from the south windows — the only shadow caster */}
       <directionalLight
         position={[2.5, 2.6, 5]}
-        intensity={1.3}
+        intensity={1.1}
         color="#ffd9a0"
         castShadow
-        shadow-mapSize={[1024, 1024]}
+        shadow-mapSize={[2048, 2048]}
+        shadow-normalBias={0.02}
         shadow-camera-left={-6}
         shadow-camera-right={6}
         shadow-camera-top={6}
@@ -140,10 +142,10 @@ export function Shop() {
       {/* counter lamp */}
       <pointLight position={[0, 2.4, -3]} intensity={1.4} distance={4} color="#ffd9a0" />
       {/* central fill over the bins/aisle */}
-      <pointLight position={[0, 2.5, 0.6]} intensity={1.1} distance={5} color="#fff0d8" />
+      <pointLight position={[0, 2.5, 0.6]} intensity={1.0} distance={5} color="#fff0d8" />
 
       {/* floor */}
-      <mesh material={floorMat} rotation-x={-Math.PI / 2} receiveShadow>
+      <mesh material={MAT.floor} rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[W, D]} />
       </mesh>
       <ContactShadows position={[0, 0.005, 0]} scale={12} far={2} blur={2.5} opacity={0.35} frames={1} />
@@ -231,6 +233,7 @@ export function Shop() {
 
       <CeilingFan />
       <DustMotes />
+      <WallArt />
       <Facade />
 
       {/* fixtures + stock */}
