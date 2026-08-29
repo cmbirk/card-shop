@@ -188,7 +188,9 @@ export function buildCardVisuals(): Map<string, CardVisual> {
     drawCardBack(ctx, sport, 0, 0, CELL_W, CELL_H);
     backMats.set(sport, new THREE.MeshStandardMaterial({ map: toTexture(ctx), roughness: 0.7 }));
     const geo = new THREE.ShapeGeometry(shape);
-    bakeUVs(geo, CARD_SIZE.w, CARD_SIZE.h, { u0: 0, v0: 0, u1: 1, v1: 1 }, true);
+    // the back mesh is rotated 180° about Y, which already puts u=1 on the viewer's right —
+    // mirroring the UVs on top of that reads the back reversed (real scans made it obvious)
+    bakeUVs(geo, CARD_SIZE.w, CARD_SIZE.h, { u0: 0, v0: 0, u1: 1, v1: 1 }, false);
     backGeos.set(sport, geo);
   }
 
@@ -296,7 +298,7 @@ export function makeDetailMaterials(card: Card): {
   };
 }
 
-/** Unit-UV geometry (0..1 front, mirrored back) for detail materials. */
+/** Unit-UV geometry (0..1) for detail materials. */
 let detailGeos: { front: THREE.BufferGeometry; back: THREE.BufferGeometry } | null = null;
 export function getDetailGeometries() {
   if (!detailGeos) {
@@ -304,7 +306,7 @@ export function getDetailGeometries() {
     const front = new THREE.ShapeGeometry(shape);
     bakeUVs(front, CARD_SIZE.w, CARD_SIZE.h, { u0: 0, v0: 0, u1: 1, v1: 1 }, false);
     const back = new THREE.ShapeGeometry(shape);
-    bakeUVs(back, CARD_SIZE.w, CARD_SIZE.h, { u0: 0, v0: 0, u1: 1, v1: 1 }, true);
+    bakeUVs(back, CARD_SIZE.w, CARD_SIZE.h, { u0: 0, v0: 0, u1: 1, v1: 1 }, false); // see backGeos note
     detailGeos = { front, back };
   }
   return detailGeos;

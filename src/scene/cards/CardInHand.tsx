@@ -15,7 +15,7 @@ import { sfx } from '../../systems/sfx';
 
 export function CardInHand() {
   const heldCardId = useInspectStore((s) => s.heldCardId);
-  if (!heldCardId) return null;
+  if (!heldCardId || !inventoryById.has(heldCardId)) return null;
   return <HeldCard key={heldCardId} cardId={heldCardId} />;
 }
 

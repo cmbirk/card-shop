@@ -23,6 +23,7 @@ export const useInspectStore = create<InspectState>((set, get) => ({
   pickUp: (id) => {
     const nav = useNavStore.getState();
     if (get().mode !== 'idle' || nav.mode === 'transit') return;
+    if (!inventoryById.has(id)) return; // stale id (card removed since load) — don't crash the scene
     nav.setMode('inspect-locked');
     set({ heldCardId: id, mode: 'pickingUp' });
   },
