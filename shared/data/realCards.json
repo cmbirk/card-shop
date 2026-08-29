@@ -171,6 +171,62 @@
         "funFact": "Population 322 in PSA 10 with zero graded higher. This is the ceiling.",
         "investmentNote": "blue-chip of this set"
       }
+    },
+    {
+      "id": "tag-h1761453",
+      "sport": "tcg",
+      "category": "graded-slabs",
+      "playerName": "CHARIZARD VSTAR",
+      "team": "",
+      "year": 2022,
+      "setName": "POK\u00c9MON SWORD & SHIELD JAPANESE",
+      "cardNumber": "#212/172",
+      "rarity": "graded",
+      "grade": {
+        "company": "TAG",
+        "value": 10,
+        "label": "TAG 10 PRISTINE",
+        "certNumber": "H1761453"
+      },
+      "price": 45000,
+      "seed": -969961840,
+      "featured": true,
+      "images": {
+        "front": "/cards/tag/tag-h1761453-f.jpg",
+        "back": "/cards/tag/tag-h1761453-b.jpg"
+      },
+      "lore": {
+        "blurb": "2022 CHARIZARD VSTAR, TAG-graded 10 (PRISTINE) with a full Digital Image & Grading report.",
+        "funFact": "Verify the DIG report at my.taggrading.com/card/H1761453."
+      }
+    },
+    {
+      "id": "tag-k6679119",
+      "sport": "tcg",
+      "category": "graded-slabs",
+      "playerName": "MEWTWO VSTAR",
+      "team": "",
+      "year": 2022,
+      "setName": "POK\u00c9MON SWORD & SHIELD JAPANESE",
+      "cardNumber": "#221/172",
+      "rarity": "graded",
+      "grade": {
+        "company": "TAG",
+        "value": 10,
+        "label": "TAG 10 PRISTINE",
+        "certNumber": "K6679119"
+      },
+      "price": 32000,
+      "seed": 78582675,
+      "featured": true,
+      "images": {
+        "front": "/cards/tag/tag-k6679119-f.jpg",
+        "back": "/cards/tag/tag-k6679119-b.jpg"
+      },
+      "lore": {
+        "blurb": "2022 MEWTWO VSTAR, TAG-graded 10 (PRISTINE) with a full Digital Image & Grading report.",
+        "funFact": "Verify the DIG report at my.taggrading.com/card/K6679119."
+      }
     }
   ]
 }
