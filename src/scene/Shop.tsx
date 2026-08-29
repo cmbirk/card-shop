@@ -85,7 +85,7 @@ function DustMotes() {
     pos.needsUpdate = true;
   });
   return (
-    <points ref={ref}>
+    <points ref={ref} raycast={() => null}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions.slice(), 3]} />
       </bufferGeometry>
