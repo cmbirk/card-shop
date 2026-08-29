@@ -121,6 +121,10 @@ function toTexture(ctx: CanvasRenderingContext2D): THREE.CanvasTexture {
 /** Paint a real scan over a canvas region once it loads (contain-fit on a dark mat). */
 function paintScan(url: string, ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, tex: THREE.Texture) {
   const img = new Image();
+  // scans in Supabase Storage are cross-origin; without this the atlas canvas is tainted and
+  // WebGL refuses to upload it (SecurityError on texSubImage2D) — every card in the atlas goes blank
+  img.crossOrigin = 'anonymous';
+  img.onerror = () => console.warn('[atlas] scan failed to load', url);
   img.onload = () => {
     ctx.fillStyle = '#181410';
     ctx.fillRect(x, y, w, h);
@@ -214,9 +218,36 @@ export function buildCardVisuals(): Map<string, CardVisual> {
 }
 
 export function getCardVisual(cardId: string): CardVisual {
-  const v = buildCardVisuals().get(cardId);
+  let v = buildCardVisuals().get(cardId);
+  if (!v) {
+    // inventory changed under us (admin save) — rebuild rather than crash the scene
+    invalidateCardVisuals();
+    v = buildCardVisuals().get(cardId);
+  }
   if (!v) throw new Error(`no visuals for card ${cardId}`);
   return v;
+}
+
+/**
+ * Drop the atlas so the next getCardVisual() rebuilds it from the current inventory.
+ * Called on reloadInventory(). Old textures are disposed a beat later so meshes mid-render
+ * aren't pulling the rug out from under themselves.
+ */
+export function invalidateCardVisuals(): void {
+  const old = visuals;
+  visuals = null;
+  if (!old) return;
+  const seen = new Set<THREE.Material>();
+  setTimeout(() => {
+    for (const v of old.values()) {
+      for (const m of [v.frontMaterial, v.backMaterial]) {
+        if (seen.has(m)) continue;
+        seen.add(m);
+        m.map?.dispose();
+        m.dispose();
+      }
+    }
+  }, 1000);
 }
 
 /** Hi-res single-card textures for close inspection (created on pickup, dispose after). */

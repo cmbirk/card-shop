@@ -38,6 +38,9 @@ export const useInventoryVersion = create<{ version: number; bump: () => void }>
 export async function reloadInventory(): Promise<void> {
   loaded = null;
   await loadInventory();
+  // the card-art atlas was built from the old inventory; rebuild it before the shelves re-place
+  const { invalidateCardVisuals } = await import('../scene/cards/atlas');
+  invalidateCardVisuals();
   useInventoryVersion.getState().bump();
 }
 

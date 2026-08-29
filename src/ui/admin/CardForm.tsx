@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Card, GradeCompany, RawCondition } from '@shared/types';
-import { saveCard, deleteCard, uploadCardImage, suggestId } from '../../admin/adminCards';
+import { saveCard, deleteCard, uploadCardImage, newCardId } from '../../admin/adminCards';
 import { prepareScan, fileFromDataTransfer } from '../../admin/imagePrep';
 
 const SPORTS: Card['sport'][] = ['baseball', 'basketball', 'football', 'hockey', 'tcg'];
@@ -14,7 +14,44 @@ const CONDITIONS: RawCondition[] = ['NM-MT', 'NM', 'EX-MT', 'EX', 'VG-EX', 'VG',
 
 /** "12.50" ↔ 1250 */
 const centsToInput = (c: number | undefined) => (c == null ? '' : (c / 100).toFixed(2));
-const inputToCents = (s: string) => (s.trim() === '' ? undefined : Math.round(parseFloat(s) * 100) || 0);
+const inputToCents = (s: string) => {
+  const n = parseFloat(s.replace(/[$,\s]/g, ''));
+  return s.trim() === '' ? undefined : Number.isFinite(n) ? Math.round(n * 100) : undefined;
+};
+
+/**
+ * Dollar amount stored as integer cents. Keeps the raw text while you type (a controlled
+ * number input that re-formats to two decimals on every keystroke can't be typed into) and
+ * formats on blur.
+ */
+function MoneyInput({ cents, onCents, required, placeholder }: { cents: number | undefined; onCents: (c: number | undefined) => void; required?: boolean; placeholder?: string }) {
+  const [text, setText] = useState(centsToInput(cents));
+  const [focused, setFocused] = useState(false);
+  // external change while not editing (e.g. a different card loaded) → resync
+  const shown = focused ? text : centsToInput(cents);
+  return (
+    <input data-1p-ignore
+      type="text"
+      inputMode="decimal"
+      placeholder={placeholder ?? '0.00'}
+      value={shown}
+      required={required}
+      onFocus={(e) => {
+        setText(centsToInput(cents));
+        setFocused(true);
+        e.target.select();
+      }}
+      onChange={(e) => {
+        setText(e.target.value);
+        onCents(inputToCents(e.target.value));
+      }}
+      onBlur={() => {
+        setFocused(false);
+        setText(centsToInput(inputToCents(text) ?? cents));
+      }}
+    />
+  );
+}
 
 interface FormProps {
   initial: Card;
@@ -47,8 +84,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     onError(null);
-    const id = card.id.trim() || suggestId(card);
-    if (!id) return onError('Give the card an id (or fill in player + year so one can be suggested).');
+    const id = card.id.trim() || newCardId(card.sport);
     if (!card.playerName.trim()) return onError('Player name is required.');
     setBusy(true);
     try {
@@ -78,8 +114,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
 
   const upload = async (side: 'front' | 'back', file: File | undefined) => {
     if (!file) return;
-    const id = card.id.trim() || suggestId(card);
-    if (!id) return onError('Set an id (or player + year) before uploading scans.');
+    const id = card.id.trim() || newCardId(card.sport);
     setUploading(side);
     setStage('reading…');
     onError(null);
@@ -111,6 +146,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
 
   return (
     <form
+      autoComplete="off"
       className={`admin-form${dragOver === 'form' ? ' drag-over' : ''}`}
       onSubmit={submit}
       onDragOver={(e) => {
@@ -132,14 +168,9 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
       <fieldset>
         <legend>Identity</legend>
         <div className="grid">
-          <label>
+          <label title="Generated — unique per physical card, never derived from its details">
             Id
-            <input
-              value={card.id}
-              placeholder={suggestId(card) || 'auto'}
-              onChange={(e) => patch({ id: e.target.value })}
-              disabled={!isNew}
-            />
+            <input data-1p-ignore value={card.id} readOnly style={{ fontFamily: "ui-monospace, monospace", opacity: 0.7 }} />
           </label>
           <label>
             Sport
@@ -159,31 +190,31 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           </label>
           <label className="wide">
             Player
-            <input value={card.playerName} onChange={(e) => patch({ playerName: e.target.value })} required />
+            <input data-1p-ignore value={card.playerName} onChange={(e) => patch({ playerName: e.target.value })} required />
           </label>
           <label>
             Team
-            <input value={card.team} onChange={(e) => patch({ team: e.target.value })} />
+            <input data-1p-ignore value={card.team} onChange={(e) => patch({ team: e.target.value })} />
           </label>
           <label>
             Year
-            <input type="number" value={card.year || ''} onChange={(e) => patch({ year: num(e.target.value) ?? 0 })} />
+            <input data-1p-ignore type="number" value={card.year || ''} onChange={(e) => patch({ year: num(e.target.value) ?? 0 })} />
           </label>
           <label>
             Brand
-            <input value={card.brand ?? ''} placeholder="Topps, Panini…" onChange={(e) => patch({ brand: e.target.value || undefined })} />
+            <input data-1p-ignore value={card.brand ?? ''} placeholder="Topps, Panini…" onChange={(e) => patch({ brand: e.target.value || undefined })} />
           </label>
           <label className="wide">
             Set
-            <input value={card.setName} onChange={(e) => patch({ setName: e.target.value })} />
+            <input data-1p-ignore value={card.setName} onChange={(e) => patch({ setName: e.target.value })} />
           </label>
           <label>
             Card #
-            <input value={card.cardNumber} onChange={(e) => patch({ cardNumber: e.target.value })} />
+            <input data-1p-ignore value={card.cardNumber} onChange={(e) => patch({ cardNumber: e.target.value })} />
           </label>
           <label>
             Subset / insert
-            <input value={card.subset ?? ''} onChange={(e) => patch({ subset: e.target.value || undefined })} />
+            <input data-1p-ignore value={card.subset ?? ''} onChange={(e) => patch({ subset: e.target.value || undefined })} />
           </label>
         </div>
       </fieldset>
@@ -193,19 +224,19 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
         <div className="grid">
           <label>
             Parallel
-            <input value={card.parallel ?? ''} placeholder="Base, Refractor…" onChange={(e) => patch({ parallel: e.target.value || undefined })} />
+            <input data-1p-ignore value={card.parallel ?? ''} placeholder="Base, Refractor…" onChange={(e) => patch({ parallel: e.target.value || undefined })} />
           </label>
           <label>
             Print run /X
-            <input type="number" value={card.printRun ?? ''} onChange={(e) => patch({ printRun: num(e.target.value) ?? null })} />
+            <input data-1p-ignore type="number" value={card.printRun ?? ''} onChange={(e) => patch({ printRun: num(e.target.value) ?? null })} />
           </label>
           <label>
             Serial #
-            <input type="number" value={card.serialNumber ?? ''} onChange={(e) => patch({ serialNumber: num(e.target.value) })} />
+            <input data-1p-ignore type="number" value={card.serialNumber ?? ''} onChange={(e) => patch({ serialNumber: num(e.target.value) })} />
           </label>
           <label>
             Variation
-            <input value={card.variation ?? ''} placeholder="SP / SSP / error…" onChange={(e) => patch({ variation: e.target.value || undefined })} />
+            <input data-1p-ignore value={card.variation ?? ''} placeholder="SP / SSP / error…" onChange={(e) => patch({ variation: e.target.value || undefined })} />
           </label>
           <label>
             Autograph
@@ -225,19 +256,19 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           </label>
           <div className="checks wide">
             <label>
-              <input type="checkbox" checked={!!card.isRookie} onChange={(e) => patch({ isRookie: e.target.checked })} /> Rookie
+              <input data-1p-ignore type="checkbox" checked={!!card.isRookie} onChange={(e) => patch({ isRookie: e.target.checked })} /> Rookie
             </label>
             <label>
-              <input type="checkbox" checked={!!card.isInsert} onChange={(e) => patch({ isInsert: e.target.checked })} /> Insert
+              <input data-1p-ignore type="checkbox" checked={!!card.isInsert} onChange={(e) => patch({ isInsert: e.target.checked })} /> Insert
             </label>
             <label>
-              <input type="checkbox" checked={!!card.isError} onChange={(e) => patch({ isError: e.target.checked })} /> Error
+              <input data-1p-ignore type="checkbox" checked={!!card.isError} onChange={(e) => patch({ isError: e.target.checked })} /> Error
             </label>
             <label>
-              <input type="checkbox" checked={!!card.foil} onChange={(e) => patch({ foil: e.target.checked })} /> Foil
+              <input data-1p-ignore type="checkbox" checked={!!card.foil} onChange={(e) => patch({ foil: e.target.checked })} /> Foil
             </label>
             <label>
-              <input type="checkbox" checked={!!card.featured} onChange={(e) => patch({ featured: e.target.checked })} /> Featured (display case)
+              <input data-1p-ignore type="checkbox" checked={!!card.featured} onChange={(e) => patch({ featured: e.target.checked })} /> Featured (display case)
             </label>
           </div>
         </div>
@@ -265,15 +296,15 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
               </label>
               <label>
                 Grade
-                <input type="number" step="0.5" value={grade.value} onChange={(e) => patchGrade({ value: Number(e.target.value), label: '' })} />
+                <input data-1p-ignore type="number" step="0.5" value={grade.value} onChange={(e) => patchGrade({ value: Number(e.target.value), label: '' })} />
               </label>
               <label>
                 Label
-                <input value={grade.label} placeholder="PSA 10 GEM MT" onChange={(e) => patchGrade({ label: e.target.value })} />
+                <input data-1p-ignore value={grade.label} placeholder="PSA 10 GEM MT" onChange={(e) => patchGrade({ label: e.target.value })} />
               </label>
               <label>
                 Cert #
-                <input value={grade.certNumber ?? ''} onChange={(e) => patchGrade({ certNumber: e.target.value || undefined })} />
+                <input data-1p-ignore value={grade.certNumber ?? ''} onChange={(e) => patchGrade({ certNumber: e.target.value || undefined })} />
               </label>
             </>
           ) : (
@@ -303,7 +334,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
         <div className="grid">
           <label>
             Price $
-            <input type="number" step="0.01" min="0" value={centsToInput(card.price)} onChange={(e) => patch({ price: inputToCents(e.target.value) ?? 0 })} required />
+            <MoneyInput cents={card.price} onCents={(c) => patch({ price: c ?? 0 })} required />
           </label>
           <label>
             Status
@@ -315,19 +346,19 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           </label>
           <label>
             Qty
-            <input type="number" min="0" value={card.quantity ?? 1} onChange={(e) => patch({ quantity: num(e.target.value) ?? 1 })} />
+            <input data-1p-ignore type="number" min="0" value={card.quantity ?? 1} onChange={(e) => patch({ quantity: num(e.target.value) ?? 1 })} />
           </label>
           <label>
             Cost basis $ <span className="admin-only">admin</span>
-            <input type="number" step="0.01" min="0" value={centsToInput(card.costBasis)} onChange={(e) => patch({ costBasis: inputToCents(e.target.value) })} />
+            <MoneyInput cents={card.costBasis} onCents={(c) => patch({ costBasis: c })} placeholder="what you paid" />
           </label>
           <label>
             Acquired <span className="admin-only">admin</span>
-            <input type="date" value={card.acquiredDate ?? ''} onChange={(e) => patch({ acquiredDate: e.target.value || undefined })} />
+            <input data-1p-ignore type="date" value={card.acquiredDate ?? ''} onChange={(e) => patch({ acquiredDate: e.target.value || undefined })} />
           </label>
           <label>
             From <span className="admin-only">admin</span>
-            <input value={card.acquiredFrom ?? ''} placeholder="eBay, show, trade…" onChange={(e) => patch({ acquiredFrom: e.target.value || undefined })} />
+            <input data-1p-ignore value={card.acquiredFrom ?? ''} placeholder="eBay, show, trade…" onChange={(e) => patch({ acquiredFrom: e.target.value || undefined })} />
           </label>
         </div>
       </fieldset>
@@ -356,7 +387,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
               >
                 <span>{side}</span>
                 {url && uploading !== side ? <img src={url} alt={`${side} scan`} /> : <div className="admin-scan-empty">{uploading === side ? stage || 'working…' : 'drop a photo\nor click'}</div>}
-                <input type="file" accept="image/*,.heic,.heif" disabled={!!uploading} onChange={(e) => void upload(side, e.target.files?.[0])} />
+                <input data-1p-ignore type="file" accept="image/*,.heic,.heif" disabled={!!uploading} onChange={(e) => void upload(side, e.target.files?.[0])} />
               </label>
             );
           })}
@@ -372,11 +403,11 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           </label>
           <label className="wide">
             Fun fact
-            <input value={card.lore.funFact ?? ''} onChange={(e) => patch({ lore: { ...card.lore, funFact: e.target.value || undefined } })} />
+            <input data-1p-ignore value={card.lore.funFact ?? ''} onChange={(e) => patch({ lore: { ...card.lore, funFact: e.target.value || undefined } })} />
           </label>
           <label className="wide">
             Investment note
-            <input value={card.lore.investmentNote ?? ''} onChange={(e) => patch({ lore: { ...card.lore, investmentNote: e.target.value || undefined } })} />
+            <input data-1p-ignore value={card.lore.investmentNote ?? ''} onChange={(e) => patch({ lore: { ...card.lore, investmentNote: e.target.value || undefined } })} />
           </label>
         </div>
       </fieldset>

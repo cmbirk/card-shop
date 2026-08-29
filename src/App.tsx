@@ -11,6 +11,7 @@ import { CardInHand } from './scene/cards/CardInHand';
 import { UIOverlay } from './ui/UIOverlay';
 import { loadInventory } from './systems/inventory';
 import { useAuthStore } from './stores/authStore';
+import { ErrorBoundary } from './ui/ErrorBoundary';
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -41,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <Canvas
         shadows
         dpr={[1, 2]}
@@ -66,6 +67,6 @@ export default function App() {
         </EffectComposer>
       </Canvas>
       <UIOverlay />
-    </>
+    </ErrorBoundary>
   );
 }

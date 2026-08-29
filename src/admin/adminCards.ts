@@ -55,10 +55,21 @@ export async function uploadCardImage(file: File, cardId: string, side: 'front' 
   return data.publicUrl;
 }
 
+/**
+ * Generated card id: sport prefix + 8 random hex chars (e.g. "fb-3f9a2c1d"). Never derived from
+ * mutable fields — two copies of the same card must not collide — and short because ids ride
+ * Chris's grounding prompt.
+ */
+export function newCardId(sport: Card['sport'] = 'baseball'): string {
+  const bytes = new Uint8Array(4);
+  crypto.getRandomValues(bytes);
+  return `${sport.slice(0, 2)}-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
+}
+
 /** A blank card scaffold for the "add" form. */
 export function blankCard(): Card {
   return {
-    id: '',
+    id: newCardId(),
     sport: 'baseball',
     category: 'stars',
     playerName: '',
@@ -77,7 +88,7 @@ export function blankCard(): Card {
   };
 }
 
-/** Derive a stable id from the card fields when the admin hasn't set one. */
+/** @deprecated ids are generated (newCardId); kept for scripts that still call it. */
 export function suggestId(c: Card): string {
   const slug = (s: string) =>
     s
@@ -227,8 +238,7 @@ function recordToCard(r: Record<string, unknown>): { card?: Card; errors: string
     featured: truthy(r.featured),
     seed: num(r.seed) ?? Math.floor(Math.random() * 2_000_000_000),
   };
-  if (!card.id) card.id = suggestId(card);
-  if (!card.id) return { errors: ['could not derive an id — set id or player + year'] };
+  if (!card.id) card.id = newCardId(card.sport); // no id → a new card
   return { card, errors: [] };
 }
 
