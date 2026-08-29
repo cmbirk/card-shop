@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { Card, ChatMessage } from '../../shared/types';
-import { buildInventoryContext, getInventory, priceStr } from './inventoryContext';
+import { buildInventoryContext, getInventory, priceStr } from './inventoryContext.js';
 
 const PERSONA = `You are Chris, the owner of GEM, a small neighborhood trading-card shop (GEM as in gem mint — the grade every collector chases). A customer is standing at your counter, in your shop, talking to you.
 
@@ -72,7 +72,13 @@ export async function runShopkeeper(
       }
     }
     const final = await stream.finalMessage();
-    events.onDone(final.usage);
+    const u = final.usage;
+    // cache_read > 0 on turn 2+ proves the system-prompt cache is working
+    // (haiku-4-5 needs a ≥4096-token prefix to cache at all)
+    console.log(
+      `[shopkeeper] tokens in=${u.input_tokens} out=${u.output_tokens} cache_write=${u.cache_creation_input_tokens} cache_read=${u.cache_read_input_tokens}`,
+    );
+    events.onDone(u);
   } catch (err) {
     if (signal?.aborted) return;
     console.error('[shopkeeper]', err);

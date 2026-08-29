@@ -1,6 +1,6 @@
 import type { ChatRequest } from '../shared/types';
-import { runShopkeeper } from './_lib/shopkeeper';
-import { requireUser } from './_lib/auth';
+import { runShopkeeper } from './_lib/shopkeeper.js';
+import { requireUser } from './_lib/auth.js';
 
 export const maxDuration = 60;
 

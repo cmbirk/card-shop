@@ -1,9 +1,9 @@
 // Relative imports only — keeps the Vercel function bundler happy without alias config.
 import { createClient } from '@supabase/supabase-js';
 import type { Card, InventoryFile } from '../../shared/types';
-import { rowToCard, type CardRow } from '../../shared/cardMapping';
-import inventoryJson from '../../shared/data/inventory.json';
-import realCardsJson from '../../shared/data/realCards.json';
+import { rowToCard, type CardRow } from '../../shared/cardMapping.js';
+import inventoryJson from '../../shared/data/inventory.json' with { type: 'json' };
+import realCardsJson from '../../shared/data/realCards.json' with { type: 'json' };
 
 const bundled: Card[] = [
   ...(inventoryJson as InventoryFile).cards,
@@ -25,7 +25,9 @@ export async function getInventory(): Promise<{ cards: Card[]; cardsById: Map<st
   let cards = bundled;
   if (supa) {
     try {
-      const { data, error } = await supa.from('cards').select('*').neq('status', 'sold');
+      // deterministic order — unordered SELECT can shuffle rows between fetches,
+      // changing the system-prompt bytes and silently invalidating the prompt cache
+      const { data, error } = await supa.from('cards').select('*').neq('status', 'sold').order('id');
       if (error) throw error;
       if (data && data.length) cards = (data as CardRow[]).map(rowToCard);
     } catch (err) {
