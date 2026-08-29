@@ -31,6 +31,10 @@ function tone(freq: number, dur: number, type: OscillatorType, gain: number, swe
 
 export const sfx = {
   tick: () => tone(2200, 0.03, 'sine', 0.03),
+  shimmer: () => {
+    tone(3200, 0.06, 'sine', 0.025, 4800);
+    setTimeout(() => tone(4200, 0.05, 'sine', 0.018, 5600), 40);
+  },
   pickup: () => tone(500, 0.12, 'triangle', 0.06, 900),
   flip: () => tone(300, 0.08, 'triangle', 0.05, 600),
   putBack: () => tone(700, 0.08, 'sine', 0.05, 400),

@@ -99,6 +99,12 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   system prompt). Maya offers a line about the top slab when you reach the case.
 - **Cards are data; positions are derived.** `placement.ts` maps inventory → shelf slots with
   seeded jitter. Moving a shelf never touches card data.
+- **Refractors flash when you tilt them.** Foils and non-base parallels get a clearcoat/iridescent
+  material in hand plus a light band that sweeps across the face as you tilt (with a shimmer sound);
+  shelf cards keep the cheap foil shader.
+- **Bins you actually dig through.** Bargain bins are a front-to-back stack: scroll (or ←/→) to thumb
+  through — cards flick forward and the one under your thumb stands up; click it to pick it up, or
+  click a buried card to jump to it.
 - **Procedural art, real scans override.** Card faces are canvas-generated (fictional
   players — licensing-safe) in texture atlases; a card's `images.front` paints its real scan
   over the atlas cell. Graded cards render as brand-accurate slabs (PSA/BGS/TAG/SGC labels).

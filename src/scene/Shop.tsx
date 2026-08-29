@@ -247,7 +247,7 @@ export function Shop() {
         <FixtureGroup key={f.id} fixture={f}>
           {f.kind === 'shelf' && <Shelf fixture={f} cards={placed.get(f.id) ?? []} />}
           {f.kind === 'displayCase' && <DisplayCase cards={placed.get(f.id) ?? []} />}
-          {f.kind === 'bin' && <Bin cards={placed.get(f.id) ?? []} />}
+          {f.kind === 'bin' && <Bin fixtureId={f.id} cards={placed.get(f.id) ?? []} />}
           {f.kind === 'counter' && <Counter />}
         </FixtureGroup>
       ))}

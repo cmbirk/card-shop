@@ -84,7 +84,9 @@ export function UIOverlay() {
         <p>
           {outside
             ? 'Click the front door to step inside'
-            : 'Click a glowing spot to walk over · click a card to pick it up'}
+            : station === 'bins'
+              ? 'Scroll over a bin to thumb through it · click the card that\'s up to pick it up'
+              : 'Click a glowing spot to walk over · click a card to pick it up'}
         </p>
       </div>
       {isAdmin && (

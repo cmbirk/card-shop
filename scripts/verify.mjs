@@ -56,6 +56,9 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
   else if (cmd === 'adminFlag') await page.evaluate(() => window.__auth?.setState({ isAdmin: true }));
   else if (cmd === 'admin') await page.evaluate(() => { window.__auth?.setState({ isAdmin: true }); window.__ui?.getState().setAdminOpen(true); });
   else if (cmd === 'ask') await page.evaluate((id) => { window.__inspect?.getState().pickUp(id); const t = setInterval(() => { if (window.__inspect?.getState().mode === 'inspecting') { clearInterval(t); window.__dialogue?.getState().askAbout(id); } }, 100); }, a[0]);
+  else if (cmd === 'wheel') await page.mouse.wheel(0, Number(a[0]));
+  else if (cmd === 'riffle') await page.evaluate(([id, n]) => window.__bin?.getState().step(id, Number(n), 99), a);
+  else if (cmd === 'tilt') await page.evaluate(([y, p]) => window.__tilt?.(Number(y), Number(p)), a);
   else if (cmd === 'pickup') await page.evaluate((id) => window.__inspect?.getState().pickUp(id), a[0]);
   else if (cmd === 'state') {
     const s = await page.evaluate(() => ({
@@ -66,6 +69,7 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
       adminOpen: window.__ui?.getState().adminOpen,
       chris: window.__keeper?.getState().pose,
       maya: window.__maya?.getState().line,
+      bin: window.__bin?.getState().index,
     }));
     console.log('STATE', JSON.stringify(s));
   } else if (cmd === 'shot') {

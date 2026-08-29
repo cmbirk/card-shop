@@ -10,10 +10,11 @@ import { useAuthStore } from './stores/authStore';
 import { useDialogueStore } from './stores/dialogueStore';
 import { useShopkeeperStore } from './stores/shopkeeperStore';
 import { useMayaStore } from './stores/mayaStore';
+import { useBinStore } from './stores/binStore';
 
 if (import.meta.env.DEV) {
   // dev-only hooks for scripted smoke tests
-  Object.assign(window, { __nav: useNavStore, __inspect: useInspectStore, __basket: useBasketStore, __ui: useUIStore, __auth: useAuthStore, __dialogue: useDialogueStore, __keeper: useShopkeeperStore, __maya: useMayaStore });
+  Object.assign(window, { __nav: useNavStore, __inspect: useInspectStore, __basket: useBasketStore, __ui: useUIStore, __auth: useAuthStore, __dialogue: useDialogueStore, __keeper: useShopkeeperStore, __maya: useMayaStore, __bin: useBinStore });
 }
 
 createRoot(document.getElementById('root')!).render(

@@ -18,8 +18,12 @@ import { formatCents } from '../../stores/basketStore';
 import { FEEL } from '../../feel';
 import { sfx } from '../../systems/sfx';
 
-/** A card in its home slot (shelf / bin / case). Hover lifts it; click picks it up. */
-export function CardMesh({ card, slot }: { card: Card; slot: SlotTransform }) {
+/**
+ * A card in its home slot (shelf / bin / case). Hover lifts it; click picks it up.
+ * `onClickOverride` lets a fixture intercept the click (return true = handled) — the bin
+ * uses it so clicking a buried card riffles to it instead of picking it up.
+ */
+export function CardMesh({ card, slot, onClickOverride }: { card: Card; slot: SlotTransform; onClickOverride?: () => boolean }) {
   const group = useRef<THREE.Group>(null!);
   const inner = useRef<THREE.Group>(null!);
   const [hovered, setHovered] = useState(false);
@@ -69,6 +73,7 @@ export function CardMesh({ card, slot }: { card: Card; slot: SlotTransform }) {
             if (hidden || !canInteract()) return;
             e.stopPropagation();
             setHovered(false);
+            if (onClickOverride?.()) return;
             sfx.pickup();
             useInspectStore.getState().pickUp(card.id);
           }}

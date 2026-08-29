@@ -22,6 +22,18 @@ export const FEEL = {
   inspectMaxDistance: 0.5,
   detailTextureAt: 0.3, // swap to hi-res closer than this
 
+  // refractor sheen (in hand)
+  sheenSweepScale: 1.6, // how fast the light band crosses the card per radian of tilt
+  shimmerVelocity: 2.5, // rad/s of tilt before the shimmer sound can fire
+  shimmerCooldown: 0.35, // s between shimmers
+
+  // bargain-bin riffle
+  riffleLambda: 14,
+  riffleLift: 0.07, // the open card stands up out of the stack
+  riffleOpenTilt: (22 * Math.PI) / 180, // toward the customer
+  riffleFlickTilt: (-45 * Math.PI) / 180, // flicked-forward cards lie against the front wall
+  riffleWheelStep: 40, // px of wheel per card (trackpads)
+
   // basket
   basketLambda: 8,
   basketAnchor: [0.24, -0.22, -0.75] as const,

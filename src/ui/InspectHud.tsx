@@ -3,6 +3,7 @@ import { useInspectStore } from '../stores/inspectStore';
 import { useDialogueStore } from '../stores/dialogueStore';
 import { useShopkeeperStore } from '../stores/shopkeeperStore';
 import { inventoryById } from '../systems/inventory';
+import { isRefractor } from '../scene/cards/atlas';
 import { formatCents } from '../stores/basketStore';
 
 export function InspectHud() {
@@ -56,7 +57,7 @@ export function InspectHud() {
           Put back
         </button>
       </div>
-      <div className="hint-line">drag to tilt · double-click or Flip to see the back · scroll to zoom · A to ask Chris · Esc to put back</div>
+      <div className="hint-line">{isRefractor(card) ? 'tilt it — it\'s a refractor · ' : 'drag to tilt · '}double-click or Flip to see the back · scroll to zoom · A to ask Chris · Esc to put back</div>
     </div>
   );
 }

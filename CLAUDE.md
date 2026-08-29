@@ -54,7 +54,11 @@ src/
   `StationController` turns the camera on `visiting`. Situational chat context (held card, station)
   goes in `ChatRequest.context` → appended to the *user* turn, never the system prompt.
 - **Transparent/decorative meshes set `raycast={() => null}`** or they steal clicks (this broke
-  every graded card once).
+  every graded card once). Corollary: an invisible *hit box* in front of cards is also a click thief —
+  its hit bubbles to `FixtureGroup`'s `stopPropagation` and drops every hit behind it. `Bin.tsx`
+  raycasts its wheel target manually instead of giving it R3F handlers.
+- **The wheel is shared:** `CardInHand` owns it while inspecting; `Bin` only riffles when parked at
+  `bins` with nothing in hand. `binSlot` is the closed-stack rest pose; `Bin.tsx` animates offsets.
 
 ## Dev workflow
 
@@ -64,7 +68,8 @@ src/
   Dev hooks in dev mode: `window.__nav / __inspect / __basket / __ui / __auth / __dialogue / __keeper / __maya`.
   Camera glide is slow headless — poll `__nav.getState()` for arrival before asserting. `verify.mjs`
   actions `admin` / `adminFlag` fake admin status; `ask,<id>` runs the hold-up-a-card → Chris walks
-  over flow (headless has no JWT, so the fallback line shows — the walk still exercises fully).
+  over flow (headless has no JWT, so the fallback line shows — the walk still exercises fully);
+  `tilt,<yaw>,<pitch>` poses the held card (sheen shots); `riffle,<binId>,<n>` / `wheel,<dy>` dig a bin.
 - **Admin edits must call `reloadInventory()`** (bumps `useInventoryVersion`) or the shelves
   won't re-place until a page reload.
 - **Supabase:** `npm run db:push` (apply migrations), `db:seed`, `db:types`. Project ref in

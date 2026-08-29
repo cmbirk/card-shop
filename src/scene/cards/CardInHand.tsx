@@ -5,7 +5,7 @@ import { easing } from 'maath';
 import { CARD_SIZE } from '@shared/data/shopLayout';
 import { inventoryById } from '../../systems/inventory';
 import { getCardHome } from '../../systems/cardRegistry';
-import { makeDetailMaterials, getDetailGeometries } from './atlas';
+import { makeDetailMaterials, getDetailGeometries, isRefractor, type SweepUniforms } from './atlas';
 import { Slab } from './Slab';
 import { useInspectStore, type InspectMode } from '../../stores/inspectStore';
 import { useBasketStore } from '../../stores/basketStore';
@@ -46,7 +46,23 @@ function HeldCard({ cardId }: { cardId: string }) {
     distCur: FEEL.inspectDistance as number,
     lastFlip: useInspectStore.getState().requestFlip,
     dragging: false,
+    sweepSide: 1, // which side of centre the light band was on last frame (for the shimmer trigger)
+    shimmerAt: 0,
   });
+  const refractor = isRefractor(card);
+
+  // dev-only: scripted tilt for the verify loop (see scripts/verify.mjs `tilt`)
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const a = anim.current;
+    (window as unknown as { __tilt?: (yaw: number, pitch: number) => void }).__tilt = (yaw, pitch) => {
+      a.targetYaw = yaw;
+      a.targetPitch = pitch;
+    };
+    return () => {
+      delete (window as unknown as { __tilt?: unknown }).__tilt;
+    };
+  }, []);
 
   // drag-to-rotate + wheel zoom on the canvas while inspecting
   useEffect(() => {
@@ -104,7 +120,7 @@ function HeldCard({ cardId }: { cardId: string }) {
 
   const pose = useMemo(() => ({ pos: new THREE.Vector3(), quat: new THREE.Quaternion() }), []);
 
-  useFrame((_, dtRaw) => {
+  useFrame((state, dtRaw) => {
     const dt = Math.min(dtRaw, 0.05);
     const st = useInspectStore.getState();
     const a = anim.current;
@@ -153,8 +169,23 @@ function HeldCard({ cardId }: { cardId: string }) {
         break;
       }
       case 'inspecting': {
+        const prevYaw = a.yaw;
+        const prevPitch = a.pitch;
         a.yaw = THREE.MathUtils.damp(a.yaw, a.targetYaw, FEEL.dragLambda, dt);
         a.pitch = THREE.MathUtils.damp(a.pitch, a.targetPitch, FEEL.dragLambda, dt);
+        if (refractor) {
+          // the light band is a fixed function of the pose, so it moves with the card like real light
+          const sweep = 0.5 + 0.5 * Math.sin(a.yaw * FEEL.sheenSweepScale + a.pitch * 1.2);
+          const u = (detail.front.userData.sweep as SweepUniforms | undefined);
+          if (u) u.uSweep.value = sweep;
+          const vel = dt > 0 ? (Math.abs(a.yaw - prevYaw) + Math.abs(a.pitch - prevPitch)) / dt : 0;
+          const side = sweep >= 0.5 ? 1 : -1;
+          if (side !== a.sweepSide && vel > FEEL.shimmerVelocity && state.clock.elapsedTime - a.shimmerAt > FEEL.shimmerCooldown) {
+            sfx.shimmer();
+            a.shimmerAt = state.clock.elapsedTime;
+          }
+          a.sweepSide = side;
+        }
         a.distCur = THREE.MathUtils.damp(a.distCur, a.dist, 8, dt);
         // pull back slightly mid-flip so the edge doesn't feel paper-thin
         const flipFrac = Math.abs(((a.yaw % (Math.PI * 2)) + Math.PI * 2) % Math.PI);

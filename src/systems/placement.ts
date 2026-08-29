@@ -55,14 +55,13 @@ function caseSlot(fixture: Fixture, index: number): SlotTransform {
   };
 }
 
+/** Closed stack, back (index 0) to front; Bin.tsx animates the riffle on top of this rest pose. */
 function binSlot(fixture: Fixture, index: number, card: Card): SlotTransform {
-  const { cols, spacing } = fixture.slots;
+  const { spacing } = fixture.slots;
   const rand = mulberry32(card.seed);
-  const x = (index - (cols - 1) / 2) * (spacing[0] + 0.002);
-  // riffled-through stack leaning against the bin's back wall
   return {
-    position: [x + spread(rand) * 0.012, 0.62 + spread(rand) * 0.015, -0.08 + index * 0.012],
-    rotation: [-55 * DEG, spread(rand) * 6 * DEG, spread(rand) * 8 * DEG],
+    position: [spread(rand) * 0.008, 0.85 + spread(rand) * 0.008, -0.18 + index * spacing[1]],
+    rotation: [-35 * DEG, spread(rand) * 3 * DEG, spread(rand) * 5 * DEG],
   };
 }
 

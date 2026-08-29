@@ -85,7 +85,7 @@ export const shopLayout: ShopLayout = {
       position: [-0.6, 0, -0.5],
       rotationY: (15 * Math.PI) / 180,
       accepts: { category: 'budget-box' },
-      slots: { rows: 1, cols: 10, spacing: [0.05, 0] },
+      slots: { rows: 1, cols: 24, spacing: [0, 0.014] }, // a front-to-back stack; spacing[1] = card pitch
       stationId: 'bins',
       label: 'Discount Bin',
     },
@@ -95,7 +95,7 @@ export const shopLayout: ShopLayout = {
       position: [0.7, 0, -0.6],
       rotationY: (-10 * Math.PI) / 180,
       accepts: { category: 'budget-box-b' },
-      slots: { rows: 1, cols: 10, spacing: [0.05, 0] },
+      slots: { rows: 1, cols: 24, spacing: [0, 0.014] }, // a front-to-back stack; spacing[1] = card pitch
       stationId: 'bins',
       label: 'Discount Bin',
     },

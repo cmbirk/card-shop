@@ -57,12 +57,31 @@ function bakeUVs(geo: THREE.BufferGeometry, w: number, h: number, rect: UVRect, 
   uv.needsUpdate = true;
 }
 
-/** Inject a cheap view-angle rainbow + fresnel into a standard material — the foil effect. */
-export function makeFoil(material: THREE.MeshStandardMaterial, strength = 0.35): THREE.MeshStandardMaterial {
+/** Foil / refractor / non-base parallel — the cards that flash when you tilt them. */
+export function isRefractor(card: Card): boolean {
+  return !!card.foil || (!!card.parallel && card.parallel.toLowerCase() !== 'base');
+}
+
+/** Uniforms exposed on a sweep-enabled foil material (see makeFoil). */
+export interface SweepUniforms {
+  uSweep: { value: number }; // 0..1 band position across the card
+  uSweepStrength: { value: number };
+}
+
+/**
+ * Inject a cheap view-angle rainbow + fresnel into a standard material — the foil effect.
+ * With `sweep`, also adds a bright diagonal light band the frame loop can drive across the
+ * face from the tilt (in-hand only); uniforms land on `material.userData.sweep`.
+ */
+export function makeFoil(material: THREE.MeshStandardMaterial, strength = 0.35, opts: { sweep?: boolean } = {}): THREE.MeshStandardMaterial {
+  const sweep: SweepUniforms = { uSweep: { value: 0.5 }, uSweepStrength: { value: opts.sweep ? 0.32 : 0 } };
+  if (opts.sweep) material.userData.sweep = sweep;
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uFoilStrength = { value: strength };
+    shader.uniforms.uSweep = sweep.uSweep;
+    shader.uniforms.uSweepStrength = sweep.uSweepStrength;
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform float uFoilStrength;')
+      .replace('#include <common>', '#include <common>\nuniform float uFoilStrength;\nuniform float uSweep;\nuniform float uSweepStrength;')
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
@@ -74,10 +93,14 @@ export function makeFoil(material: THREE.MeshStandardMaterial, strength = 0.35):
           vec3 fRainbow = 0.5 + 0.5 * cos( 6.2831 * ( fAng * 2.0 + vMapUv.y * 1.5 ) + vec3( 0.0, 2.094, 4.188 ) );
           float fBand = 0.8 + 0.2 * sin( ( vMapUv.x + vMapUv.y ) * 40.0 );
           totalEmissiveRadiance += fRainbow * fFres * fBand * uFoilStrength;
+          // light sweep: a soft diagonal band whose position is driven from the tilt
+          float fSweepPos = vMapUv.x * 0.7 + vMapUv.y * 0.3;
+          float fSweep = exp( -pow( ( fSweepPos - uSweep ) * 14.0, 2.0 ) );
+          totalEmissiveRadiance += ( fRainbow * 0.6 + 0.4 ) * fSweep * uSweepStrength;
         }`,
       );
   };
-  material.customProgramCacheKey = () => `foil-${strength}`;
+  material.customProgramCacheKey = () => `foil-${strength}-${opts.sweep ? 'sweep' : 'flat'}`;
   return material;
 }
 
@@ -213,8 +236,21 @@ export function makeDetailMaterials(card: Card): {
   if (card.images?.front) paintScan(card.images.front, fctx, 0, 0, fw, fh, frontTex);
   if (card.images?.back) paintScan(card.images.back, bctx, 0, 0, fw, fh, backTex);
   frontTex.anisotropy = 8;
-  const front = card.foil
-    ? makeFoil(new THREE.MeshStandardMaterial({ map: frontTex, roughness: 0.35, metalness: 0.1 }))
+  // refractors get the real treatment in hand: clearcoat + iridescence + a tilt-driven light sweep
+  const front = isRefractor(card)
+    ? makeFoil(
+        new THREE.MeshPhysicalMaterial({
+          map: frontTex,
+          roughness: 0.3,
+          metalness: 0.15,
+          clearcoat: 0.5,
+          clearcoatRoughness: 0.3,
+          iridescence: 0.18,
+          iridescenceIOR: 1.3,
+        }),
+        0.35,
+        { sweep: true },
+      )
     : new THREE.MeshStandardMaterial({ map: frontTex, roughness: 0.55 });
   const back = new THREE.MeshStandardMaterial({ map: backTex, roughness: 0.7 });
   return {
