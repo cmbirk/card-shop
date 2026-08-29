@@ -2,6 +2,7 @@ import type { Fixture } from '@shared/types';
 import type { PlacedCard } from '../../systems/placement';
 import { MAT, makeLabelMaterial } from '../materials';
 import { CardMesh } from '../cards/CardMesh';
+import { ProductRow } from './SealedProduct';
 
 const ROW_Y = [0.5, 0.9, 1.3, 1.7];
 
@@ -46,6 +47,15 @@ export function Shelf({ fixture, cards }: { fixture: Fixture; cards: PlacedCard[
       <pointLight position={[0, 2.3, 1.1]} intensity={1.6} distance={3.8} color="#fff0d8" />
       {cards.map(({ card, slot }) => (
         <CardMesh key={card.id} card={card} slot={slot} />
+      ))}
+      {/* sealed product fills rows the cards don't reach (cards fill top-down) */}
+      {ROW_Y.filter((_, i) => i < ROW_Y.length - Math.ceil(cards.length / fixture.slots.cols)).map((y, i) => (
+        <ProductRow
+          key={y}
+          sport={fixture.accepts.sport ?? 'baseball'}
+          y={y + 0.015}
+          seed={[...fixture.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7) + i * 77}
+        />
       ))}
     </group>
   );
