@@ -18,7 +18,7 @@ TypeScript, on Vercel (static client + `/api` serverless functions), backed by S
 ```bash
 npm install
 cp .env.example .env.local     # add ANTHROPIC_API_KEY + your Supabase keys (see below)
-npm run dev:client -- --port 5199   # Vite dev server; also dev-mounts /api
+npm run dev   # Vite dev server; also dev-mounts /api
 ```
 
 Open http://localhost:5199. The app runs even before Supabase/keys are configured — it falls
@@ -72,9 +72,9 @@ src/
   stores/          zustand: nav, basket, inspect, dialogue, ui, auth
   systems/         inventory (live Supabase read + bundled fallback), placement, rng, sfx
   scene/           Shop, Facade, StationController (glide nav), fixtures/, cards/,
-                   Shopkeeper (Chris), Maya, Basket, materials/pbr
-  admin/           admin CRUD + panel (add/price/photograph cards)  ⟵ in progress
-  ui/              DOM overlays: chat, basket, inspect, checkout, sign-in
+                   Shopkeeper (Chris), Maya, Basket, BackOfficeDoor, materials/pbr
+  admin/           adminCards.ts — Supabase CRUD + scan upload (admin JWT, RLS-gated)
+  ui/              DOM overlays: chat, basket, inspect, checkout, sign-in, AdminPanel (back office)
 scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill)
 ```
 
@@ -87,6 +87,12 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   view (admin-only columns like cost basis hidden), and RLS lets only admins (rows in the
   `admins` table) write. Chris's grounding reads the DB (TTL-cached), so new cards show up
   without a redeploy.
+- **Back office.** Admins get a "STAFF ONLY" door beside the counter (and a 🗝 HUD button)
+  that opens the admin panel: search every card incl. sold/reserved and cost basis, add/edit
+  (identity, parallel/hits, grading, price, admin-only acquisition fields, lore), upload
+  front/back scans to Storage, delete. Saves re-place the shelves live. Non-admins who click
+  the door get waved off by Chris.
+- **Sign-in: Google or email magic link.** Both resolve to one Supabase user per email.
 - **Cards are data; positions are derived.** `placement.ts` maps inventory → shelf slots with
   seeded jitter. Moving a shelf never touches card data.
 - **Procedural art, real scans override.** Card faces are canvas-generated (fictional
@@ -102,9 +108,16 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
 
 ## Roadmap
 
-Finishing the **admin panel + in-world back office** (add/price/photograph cards from a desk
-computer). Then: Stripe checkout, first-person WASD (the nav rig is already a swappable
+Next: an actual back room behind the STAFF ONLY door (desk computer that opens the panel
+in-world). Then: Stripe checkout, first-person WASD (the nav rig is already a swappable
 component), pack-ripping, and richer Chris. See the plan doc for detail.
+
+- **Branded Google sign-in.** The consent screen currently says "Sign in to
+  `<ref>.supabase.co`" because Google shows the redirect URI's domain for unverified apps.
+  Fix: Supabase custom domain (Pro + add-on, e.g. `api.gemcardshop.com`) → update the Google
+  client's redirect URI/origins + `VITE_SUPABASE_URL` → then optionally publish the OAuth
+  consent screen with `gemcardshop.com` as an authorized domain (needs privacy/terms pages +
+  Search Console verification) so it reads "Sign in to GEM". Deferred — not needed yet.
 
 Football card scans in `public/cards/football/` are 1894 Mayo Cut Plug cards via Wikimedia
 Commons / The MET Open Access (public domain).

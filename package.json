@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vercel dev",
-    "dev:client": "vite",
+    "dev": "vite --port 5199",
+    "dev:vercel": "vercel dev",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",

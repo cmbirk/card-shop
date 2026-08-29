@@ -8,6 +8,8 @@ import { InspectHud } from './InspectHud';
 import { ChatWindow } from './ChatWindow';
 import { CheckoutModal } from './CheckoutModal';
 import { SignInPanel } from './SignInPanel';
+import { AdminPanel } from './AdminPanel';
+import { useAuthStore } from '../stores/authStore';
 
 /** Non-visual: wires station arrival to checkout phase + shopkeeper dialogue. */
 function NavEffects() {
@@ -56,6 +58,7 @@ export function UIOverlay() {
   const station = useNavStore((s) => s.currentStation);
   const mode = useNavStore((s) => s.mode);
   const showStepBack = mode === 'station' && station !== 'outside' && station !== 'center' && station !== 'entry';
+  const isAdmin = useAuthStore((s) => s.isAdmin);
   return (
     <div className="overlay">
       <NavEffects />
@@ -67,6 +70,11 @@ export function UIOverlay() {
             : 'Click a glowing spot to walk over · click a card to pick it up'}
         </p>
       </div>
+      {isAdmin && (
+        <button className="btn secondary back-office-btn" onClick={() => useUIStore.getState().setAdminOpen(true)}>
+          🗝 Back office
+        </button>
+      )}
       {showStepBack && (
         <button className="btn step-back" onClick={() => useNavStore.getState().goTo('center')}>
           ↩ Step back
@@ -77,6 +85,7 @@ export function UIOverlay() {
       <ChatWindow />
       <CheckoutModal />
       <SignInPanel />
+      <AdminPanel />
     </div>
   );
 }

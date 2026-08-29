@@ -195,3 +195,6 @@ export const shopLayout: ShopLayout = {
 // Standard trading card: 2.5" x 3.5" — chunkier fake thickness so edges catch light.
 export const CARD_SIZE = { w: 0.064, h: 0.089, t: 0.002 } as const;
 export const SLAB_SIZE = { w: 0.085, h: 0.135, t: 0.01 } as const;
+
+// "Staff Only" door to the back office, on the north wall left of the counter.
+export const BACK_OFFICE_DOOR = { position: [-3.0, 0, -ROOM.depth / 2] as const, width: 1.0, height: 2.2 } as const;

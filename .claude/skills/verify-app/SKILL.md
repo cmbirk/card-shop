@@ -13,7 +13,7 @@ used constantly during development.
 
 1. **Ensure the dev server is up** on port 5199:
    ```
-   npm run dev:client -- --port 5199   # run in background; it dev-mounts /api too
+   npm run dev   # run in background; it dev-mounts /api too
    ```
    (First time on a machine: `npx playwright install chromium`.)
 
@@ -24,7 +24,8 @@ used constantly during development.
    ```
    Actions: `goto,<station>` (nav via dev hook, polls for arrival), `wait,<ms>`, `click,<x>,<y>`,
    `dblclick`, `move`, `key,<Key>`, `clickText,<text>` (DOM overlay), `basket,<id>[,<id>]`,
-   `pickup,<id>` (grab a card by id — avoids pixel-aiming), `state` (print nav/inspect/basket),
+   `pickup,<id>` (grab a card by id — avoids pixel-aiming), `admin` / `adminFlag` (fake admin; open panel /
+   just set the flag), `state` (print nav/inspect/basket/adminOpen),
    `shot,<path>`. It always prints `CONSOLE ISSUES` or `NO CONSOLE ERRORS`.
 
 3. **Read the screenshot(s)** with the Read tool and check the change looks right. Read the console
@@ -32,7 +33,8 @@ used constantly during development.
 
 ## Notes that save time
 
-- **Dev hooks (`window.__nav / __inspect / __basket`) exist only in `dev:client`.** Prefer
+- **Dev hooks (`window.__nav / __inspect / __basket / __ui / __auth`) exist only in `dev`.** `admin` opens the
+  back-office panel as a fake admin; `adminFlag` only sets `isAdmin` (e.g. to click the STAFF ONLY door). Prefer
   `goto,<station>` and `pickup,<id>` over pixel clicks — headless SwiftShader renders at ~5-10fps, so
   camera glides are slow (the script polls ~13s for arrival) and precise clicks during transit are
   ignored by design.

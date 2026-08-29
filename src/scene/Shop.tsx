@@ -4,7 +4,7 @@ import { ContactShadows, Environment, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { shopLayout, ROOM } from '@shared/data/shopLayout';
 import type { Fixture } from '@shared/types';
-import { inventory } from '../systems/inventory';
+import { inventory, useInventoryVersion } from '../systems/inventory';
 import { assignCards } from '../systems/placement';
 import { MAT, makeLabelMaterial } from './materials';
 import { Shelf } from './fixtures/Shelf';
@@ -15,6 +15,7 @@ import { useNavStore } from './../stores/navStore';
 import { useInspectStore } from '../stores/inspectStore';
 import { Facade } from './Facade';
 import { WallArt } from './WallArt';
+import { BackOfficeDoor } from './BackOfficeDoor';
 
 function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false);
@@ -111,7 +112,9 @@ function Pennant({ x, z, hue, rot }: { x: number; z: number; hue: number; rot: n
 }
 
 export function Shop() {
-  const placed = useMemo(() => assignCards(inventory, shopLayout), []);
+  const invVersion = useInventoryVersion((s) => s.version);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const placed = useMemo(() => assignCards(inventory, shopLayout), [invVersion]);
   const inspecting = useInspectStore((s) => s.mode !== 'idle');
 
   const W = ROOM.width;
@@ -201,6 +204,9 @@ export function Shop() {
       <mesh material={makeLabelMaterial('Thanks! Come again', { bg: '#efe6c8', fg: '#3b2a1a', size: 40 })} position={[0, 1.9, D / 2 - 0.04]} rotation-y={Math.PI}>
         <planeGeometry args={[0.6, 0.16]} />
       </mesh>
+
+      {/* staff-only door to the back office */}
+      <BackOfficeDoor />
 
       {/* entry rug */}
       <mesh material={MAT.green} position={[0, 0.012, 3.4]} rotation-x={-Math.PI / 2}>

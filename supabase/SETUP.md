@@ -41,6 +41,36 @@ policies. Re-runnable safely (the migration is idempotent).
    SUPABASE_SERVICE_ROLE_KEY=<service_role key>     # SERVER-ONLY — never prefix with VITE_
    ```
 
+## 4b. Google sign-in (OAuth client)
+The guestbook offers **Continue with Google** plus an email magic link. Google needs a
+one-time OAuth client:
+
+1. **Google Cloud Console** → https://console.cloud.google.com → create (or pick) a
+   project, e.g. `gem-card-shop`.
+2. **APIs & Services → OAuth consent screen** → External → app name `GEM`, support email,
+   developer email → Save. Scopes: leave defaults (email/profile/openid). While the app is
+   in *Testing* only listed test users can sign in — click **Publish app** when ready for
+   real customers (no verification is needed for basic email/profile scopes).
+3. **APIs & Services → Credentials → Create credentials → OAuth client ID**
+   - Application type: **Web application**, name `GEM Supabase`
+   - **Authorized JavaScript origins:** `https://gemcardshop.com`, `http://localhost:5199`
+   - **Authorized redirect URIs:** exactly one —
+     `https://plifvdhdmeslbweojhhr.supabase.co/auth/v1/callback`
+     (Google redirects to *Supabase*, which then bounces back to the app.)
+   - Create → copy the **Client ID** and **Client secret**.
+4. **Supabase dashboard → Authentication → Providers → Google** → Enable → paste Client ID +
+   Client secret → Save.
+5. **Supabase → Authentication → URL Configuration:**
+   - Site URL: `https://gemcardshop.com`
+   - Redirect URLs: add `http://localhost:5199/**` and `https://*.vercel.app/**` (preview deploys).
+   Without these the post-login bounce lands on the Site URL instead of where you clicked.
+6. Test: `npm run dev`, click the front door → **Continue with Google**. Your
+   Google account becomes a row in Authentication → Users; add its UUID to `public.admins`
+   (step 4) if it's you.
+
+Note: a Google user and a magic-link user with the same email are the **same** Supabase user
+(identities are linked by verified email), so the admins row works either way.
+
 ## 5. Seed + generate types
 ```
 ! npm run db:seed             # migrate the 120 bundled cards into the DB

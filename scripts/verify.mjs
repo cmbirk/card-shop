@@ -14,7 +14,7 @@
 //   state                print { nav, inspect, basket } state
 //   shot,<path>          screenshot to path
 //
-// Dev hooks (window.__nav/__inspect/__basket) exist only in `npm run dev:client`.
+// Dev hooks (window.__nav/__inspect/__basket) exist only in `npm run dev`.
 // Camera glide is slow under headless SwiftShader — after `goto`, the script
 // polls up to ~13s for arrival before continuing.
 import { chromium } from 'playwright';
@@ -53,6 +53,8 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
   else if (cmd === 'key') await page.keyboard.press(a[0]);
   else if (cmd === 'clickText') await page.getByText(a.join(','), { exact: false }).first().click();
   else if (cmd === 'basket') await page.evaluate((ids) => ids.forEach((id) => window.__basket?.getState().add(id)), a);
+  else if (cmd === 'adminFlag') await page.evaluate(() => window.__auth?.setState({ isAdmin: true }));
+  else if (cmd === 'admin') await page.evaluate(() => { window.__auth?.setState({ isAdmin: true }); window.__ui?.getState().setAdminOpen(true); });
   else if (cmd === 'pickup') await page.evaluate((id) => window.__inspect?.getState().pickUp(id), a[0]);
   else if (cmd === 'state') {
     const s = await page.evaluate(() => ({
@@ -60,6 +62,7 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
       inspect: window.__inspect?.getState().mode,
       held: window.__inspect?.getState().heldCardId,
       basket: window.__basket?.getState().items,
+      adminOpen: window.__ui?.getState().adminOpen,
     }));
     console.log('STATE', JSON.stringify(s));
   } else if (cmd === 'shot') {

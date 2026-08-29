@@ -2,6 +2,7 @@ import type { Card, InventoryFile } from '@shared/types';
 import { rowToCard, type CardRow } from '@shared/cardMapping';
 import inventoryJson from '@shared/data/inventory.json';
 import realCardsJson from '@shared/data/realCards.json';
+import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 
 // Live inventory. Populated by loadInventory() before the shop renders:
@@ -26,6 +27,19 @@ function setInventory(cards: Card[]) {
 }
 
 let loaded: Promise<void> | null = null;
+
+/** Bumps every time the live inventory is (re)loaded; scene code keys placement on it. */
+export const useInventoryVersion = create<{ version: number; bump: () => void }>((set) => ({
+  version: 0,
+  bump: () => set((s) => ({ version: s.version + 1 })),
+}));
+
+/** Re-read from Supabase (after an admin edit) and re-place cards on the shelves. */
+export async function reloadInventory(): Promise<void> {
+  loaded = null;
+  await loadInventory();
+  useInventoryVersion.getState().bump();
+}
 
 /** Load inventory once (Supabase → fallback bundled). Idempotent. */
 export function loadInventory(): Promise<void> {

@@ -21,9 +21,9 @@ src/
   stores/          zustand: nav, basket, inspect, dialogue, ui, auth
   systems/         inventory (live Supabase read + bundled fallback), placement, rng, sfx
   scene/           Shop, Facade, StationController (glide nav), fixtures/, cards/, Shopkeeper (Chris),
-                   Maya, Basket, materials/pbr
-  admin/           admin CRUD + panel (add/price/photograph cards)
-  ui/              DOM overlays: chat, basket, inspect, checkout, sign-in
+                   Maya, Basket, BackOfficeDoor (STAFF ONLY → admin panel), materials/pbr
+  admin/           adminCards.ts — Supabase CRUD + scan upload under the admin JWT
+  ui/              DOM overlays: chat, basket, inspect, checkout, sign-in, AdminPanel (back office)
 ```
 
 ## Critical gotchas (these have bitten us)
@@ -55,11 +55,14 @@ src/
 
 ## Dev workflow
 
-- `npm run dev:client -- --port 5199` — Vite + dev-mounted `/api`. `.env.local` (gitignored) holds
+- `npm run dev` — Vite + dev-mounted `/api`. `.env.local` (gitignored) holds
   Anthropic + Supabase keys. `npm run build` = tsc + vite build. `npm test` = vitest.
 - **Verify visually with the `verify-app` skill** (headless Playwright screenshot + console capture).
-  Dev hooks in dev mode: `window.__nav / __inspect / __basket`. Camera glide is slow headless —
-  poll `__nav.getState()` for arrival before asserting.
+  Dev hooks in dev mode: `window.__nav / __inspect / __basket / __ui / __auth`. Camera glide is
+  slow headless — poll `__nav.getState()` for arrival before asserting. `verify.mjs` actions
+  `admin` / `adminFlag` fake admin status to exercise the back office without a real JWT.
+- **Admin edits must call `reloadInventory()`** (bumps `useInventoryVersion`) or the shelves
+  won't re-place until a page reload.
 - **Supabase:** `npm run db:push` (apply migrations), `db:seed`, `db:types`. Project ref in
   `supabase/.temp` (gitignored). See `supabase/SETUP.md`.
 
