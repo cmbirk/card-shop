@@ -55,6 +55,7 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
   else if (cmd === 'basket') await page.evaluate((ids) => ids.forEach((id) => window.__basket?.getState().add(id)), a);
   else if (cmd === 'adminFlag') await page.evaluate(() => window.__auth?.setState({ isAdmin: true }));
   else if (cmd === 'admin') await page.evaluate(() => { window.__auth?.setState({ isAdmin: true }); window.__ui?.getState().setAdminOpen(true); });
+  else if (cmd === 'ask') await page.evaluate((id) => { window.__inspect?.getState().pickUp(id); const t = setInterval(() => { if (window.__inspect?.getState().mode === 'inspecting') { clearInterval(t); window.__dialogue?.getState().askAbout(id); } }, 100); }, a[0]);
   else if (cmd === 'pickup') await page.evaluate((id) => window.__inspect?.getState().pickUp(id), a[0]);
   else if (cmd === 'state') {
     const s = await page.evaluate(() => ({
@@ -63,6 +64,8 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
       held: window.__inspect?.getState().heldCardId,
       basket: window.__basket?.getState().items,
       adminOpen: window.__ui?.getState().adminOpen,
+      chris: window.__keeper?.getState().pose,
+      maya: window.__maya?.getState().line,
     }));
     console.log('STATE', JSON.stringify(s));
   } else if (cmd === 'shot') {

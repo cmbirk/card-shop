@@ -93,6 +93,10 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   front/back scans to Storage, delete. Saves re-place the shelves live. Non-admins who click
   the door get waved off by Chris.
 - **Sign-in: Google or email magic link.** Both resolve to one Supabase user per email.
+- **Hold a card up and ask Chris.** From any shelf, "Ask Chris" (or `A`) has Chris walk out from
+  behind the counter to you, the camera turns to him, and his take on *that* card streams into a
+  speech bubble; then he walks back. The held card + station ride the user turn (never the cached
+  system prompt). Maya offers a line about the top slab when you reach the case.
 - **Cards are data; positions are derived.** `placement.ts` maps inventory → shelf slots with
   seeded jitter. Moving a shelf never touches card data.
 - **Procedural art, real scans override.** Card faces are canvas-generated (fictional

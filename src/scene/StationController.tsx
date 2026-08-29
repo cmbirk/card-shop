@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { shopLayout } from '@shared/data/shopLayout';
 import type { Station } from '@shared/types';
 import { useNavStore } from '../stores/navStore';
+import { useShopkeeperStore } from '../stores/shopkeeperStore';
 import { FEEL } from '../feel';
 import { sfx } from '../systems/sfx';
 
@@ -88,6 +89,32 @@ export function StationController() {
     };
     void run();
   }, [targetStation]);
+
+  // turn to face Chris when he walks over to talk (bounds released — setLookAt doesn't clamp),
+  // and back to the station's view + clamp when he heads home
+  const keeperPose = useShopkeeperStore((s) => s.pose);
+  useEffect(() => {
+    const c = ref.current;
+    const nav = useNavStore.getState();
+    const st = stations.get(nav.currentStation);
+    if (!c || !st || nav.mode === 'transit') return;
+    const { spot } = useShopkeeperStore.getState();
+    c.smoothTime = FEEL.glideSmoothTime;
+    if (keeperPose === 'visiting' && spot) {
+      // aim a touch to his right so the held card (screen centre) doesn't cover his face
+      const dx = spot[0] - st.position[0];
+      const dz = spot[1] - st.position[2];
+      const len = Math.hypot(dx, dz) || 1;
+      const rx = -dz / len;
+      const rz = dx / len;
+      releaseBounds();
+      void c.setLookAt(...st.position, spot[0] + rx * 0.45, 1.45, spot[1] + rz * 0.45, true);
+    } else if (keeperPose === 'walkingBack') {
+      void c.setLookAt(...st.position, ...st.target, true).then(() => {
+        if (useNavStore.getState().currentStation === st.id) clampToStation(st);
+      });
+    }
+  }, [keeperPose]);
 
   // user look-around only while parked at a station
   useFrame(() => {

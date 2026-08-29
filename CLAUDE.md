@@ -50,6 +50,9 @@ src/
   everything works without real images.
 - **All animation constants live in `feel.ts`.** No magic durations/eases in components.
 - **Per-frame code mutates refs, never React state.** Read zustand via `getState()` in `useFrame`.
+- **Chris's whereabouts live in `shopkeeperStore`** (pose + spot); `Shopkeeper.tsx` does the walking,
+  `StationController` turns the camera on `visiting`. Situational chat context (held card, station)
+  goes in `ChatRequest.context` → appended to the *user* turn, never the system prompt.
 - **Transparent/decorative meshes set `raycast={() => null}`** or they steal clicks (this broke
   every graded card once).
 
@@ -58,9 +61,10 @@ src/
 - `npm run dev` — Vite + dev-mounted `/api`. `.env.local` (gitignored) holds
   Anthropic + Supabase keys. `npm run build` = tsc + vite build. `npm test` = vitest.
 - **Verify visually with the `verify-app` skill** (headless Playwright screenshot + console capture).
-  Dev hooks in dev mode: `window.__nav / __inspect / __basket / __ui / __auth`. Camera glide is
-  slow headless — poll `__nav.getState()` for arrival before asserting. `verify.mjs` actions
-  `admin` / `adminFlag` fake admin status to exercise the back office without a real JWT.
+  Dev hooks in dev mode: `window.__nav / __inspect / __basket / __ui / __auth / __dialogue / __keeper / __maya`.
+  Camera glide is slow headless — poll `__nav.getState()` for arrival before asserting. `verify.mjs`
+  actions `admin` / `adminFlag` fake admin status; `ask,<id>` runs the hold-up-a-card → Chris walks
+  over flow (headless has no JWT, so the fallback line shows — the walk still exercises fully).
 - **Admin edits must call `reloadInventory()`** (bumps `useInventoryVersion`) or the shelves
   won't re-place until a page reload.
 - **Supabase:** `npm run db:push` (apply migrations), `db:seed`, `db:types`. Project ref in

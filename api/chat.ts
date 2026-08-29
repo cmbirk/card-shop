@@ -30,6 +30,9 @@ export async function POST(req: Request): Promise<Response> {
     return new Response('Bad request', { status: 400 });
   }
 
+  const str = (v: unknown) => (typeof v === 'string' && v.length <= 64 ? v : undefined);
+  const context = body.context ? { station: str(body.context.station), holding: str(body.context.holding) } : undefined;
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       await runShopkeeper(
@@ -47,6 +50,7 @@ export async function POST(req: Request): Promise<Response> {
           },
         },
         req.signal,
+        context,
       );
     },
     cancel() {

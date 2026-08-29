@@ -357,7 +357,8 @@
 }
 
 /* ---- Mel's in-world speech bubble ---- */
-.mel-bubble {
+.mel-bubble,
+.staff-bubble {
   width: 240px;
   background: #fffdf5;
   color: #2b2118;

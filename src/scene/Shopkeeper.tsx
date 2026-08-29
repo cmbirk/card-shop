@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber';
 import { Html, useAnimations, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useDialogueStore, type MelGesture } from '../stores/dialogueStore';
-import { FEEL } from '../feel';
+import { useShopkeeperStore, SHOPKEEPER_HOME } from '../stores/shopkeeperStore';
+import { FEEL, bubbleHoldSeconds } from '../feel';
 
 const MODEL_URL = '/models/shopkeeper.glb';
 
@@ -15,6 +16,7 @@ const CLIP = {
   nod: 'Agree_Gesture',
   shrug: 'Shrug',
   checkout: 'Checkout_Gesture',
+  walk: 'Walking',
 } as const;
 
 const GESTURE_CLIP: Record<MelGesture, string> = {
@@ -25,9 +27,14 @@ const GESTURE_CLIP: Record<MelGesture, string> = {
 };
 
 const FADE = 0.35;
+const _euler = new THREE.Euler(0, 0, 0, 'YXZ'); // scratch — no per-frame allocation
 
-/** Mel — rigged GLB shopkeeper behind the counter. Idles, talks while a reply streams, head tracks the player. */
+/**
+ * Chris — rigged GLB shopkeeper. Idles behind the counter, talks while a reply streams,
+ * head-tracks the player, and walks out to a customer who holds a card up (shopkeeperStore).
+ */
 export function Shopkeeper() {
+  const root = useRef<THREE.Group>(null!); // world position/yaw — moved per frame, never via React state
   const group = useRef<THREE.Group>(null!);
   const { scene, animations } = useGLTF(MODEL_URL);
   const { actions, mixer } = useAnimations(animations, group);
@@ -36,7 +43,11 @@ export function Shopkeeper() {
   const isOpen = useDialogueStore((s) => s.isOpen);
   const gesture = useDialogueStore((s) => s.gesture);
   const gestureId = useDialogueStore((s) => s.gestureId);
+  const streamingText = useDialogueStore((s) => s.streamingText);
+  const pose = useShopkeeperStore((s) => s.pose);
   const [bubble, setBubble] = useState<string | null>(null);
+  const walk = useRef({ legId: 0, idx: 0 }); // waypoint cursor for the store's current leg
+  const yaw = useRef(0);
   const current = useRef<THREE.AnimationAction | null>(null);
   const oneShot = useRef<THREE.AnimationAction | null>(null);
   const headBone = useRef<THREE.Bone | null>(null);
@@ -110,15 +121,21 @@ export function Shopkeeper() {
     [actions],
   );
 
-  // base state: talk while a reply streams, otherwise idle (unless a one-shot gesture is running)
+  const walking = pose === 'walkingOut' || pose === 'walkingBack';
+
+  // base state: walk while out on the floor, talk while a reply streams, otherwise idle
+  // (unless a one-shot gesture is running)
   useEffect(() => {
     if (oneShot.current) return;
-    play(isStreaming ? CLIP.talk : CLIP.idle);
-  }, [isStreaming, play]);
+    play(walking ? CLIP.walk : isStreaming ? CLIP.talk : CLIP.idle);
+  }, [isStreaming, walking, play]);
 
-  // one-shot gestures from the dialogue store, then back to the base state
+
+
+  // one-shot gestures from the dialogue store, then back to the base state (never mid-walk — the
+  // walk cycle would stop while locomotion keeps sliding him along)
   useEffect(() => {
-    if (!gesture || gestureId === 0) return;
+    if (!gesture || gestureId === 0 || walking) return;
     const name = GESTURE_CLIP[gesture];
     const action = play(name, false);
     if (!action) return;
@@ -126,48 +143,103 @@ export function Shopkeeper() {
     const onFinished = (e: { action: THREE.AnimationAction }) => {
       if (e.action !== action) return;
       oneShot.current = null;
-      play(useDialogueStore.getState().isStreaming ? CLIP.talk : CLIP.idle);
+      const p = useShopkeeperStore.getState().pose;
+      play(p === 'walkingOut' || p === 'walkingBack' ? CLIP.walk : useDialogueStore.getState().isStreaming ? CLIP.talk : CLIP.idle);
     };
     mixer.addEventListener('finished', onFinished);
     return () => mixer.removeEventListener('finished', onFinished);
   }, [gesture, gestureId, play, mixer]);
 
-  // in-world speech bubble for Mel's lines while the chat panel is closed (e.g. the door greeting)
+  // in-world speech bubble while the chat panel is closed: streams live as Chris talks
+  // (e.g. answering about a held card out on the floor), then holds for reading time
   useEffect(() => {
+    if (isOpen) {
+      setBubble(null);
+      return;
+    }
+    if (isStreaming) {
+      setBubble(streamingText || '…');
+      return;
+    }
     const last = messages[messages.length - 1];
-    if (last?.role === 'assistant' && !isOpen) {
+    if (last?.role === 'assistant') {
       setBubble(last.content);
-      const t = setTimeout(() => setBubble(null), 7000);
+      const t = setTimeout(() => setBubble(null), bubbleHoldSeconds(last.content) * 1000);
       return () => clearTimeout(t);
     }
     setBubble(null);
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isStreaming, streamingText]);
+
+  // locomotion: walk the planned waypoints, face the way we're going; at the spot, face the customer
+  useFrame((_, dt) => {
+    const r = root.current;
+    if (!r) return;
+    const st = useShopkeeperStore.getState();
+    let targetYaw = 0; // rest: face +Z (the shop)
+    if (st.pose === 'walkingOut' || st.pose === 'walkingBack') {
+      const w = walk.current;
+      if (w.legId !== st.legId) {
+        w.legId = st.legId;
+        w.idx = 0;
+      }
+      const wp = st.path[w.idx];
+      if (!wp) {
+        if (st.pose === 'walkingOut') st.arrivedAtSpot();
+        else st.arrivedHome();
+      } else {
+        const dx = wp[0] - r.position.x;
+        const dz = wp[1] - r.position.z;
+        const dist = Math.hypot(dx, dz);
+        const step = FEEL.shopkeeperWalkSpeed * dt;
+        if (dist <= step) {
+          r.position.x = wp[0];
+          r.position.z = wp[1];
+          w.idx += 1;
+        } else {
+          r.position.x += (dx / dist) * step;
+          r.position.z += (dz / dist) * step;
+        }
+        targetYaw = Math.atan2(dx, dz);
+      }
+    } else if (st.pose === 'visiting') {
+      targetYaw = st.facing;
+    }
+    // shortest-arc damp on yaw
+    let d = targetYaw - yaw.current;
+    d = Math.atan2(Math.sin(d), Math.cos(d));
+    yaw.current += d * (1 - Math.exp(-FEEL.shopkeeperTurnLambda * dt));
+    r.rotation.y = yaw.current;
+  });
 
   // lazy head look-at, layered on top of the animation (runs after the mixer's frame update)
   useFrame((state, dt) => {
     const head = headBone.current;
     if (!head) return;
     const cam = state.camera.position;
-    const dx = cam.x - 0; // shopkeeper world pos (0, _, -3.7)
-    const dz = cam.z - -3.7;
-    let yaw = Math.atan2(dx, dz); // faces +Z at rest
+    const r = root.current;
+    const dx = cam.x - r.position.x;
+    const dz = cam.z - r.position.z;
+    // yaw relative to the body's current facing
+    let lookYaw = Math.atan2(dx, dz) - yaw.current;
+    lookYaw = Math.atan2(Math.sin(lookYaw), Math.cos(lookYaw));
     const dy = cam.y - 1.55;
     let pitch = -Math.atan2(dy, Math.hypot(dx, dz));
-    const interested = Math.abs(yaw) < 1.05;
+    const interested = Math.abs(lookYaw) < 1.05;
     if (!interested) {
-      yaw = 0.3; // back to sorting cards
+      lookYaw = 0.3; // back to sorting cards
       pitch = 0.35;
     }
     const L = look.current;
-    L.yaw = THREE.MathUtils.damp(L.yaw, THREE.MathUtils.clamp(yaw, -0.9, 0.9), FEEL.headLookLambda, dt);
+    L.yaw = THREE.MathUtils.damp(L.yaw, THREE.MathUtils.clamp(lookYaw, -0.9, 0.9), FEEL.headLookLambda, dt);
     L.pitch = THREE.MathUtils.damp(L.pitch, THREE.MathUtils.clamp(pitch, -0.35, 0.35), FEEL.headLookLambda, dt);
     // additive: the mixer has already written this frame's pose into head.quaternion
-    headRest.current.setFromEuler(new THREE.Euler(L.pitch, L.yaw, 0, 'YXZ'));
+    _euler.set(L.pitch, L.yaw, 0);
+    headRest.current.setFromEuler(_euler);
     head.quaternion.multiply(headRest.current);
   });
 
   return (
-    <group position={[0, 0, -3.7]}>
+    <group ref={root} position={[SHOPKEEPER_HOME[0], 0, SHOPKEEPER_HOME[1]]}>
       {bubble && (
         <Html position={[0, 2.1, 0]} center style={{ pointerEvents: 'none' }}>
           <div className="mel-bubble">{bubble}</div>

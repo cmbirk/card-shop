@@ -3,6 +3,8 @@ import { useNavStore } from '../stores/navStore';
 import { useUIStore } from '../stores/uiStore';
 import { useDialogueStore } from '../stores/dialogueStore';
 import { useInspectStore } from '../stores/inspectStore';
+import { useMayaStore } from '../stores/mayaStore';
+import { inventory } from '../systems/inventory';
 import { BasketPanel } from './BasketPanel';
 import { InspectHud } from './InspectHud';
 import { ChatWindow } from './ChatWindow';
@@ -10,6 +12,17 @@ import { CheckoutModal } from './CheckoutModal';
 import { SignInPanel } from './SignInPanel';
 import { AdminPanel } from './AdminPanel';
 import { useAuthStore } from '../stores/authStore';
+
+/** Maya's one canned line about the top slab in the case — no API, once per session. */
+function mayaCaseLine(): string | null {
+  const top = inventory
+    .filter((c) => c.featured && (c.status ?? 'available') === 'available')
+    .sort((a, b) => b.price - a.price)[0];
+  if (!top) return null;
+  const what = top.grade?.label ?? top.parallel ?? top.setName;
+  const detail = top.lore.funFact ?? top.lore.blurb;
+  return `That ${top.year} ${top.playerName} ${what} is the one everybody asks about — ${detail} Chris won't budge on the price, but I'd try.`;
+}
 
 /** Non-visual: wires station arrival to checkout phase + shopkeeper dialogue. */
 function NavEffects() {
@@ -39,6 +52,10 @@ function NavEffects() {
     const dlg = useDialogueStore.getState();
     if (currentStation === 'entry' && prev === 'outside') {
       dlg.greet(); // Chris says hello in-world (speech bubble) as you walk in
+    }
+    if (currentStation === 'case' && !useMayaStore.getState().spoken) {
+      const line = mayaCaseLine();
+      if (line) useMayaStore.getState().say(line);
     }
     if (currentStation === 'counter') {
       if (ui.checkoutPhase === 'browsing') ui.setPhase('atCounter');

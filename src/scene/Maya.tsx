@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useAnimations, useGLTF } from '@react-three/drei';
+import { Html, useAnimations, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { FEEL } from '../feel';
+import { useMayaStore } from '../stores/mayaStore';
 
 const MODEL_URL = '/models/maya.glb';
 
@@ -17,6 +18,8 @@ export function Maya() {
   const headBone = useRef<THREE.Bone | null>(null);
   const look = useRef({ yaw: 0, pitch: 0 });
   const rot = useRef(new THREE.Quaternion());
+  const line = useMayaStore((s) => s.line);
+  const lineId = useMayaStore((s) => s.lineId);
 
   useEffect(() => {
     scene.traverse((o) => {
@@ -58,6 +61,22 @@ export function Maya() {
     if (idle) idle.reset().setLoop(THREE.LoopRepeat, Infinity).play();
   }, [actions]);
 
+  // a scripted line: talk pose + bubble for its hold time, then back to idle
+  useEffect(() => {
+    if (!line) return;
+    const idle = actions['Idle_02'];
+    const talk = actions['Talk_with_Hands_Open'];
+    if (talk && idle) {
+      talk.reset().setLoop(THREE.LoopRepeat, Infinity);
+      talk.crossFadeFrom(idle, 0.35, true).play();
+    }
+    const t = setTimeout(() => {
+      if (talk && idle) idle.reset().crossFadeFrom(talk, 0.35, true).play();
+      useMayaStore.getState().clear();
+    }, FEEL.mayaLineHold * 1000);
+    return () => clearTimeout(t);
+  }, [line, lineId, actions]);
+
   // head tracks the player, layered on the animation (world pos of Maya is set below)
   const MAYA = { x: 3.95, z: -2.2, faceY: -Math.PI / 2 };
   useFrame((state, dt) => {
@@ -85,6 +104,12 @@ export function Maya() {
 
   return (
     <group position={[MAYA.x, 0, MAYA.z]} rotation-y={MAYA.faceY}>
+      {line && (
+        // the case station looks down at the slabs, so her bubble sits at chest height to stay in frame
+        <Html position={[0, 1.35, 0]} center style={{ pointerEvents: 'none' }}>
+          <div className="staff-bubble">{line}</div>
+        </Html>
+      )}
       <group ref={group}>
         <primitive object={scene} />
       </group>

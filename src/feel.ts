@@ -29,10 +29,22 @@ export const FEEL = {
 
   // shopkeeper
   headLookLambda: 6,
+  shopkeeperWalkSpeed: 1.15, // m/s, walking out to a customer and back
+  shopkeeperTurnLambda: 8, // yaw damp toward travel direction / the customer
+  bubbleHoldPerWord: 0.35, // s of reading time per word once a line finishes
+  bubbleHoldMin: 3,
+  bubbleHoldMax: 12,
+  mayaLineHold: 6, // s Maya's canned line stays up
 
   // checkout
   counterFlyStagger: 0.08,
 } as const;
+
+/** How long a spoken line stays on screen after it finishes, from its length. */
+export function bubbleHoldSeconds(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.min(FEEL.bubbleHoldMax, Math.max(FEEL.bubbleHoldMin, words * FEEL.bubbleHoldPerWord));
+}
 
 export function easeOutBack(t: number, s = FEEL.pickupOvershoot): number {
   const c1 = s;

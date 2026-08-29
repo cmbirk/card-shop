@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { Card, ChatMessage } from '../../shared/types';
+import type { Card, ChatMessage, ChatRequest } from '../../shared/types';
+import { shopLayout } from '../../shared/data/shopLayout.js';
 import { buildInventoryContext, getInventory, priceStr } from './inventoryContext.js';
 
 const PERSONA = `You are Chris, the owner of GEM, a small neighborhood trading-card shop (GEM as in gem mint — the grade every collector chases). A customer is standing at your counter, in your shop, talking to you.
@@ -26,6 +27,24 @@ function basketContext(basket: string[], cardsById: Map<string, Card>): string {
   return `[The customer's basket currently holds: ${lines.join('; ')}.]`;
 }
 
+/** Where the customer is standing and what they're holding up — appended to the user turn. */
+function situationContext(ctx: ChatRequest['context'] | undefined, cardsById: Map<string, Card>): string {
+  if (!ctx) return '';
+  const parts: string[] = [];
+  if (ctx.station) {
+    const fixture = shopLayout.fixtures.find((f) => f.stationId === ctx.station);
+    parts.push(`The customer is standing at ${fixture ? `the ${fixture.label}` : `"${ctx.station}"`}`);
+  }
+  const card = ctx.holding ? cardsById.get(ctx.holding) : undefined;
+  if (card) {
+    const cond = card.grade ? card.grade.label : card.rawCondition ? `raw ${card.rawCondition}` : 'raw';
+    parts.push(
+      `is holding up [${card.id}] ${card.playerName}, ${card.year} ${card.setName} ${card.cardNumber} (${cond}, ${priceStr(card.price)}) and wants your take on it — you walked over to them, so talk about THIS card`,
+    );
+  }
+  return parts.length ? `[${parts.join(' and ')}.]` : '';
+}
+
 export interface ShopkeeperEvents {
   onDelta: (text: string) => void;
   onDone: (usage: unknown) => void;
@@ -37,6 +56,7 @@ export async function runShopkeeper(
   basket: string[],
   events: ShopkeeperEvents,
   signal?: AbortSignal,
+  context?: ChatRequest['context'],
 ): Promise<void> {
   // identity-linked API keys must name the workspace they act in; harmless when unset
   const client = new Anthropic({
@@ -49,10 +69,11 @@ export async function runShopkeeper(
   const { cards, cardsById } = await getInventory();
   const systemPrompt = PERSONA + buildInventoryContext(cards);
 
-  // volatile basket context rides on the last user turn — never in the cached system prompt
+  // volatile basket + situation context rides on the last user turn — never in the cached system prompt
+  const situation = situationContext(context, cardsById);
   const apiMessages = messages.map((m, i) =>
     i === messages.length - 1 && m.role === 'user'
-      ? { role: m.role, content: `${basketContext(basket, cardsById)}\n\n${m.content}` }
+      ? { role: m.role, content: `${basketContext(basket, cardsById)}${situation ? `\n${situation}` : ''}\n\n${m.content}` }
       : { role: m.role, content: m.content },
   );
 

@@ -1,7 +1,12 @@
 import { create } from 'zustand';
-import type { ChatMessage } from '@shared/types';
+import type { ChatMessage, ChatRequest } from '@shared/types';
+import { shopLayout } from '@shared/data/shopLayout';
 import { streamChat } from '../api/chat';
 import { useBasketStore } from './basketStore';
+import { useInspectStore } from './inspectStore';
+import { useNavStore } from './navStore';
+import { useShopkeeperStore } from './shopkeeperStore';
+import { bubbleHoldSeconds } from '../feel';
 
 const HISTORY_CAP = 40; // ~20 turns
 
@@ -23,7 +28,27 @@ interface DialogueState {
   say: (text: string) => void;
   open: () => void;
   close: () => void;
-  send: (text: string) => Promise<void>;
+  send: (text: string, context?: ChatRequest['context']) => Promise<void>;
+  /** Hold a card up: Chris walks over, gives his take on it in-world, walks back. */
+  askAbout: (cardId: string) => Promise<void>;
+}
+
+/** Where Chris stands to talk to a customer at `stationId`: off to the viewer's right, ~2 m away
+ *  (a full figure fits the 55° fov there), facing the camera. The camera turns to him on arrival. */
+function greetSpot(stationId: string): { spot: [number, number]; facing: number } | null {
+  const st = shopLayout.stations.find((s) => s.id === stationId);
+  if (!st) return null;
+  const [cx, , cz] = st.position;
+  const [tx, , tz] = st.target;
+  const len = Math.hypot(tx - cx, tz - cz) || 1;
+  const fx = (tx - cx) / len;
+  const fz = (tz - cz) / len;
+  // viewer's right = forward rotated -90° about Y
+  const rx = -fz;
+  const rz = fx;
+  const spot: [number, number] = [cx + rx * 1.6 + fx * 1.0, cz + rz * 1.6 + fz * 1.0];
+  const facing = Math.atan2(cx - spot[0], cz - spot[1]); // model faces +Z at rest
+  return { spot, facing };
 }
 
 let abort: AbortController | null = null;
@@ -56,7 +81,77 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     abort?.abort();
     set({ isOpen: false, isStreaming: false, streamingText: '' });
   },
-  send: async (text) => {
+  askAbout: async (cardId) => {
+    if (get().isStreaming) return;
+    if (useInspectStore.getState().heldCardId !== cardId || useInspectStore.getState().mode !== 'inspecting') return;
+    const station = useNavStore.getState().currentStation;
+    const keeper = useShopkeeperStore.getState();
+    if (keeper.pose !== 'counter') return;
+
+    // still holding this card at this station? (put back / walked off → Chris turns around)
+    const stillRelevant = () =>
+      useInspectStore.getState().heldCardId === cardId &&
+      useInspectStore.getState().mode === 'inspecting' &&
+      useNavStore.getState().currentStation === station;
+
+    const dest = station === 'counter' ? null : greetSpot(station);
+    if (dest) {
+      keeper.visit(dest.spot, dest.facing);
+      const arrived = await new Promise<boolean>((resolve) => {
+        let done = false;
+        const finish = (ok: boolean) => {
+          if (done) return;
+          done = true;
+          unsubKeeper();
+          unsubInspect();
+          unsubNav();
+          clearTimeout(timer);
+          resolve(ok);
+        };
+        const unsubKeeper = useShopkeeperStore.subscribe((s) => {
+          if (s.pose === 'visiting') finish(true);
+          else if (s.pose === 'counter' || s.pose === 'walkingBack') finish(false);
+        });
+        const cancel = () => {
+          if (!stillRelevant()) {
+            useShopkeeperStore.getState().leave();
+            finish(false);
+          }
+        };
+        const unsubInspect = useInspectStore.subscribe(cancel);
+        const unsubNav = useNavStore.subscribe(cancel);
+        // safety net: if <Shopkeeper/> never reports arrival (model failed to load), don't wedge the HUD
+        const timer = setTimeout(() => {
+          useShopkeeperStore.getState().leave();
+          finish(false);
+        }, 20000);
+      });
+      if (!arrived) return;
+    }
+
+    // customer may walk off while he's talking — cut him off and send him home
+    const unsubMid = dest
+      ? useInspectStore.subscribe(() => {
+          if (!stillRelevant()) {
+            abort?.abort();
+            useShopkeeperStore.getState().leave();
+          }
+        })
+      : () => {};
+    try {
+      await get().send('Hey Chris, what do you think of this one?', { station, holding: cardId });
+    } finally {
+      unsubMid();
+    }
+
+    if (dest && useShopkeeperStore.getState().pose === 'visiting') {
+      const last = get().messages[get().messages.length - 1];
+      const hold = bubbleHoldSeconds(last?.role === 'assistant' ? last.content : '');
+      setTimeout(() => useShopkeeperStore.getState().leave(), hold * 1000);
+    }
+  },
+
+  send: async (text, context) => {
     const trimmed = text.trim();
     if (!trimmed || get().isStreaming) return;
     const messages: ChatMessage[] = [...get().messages, { role: 'user' as const, content: trimmed }].slice(-HISTORY_CAP);
@@ -64,7 +159,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     abort = new AbortController();
     try {
       const final = await streamChat(
-        { messages, basket: useBasketStore.getState().items },
+        { messages, basket: useBasketStore.getState().items, ...(context ? { context } : {}) },
         (chunk) => set((s) => ({ streamingText: s.streamingText + chunk })),
         abort.signal,
       );

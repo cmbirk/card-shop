@@ -24,7 +24,7 @@ used constantly during development.
    ```
    Actions: `goto,<station>` (nav via dev hook, polls for arrival), `wait,<ms>`, `click,<x>,<y>`,
    `dblclick`, `move`, `key,<Key>`, `clickText,<text>` (DOM overlay), `basket,<id>[,<id>]`,
-   `pickup,<id>` (grab a card by id — avoids pixel-aiming), `admin` / `adminFlag` (fake admin; open panel /
+   `pickup,<id>` (grab a card by id — avoids pixel-aiming), `ask,<id>` (pick up + Ask Chris), `admin` / `adminFlag` (fake admin; open panel /
    just set the flag), `state` (print nav/inspect/basket/adminOpen),
    `shot,<path>`. It always prints `CONSOLE ISSUES` or `NO CONSOLE ERRORS`.
 
