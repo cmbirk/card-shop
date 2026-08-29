@@ -3,28 +3,22 @@
 //
 // Usage: node scripts/addPsaCard.mjs <certNumber> [priceCents] [--featured]
 // Requires PSA_API_TOKEN in .env.local (account must be API-approved by PSA).
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { getPsaToken } from './psaAuth.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 
-if (!process.env.PSA_API_TOKEN && existsSync(join(root, '.env.local'))) {
-  for (const line of readFileSync(join(root, '.env.local'), 'utf8').split('\n')) {
-    const m = line.match(/^([A-Z_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
-  }
-}
-
-const token = process.env.PSA_API_TOKEN;
 const cert = process.argv[2];
 const priceCents = Number(process.argv[3]) || 0;
 const featured = process.argv.includes('--featured');
-if (!token || !cert) {
+if (!cert) {
   console.error('Usage: node scripts/addPsaCard.mjs <certNumber> [priceCents] [--featured]');
   process.exit(1);
 }
+const token = getPsaToken();
 
 const API = 'https://api.psacard.com/publicapi';
 const headers = { Authorization: `bearer ${token}` };
