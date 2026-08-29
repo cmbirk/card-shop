@@ -68,6 +68,20 @@ export function Shopkeeper() {
           s.side = THREE.FrontSide;
           if (s.roughness !== undefined) s.roughness = Math.max(s.roughness, 0.65);
           if (s.metalness !== undefined) s.metalness = Math.min(s.metalness, 0.05);
+          // Meshy packs skin/shirt/cap as tiny UV islands with no padding, so
+          // mipmap + bilinear filtering bleeds neighbouring colours across the
+          // seams (skin onto shirt, gray onto the arm). Disable mipmaps and
+          // clamp so each texel samples the full-res atlas — kills most bleed.
+          for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap'] as const) {
+            const tex = s[key] as THREE.Texture | null;
+            if (tex) {
+              tex.generateMipmaps = false;
+              tex.minFilter = THREE.LinearFilter;
+              tex.magFilter = THREE.LinearFilter;
+              tex.anisotropy = 1;
+              tex.needsUpdate = true;
+            }
+          }
           s.needsUpdate = true;
         }
       }
