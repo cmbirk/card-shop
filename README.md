@@ -90,7 +90,8 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
 - **Back office.** Admins walk through the "STAFF ONLY" door beside the counter into a real
   office; the desk computer (or the 🗝 HUD button) opens the panel. **Inventory:** search every
   card incl. sold/reserved/personal and cost basis, add/edit (identity, parallel/hits, grading,
-  price, admin-only acquisition fields, lore), scan upload, multi-select bulk delete, CSV export.
+  price, admin-only acquisition fields, lore), scan upload — drag photos straight from Photos.app
+  (HEIC is converted to JPEG in the browser and downsized to 1600px), multi-select bulk delete, CSV export.
   **Import:** paste/upload CSV or JSON, preview new/update/error rows, import in one go (template
   provided). **Users:** everyone who's signed the guestbook (`profiles`, maintained by DB
   triggers) with an Admin toggle. Saves re-place the shelves live. Non-admins who click the door

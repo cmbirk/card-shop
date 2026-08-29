@@ -59,6 +59,9 @@ src/
 - **No 3D basket.** Picks fly to the `HoldPile` on the counter (registered as `hold-pile` in
   `cardRegistry`); `basketStore` still holds the ids. Don't register pile cards per-id — that
   clobbers the shelf card's registry entry and breaks its next pickup/return.
+- **Scans go through `prepareScan()`** (`src/admin/imagePrep.ts`): HEIC → JPEG (native decode, else
+  `heic2any` WASM lazy-loaded — it's a 1.3 MB chunk, keep it dynamic) and ≤1600px re-encode before
+  Storage. Drop zones accept Photos.app drags (`fileFromDataTransfer` checks `items` too).
 - **`profiles` is trigger-maintained** (auth.users insert / last_sign_in_at update); the client never
   writes it. Admin membership = `admins` rows; `setAdmin` refuses self-demotion.
 - **Card art is procedural, real scans override.** `card.images.front` paints over the atlas cell;

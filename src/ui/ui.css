@@ -720,6 +720,20 @@
   place-items: center;
   font-size: 10px;
   opacity: 0.6;
+  text-align: center;
+  white-space: pre-line;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.admin-scan.drag-over img,
+.admin-scan.drag-over .admin-scan-empty {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(255, 217, 122, 0.35);
+  opacity: 1;
+}
+.admin-form.drag-over {
+  outline: 2px dashed var(--gold);
+  outline-offset: -6px;
 }
 .admin-scan input[type='file'] {
   width: 110px;

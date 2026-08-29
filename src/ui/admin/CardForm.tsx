@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Card, GradeCompany, RawCondition } from '@shared/types';
 import { saveCard, deleteCard, uploadCardImage, suggestId } from '../../admin/adminCards';
+import { prepareScan, fileFromDataTransfer } from '../../admin/imagePrep';
 
 const SPORTS: Card['sport'][] = ['baseball', 'basketball', 'football', 'hockey', 'tcg'];
 const CATEGORIES = ['rookies', 'vintage', 'stars', 'graded-slabs', 'budget-box', 'budget-box-b', 'collection'];
@@ -72,14 +73,20 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
     }
   };
 
+  const [stage, setStage] = useState('');
+  const [dragOver, setDragOver] = useState<'front' | 'back' | 'form' | null>(null);
+
   const upload = async (side: 'front' | 'back', file: File | undefined) => {
     if (!file) return;
     const id = card.id.trim() || suggestId(card);
     if (!id) return onError('Set an id (or player + year) before uploading scans.');
     setUploading(side);
+    setStage('reading…');
     onError(null);
     try {
-      const url = await uploadCardImage(file, id, side);
+      const prepared = await prepareScan(file, setStage); // HEIC → JPEG, downscale
+      setStage('uploading…');
+      const url = await uploadCardImage(prepared, id, side);
       setCard((c) => ({
         ...c,
         id,
@@ -89,11 +96,34 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
       onError((err as Error).message);
     } finally {
       setUploading(null);
+      setStage('');
     }
   };
 
+  // drop anywhere on the form: fills the front, then the back
+  const onFormDrop = (e: React.DragEvent) => {
+    const f = fileFromDataTransfer(e.dataTransfer);
+    if (!f) return;
+    e.preventDefault();
+    setDragOver(null);
+    void upload(card.images?.front ? 'back' : 'front', f);
+  };
+
   return (
-    <form className="admin-form" onSubmit={submit}>
+    <form
+      className={`admin-form${dragOver === 'form' ? ' drag-over' : ''}`}
+      onSubmit={submit}
+      onDragOver={(e) => {
+        if (Array.from(e.dataTransfer.types).includes('Files')) {
+          e.preventDefault();
+          if (dragOver === null) setDragOver('form');
+        }
+      }}
+      onDragLeave={(e) => {
+        if (e.currentTarget === e.target) setDragOver(null);
+      }}
+      onDrop={onFormDrop}
+    >
       <div className="admin-form-title">
         {isNew ? 'New card' : `Editing ${card.id}`}
         {!isNew && card.updatedAt && <span className="admin-card-sub"> · updated {new Date(card.updatedAt).toLocaleString()}</span>}
@@ -308,10 +338,25 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           {(['front', 'back'] as const).map((side) => {
             const url = side === 'front' ? card.images?.front : card.images?.back;
             return (
-              <label key={side} className="admin-scan">
+              <label
+                key={side}
+                className={`admin-scan${dragOver === side ? ' drag-over' : ''}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDragOver(side);
+                }}
+                onDragLeave={() => setDragOver(null)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDragOver(null);
+                  void upload(side, fileFromDataTransfer(e.dataTransfer));
+                }}
+              >
                 <span>{side}</span>
-                {url ? <img src={url} alt={`${side} scan`} /> : <div className="admin-scan-empty">{uploading === side ? 'uploading…' : 'no scan'}</div>}
-                <input type="file" accept="image/*" disabled={!!uploading} onChange={(e) => void upload(side, e.target.files?.[0])} />
+                {url && uploading !== side ? <img src={url} alt={`${side} scan`} /> : <div className="admin-scan-empty">{uploading === side ? stage || 'working…' : 'drop a photo\nor click'}</div>}
+                <input type="file" accept="image/*,.heic,.heif" disabled={!!uploading} onChange={(e) => void upload(side, e.target.files?.[0])} />
               </label>
             );
           })}
