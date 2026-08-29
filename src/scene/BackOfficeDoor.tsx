@@ -56,9 +56,14 @@ export function BackOfficeDoor() {
       }}
       onPointerOut={() => setHovered(false)}
     >
-      {/* frame */}
-      <mesh material={MAT.dark} position={[0, 0, -0.01]}>
-        <boxGeometry args={[w + 0.12, h + 0.08, 0.04]} />
+      {/* frame: two jambs + a header around the opening (never a plate — the door swings open) */}
+      {[-1, 1].map((sx) => (
+        <mesh key={sx} material={MAT.dark} position={[sx * (w / 2 + 0.03), 0, -0.01]}>
+          <boxGeometry args={[0.06, h + 0.08, 0.1]} />
+        </mesh>
+      ))}
+      <mesh material={MAT.dark} position={[0, h / 2 + 0.04, -0.01]}>
+        <boxGeometry args={[w + 0.12, 0.08, 0.1]} />
       </mesh>
       {/* everything below the frame hangs on a hinge at the left jamb */}
       <group ref={hinge} position={[-w / 2, 0, 0]}>

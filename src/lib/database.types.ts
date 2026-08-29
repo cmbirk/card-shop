@@ -180,6 +180,39 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          email: string | null
+          first_seen: string
+          id: string
+          last_seen: string
+          provider: string | null
+          visits: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          email?: string | null
+          first_seen?: string
+          id: string
+          last_seen?: string
+          provider?: string | null
+          visits?: number
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          email?: string | null
+          first_seen?: string
+          id?: string
+          last_seen?: string
+          provider?: string | null
+          visits?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       cards_public: {

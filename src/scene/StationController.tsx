@@ -34,8 +34,8 @@ function waypoints(from: Station | undefined, to: Station): Vec3[] {
   // wall-to-wall hops swing through the open center aisle (a doorway counts as its wall)
   const fx = rf === 'main' ? from.position[0] : DOORWAY[rf][0];
   const tx = rt === 'main' ? to.position[0] : DOORWAY[rt][0];
-  const crossing = Math.abs(fx) > 3 && Math.abs(tx) > 3 && Math.sign(fx) !== Math.sign(tx);
-  if (crossing && rf !== rt) wps.push(MIDPOINT);
+  const crossing = Math.abs(fx) >= 3 && Math.abs(tx) >= 3 && Math.sign(fx) !== Math.sign(tx);
+  if (crossing) wps.push(MIDPOINT);
   if (rt !== 'main' && rf !== rt) wps.push(DOORWAY[rt]); // enter the side room through its door
   return wps;
 }

@@ -723,3 +723,148 @@
   color: var(--red);
   border-color: var(--red);
 }
+
+/* ---- back office v2: tabs, bulk bar, import, users ---- */
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(242, 232, 213, 0.06);
+  border: 1px solid var(--wood);
+  border-radius: 999px;
+  padding: 3px;
+}
+.admin-tab {
+  border: 0;
+  background: transparent;
+  color: var(--cream);
+  opacity: 0.7;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.admin-tab.active {
+  background: var(--green);
+  opacity: 1;
+}
+.admin-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.admin-toolbar .admin-search {
+  flex: 1;
+}
+.admin-bulk {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(166, 61, 64, 0.12);
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.admin-bulk > span {
+  flex: 1;
+}
+.admin-confirm-input {
+  width: 160px !important;
+}
+.admin-table .chk {
+  width: 28px;
+  text-align: center;
+}
+.admin-table .mono {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+.tag.warn {
+  background: #8a5a1c;
+}
+.admin-help {
+  font-size: 12px;
+  opacity: 0.85;
+  line-height: 1.5;
+  margin: 0;
+}
+.admin-help code {
+  font-size: 11px;
+  background: rgba(242, 232, 213, 0.08);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+.linkish {
+  background: none;
+  border: 0;
+  color: var(--gold);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 12px;
+  padding: 0;
+}
+.admin-import {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  min-height: 0;
+}
+.admin-paste {
+  background: rgba(242, 232, 213, 0.08);
+  border: 1px solid var(--wood);
+  border-radius: 8px;
+  color: var(--cream);
+  padding: 8px 10px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  resize: vertical;
+}
+.admin-paste:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.admin-errors {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #ff9a9c;
+  max-height: 120px;
+  overflow: auto;
+}
+.admin-err-count {
+  color: #ff9a9c;
+}
+.admin-ok {
+  font-size: 13px;
+  color: #9fdca8;
+}
+.admin-preview {
+  max-height: 260px;
+  flex: none;
+}
+.admin-user {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.admin-user img,
+.admin-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--green);
+  display: inline-grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+.admin-switch {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  cursor: pointer;
+}

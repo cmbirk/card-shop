@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { shopLayout } from '@shared/data/shopLayout';
+import { useAuthStore } from './authStore';
 
 export type NavMode = 'station' | 'transit' | 'inspect-locked' | 'freewalk';
 
@@ -20,6 +21,7 @@ export const useNavStore = create<NavState>((set, get) => ({
     const { mode, currentStation } = get();
     if (mode === 'inspect-locked') return;
     if (id === currentStation && mode === 'station') return;
+    if (id === 'office' && !useAuthStore.getState().isAdmin) return; // staff only — the door gate
     set({ targetStation: id, mode: 'transit' });
   },
   arrived: (id) => set({ currentStation: id, targetStation: null, mode: 'station' }),

@@ -36,7 +36,7 @@ export const FEEL = {
 
   // back office door
   doorSwingLambda: 6,
-  doorOpenAngle: -1.9, // rad, swings into the office
+  doorOpenAngle: 1.9, // rad, swings into the office (hinge on the left jamb)
 
   // hold pile (the counter)
   holdFanSpread: 0.03, // x offset per card in the fanned stack

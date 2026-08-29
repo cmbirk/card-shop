@@ -73,8 +73,8 @@ src/
   systems/         inventory (live Supabase read + bundled fallback), placement, rng, sfx
   scene/           Shop, Facade, StationController (glide nav), fixtures/, cards/,
                    Shopkeeper (Chris), Maya, Basket, BackOfficeDoor, materials/pbr
-  admin/           adminCards.ts — Supabase CRUD + scan upload (admin JWT, RLS-gated)
-  ui/              DOM overlays: chat, basket, inspect, checkout, sign-in, AdminPanel (back office)
+  admin/           adminCards.ts (CRUD, bulk, CSV/JSON import+export), adminUsers.ts (visitors, admin toggle)
+  ui/              DOM overlays: chat, hold-pile chip, inspect, checkout, sign-in, admin/ (Inventory·Import·Users)
 scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill)
 ```
 
@@ -87,11 +87,16 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   view (admin-only columns like cost basis hidden), and RLS lets only admins (rows in the
   `admins` table) write. Chris's grounding reads the DB (TTL-cached), so new cards show up
   without a redeploy.
-- **Back office.** Admins get a "STAFF ONLY" door beside the counter (and a 🗝 HUD button)
-  that opens the admin panel: search every card incl. sold/reserved and cost basis, add/edit
-  (identity, parallel/hits, grading, price, admin-only acquisition fields, lore), upload
-  front/back scans to Storage, delete. Saves re-place the shelves live. Non-admins who click
-  the door get waved off by Chris.
+- **Back office.** Admins walk through the "STAFF ONLY" door beside the counter into a real
+  office; the desk computer (or the 🗝 HUD button) opens the panel. **Inventory:** search every
+  card incl. sold/reserved/personal and cost basis, add/edit (identity, parallel/hits, grading,
+  price, admin-only acquisition fields, lore), scan upload, multi-select bulk delete, CSV export.
+  **Import:** paste/upload CSV or JSON, preview new/update/error rows, import in one go (template
+  provided). **Users:** everyone who's signed the guestbook (`profiles`, maintained by DB
+  triggers) with an Admin toggle. Saves re-place the shelves live. Non-admins who click the door
+  get waved off by Chris.
+- **Hold pile, not a basket.** Cards you want fly to a pile on the counter — Chris holds them up
+  front — with a small HUD chip; at the counter, click a pile card to put it back, then check out.
 - **Sign-in: Google or email magic link.** Both resolve to one Supabase user per email.
 - **Hold a card up and ask Chris.** From any shelf, "Ask Chris" (or `A`) has Chris walk out from
   behind the counter to you, the camera turns to him, and his take on *that* card streams into a

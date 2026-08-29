@@ -24,8 +24,10 @@ src/
                    Maya, Basket, BackOfficeDoor (STAFF ONLY → admin panel), ShowcaseRoom + ShowcaseDoor
                    ("The Collection" annex off the west wall; ANNEX/ANNEX_DOOR in shopLayout;
                    display name = ROOM_NAME in shared/data/showcase.ts), materials/pbr
-  admin/           adminCards.ts — Supabase CRUD + scan upload under the admin JWT
-  ui/              DOM overlays: chat, basket, inspect, checkout, sign-in, AdminPanel (back office)
+  admin/           adminCards.ts (CRUD, bulk delete/upsert, CSV/JSON import+export — unit-tested),
+                   adminUsers.ts (profiles ⨝ admins, setAdmin)
+  ui/              DOM overlays: chat, hold-pile chip (BasketPanel), inspect, checkout, sign-in,
+                   admin/ (AdminPanel shell + InventoryTab/ImportTab/UsersTab/CardForm)
 ```
 
 ## Critical gotchas (these have bitten us)
@@ -51,8 +53,14 @@ src/
 - **`status: 'personal'` = not for sale.** Only a fixture with `accepts.status` takes them
   (`case-collection`); `InspectHud`/`inspectStore` hide price + basket; grounding lists them without a
   price. Memorabilia is data too (`shared/data/showcase.ts`) so Chris can talk about it.
-- **Two rooms: glides route through `ANNEX_DOORWAY`** (`StationController.waypoints`) and Chris's
-  walk path goes through the door (`pathToSpot`). A station's "room" is `position.x < ANNEX.xMax`.
+- **Three rooms (main / annex / office): glides route through the room's doorway**
+  (`StationController.roomOf` + `waypoints`); Chris's walk path goes through the annex door
+  (`pathToSpot`). `navStore.goTo('office')` is refused for non-admins (the door gate).
+- **No 3D basket.** Picks fly to the `HoldPile` on the counter (registered as `hold-pile` in
+  `cardRegistry`); `basketStore` still holds the ids. Don't register pile cards per-id — that
+  clobbers the shelf card's registry entry and breaks its next pickup/return.
+- **`profiles` is trigger-maintained** (auth.users insert / last_sign_in_at update); the client never
+  writes it. Admin membership = `admins` rows; `setAdmin` refuses self-demotion.
 - **Card art is procedural, real scans override.** `card.images.front` paints over the atlas cell;
   everything works without real images.
 - **All animation constants live in `feel.ts`.** No magic durations/eases in components.

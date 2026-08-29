@@ -27,6 +27,7 @@ export function HoldPile() {
   const group = useRef<THREE.Group>(null!);
   const cardRefs = useRef<(THREE.Group | null)[]>([]);
   const scatter = useRef({ seen: 0, t: 0 });
+  const drift = useRef<number[]>([]); // per-card sideways drift for the sweep, precomputed
 
   useEffect(() => {
     registerCard(HOLD_PILE_ID, group.current);
@@ -39,15 +40,17 @@ export function HoldPile() {
     if (tantrumCount !== s.seen) {
       s.seen = tantrumCount;
       s.t = 0.0001;
+      const rand = mulberry32(tantrumCount + 3);
+      drift.current = cardRefs.current.map(() => spread(rand));
     }
     if (s.t > 0) {
-      s.t = Math.min(s.t + dt / 0.6, 1);
+      s.t = Math.min(s.t + dt / 2.6, 1); // keeps falling until uiStore clears the pile
       cardRefs.current.forEach((g, i) => {
         if (!g) return;
-        const rand = mulberry32(i * 7 + 1);
-        g.position.x += (0.6 + spread(rand) * 0.4) * dt;
-        g.position.y -= 1.4 * s.t * dt;
-        g.rotation.z += (1 + spread(rand)) * dt * 3;
+        const d = drift.current[i] ?? 0;
+        g.position.x += (0.6 + d * 0.4) * dt;
+        g.position.y -= 1.4 * Math.min(s.t * 4, 1) * dt;
+        g.rotation.z += (1 + d) * dt * 3;
       });
       if (s.t >= 1) s.t = 0;
     }
@@ -72,11 +75,6 @@ function HeldCard({ id, index, setRef }: { id: string; index: number; setRef: (e
   const y = index * 0.0025;
   const rz = spread(rand) * 0.12 - index * 0.04;
   const visual = card ? getCardVisual(id) : null;
-
-  useEffect(() => {
-    registerCard(id, inner.current);
-    return () => unregisterCard(id);
-  }, [id]);
 
   useFrame((_, dt) => {
     if (!inner.current) return;

@@ -229,6 +229,7 @@ function HeldCard({ cardId }: { cardId: string }) {
           _q.multiply(_qFlat);
         } else {
           _v.set(-0.55, 1.05, -3.08);
+          _q.copy(_qFlat);
         }
         g.position.lerpVectors(a.startPos, _v, k);
         g.position.y += Math.sin(Math.PI * kt) * 0.5; // high toss across the shop

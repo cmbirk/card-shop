@@ -71,6 +71,12 @@ one-time OAuth client:
 Note: a Google user and a magic-link user with the same email are the **same** Supabase user
 (identities are linked by verified email), so the admins row works either way.
 
+## 4d. Visitors + promoting admins
+`public.profiles` is filled by triggers on `auth.users` (sign-up + every sign-in) and backfilled by
+`20260829130000_profiles.sql`. The Back Office → Users tab lists everyone and has an Admin toggle
+(writes the `admins` table under your JWT; you can't demote yourself). The SQL in step 4 is still
+the bootstrap for the *first* admin.
+
 ## 4c. Personal (not-for-sale) cards
 `status = 'personal'` marks a card as Chris's own — it shows in the Collection (showcase annex) case, can be
 inspected but not bought, and Chris will talk about it but never price it. Set it from the admin
