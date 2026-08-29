@@ -23,6 +23,13 @@ async function handle(server: ViteDevServer, file: string, req: IncomingMessage,
     const chunks: Buffer[] = [];
     for await (const chunk of req) chunks.push(chunk as Buffer);
     const mod = await server.ssrLoadModule(`/${file.replace(/^\//, '')}`);
+    // dispatch by HTTP-method export, matching Vercel's web-handler convention
+    const fn = mod[(req.method ?? 'GET').toUpperCase()] as ((r: Request) => Promise<Response> | Response) | undefined;
+    if (!fn) {
+      res.statusCode = 405;
+      res.end('Method not allowed');
+      return;
+    }
     const headers = new Headers();
     for (const [k, v] of Object.entries(req.headers)) {
       if (typeof v === 'string') headers.set(k, v);
@@ -32,7 +39,7 @@ async function handle(server: ViteDevServer, file: string, req: IncomingMessage,
       headers,
       body: chunks.length > 0 ? Buffer.concat(chunks) : undefined,
     });
-    const webRes: Response = await mod.default(webReq);
+    const webRes: Response = await fn(webReq);
     res.statusCode = webRes.status;
     webRes.headers.forEach((v, k) => res.setHeader(k, v));
     if (webRes.body) {

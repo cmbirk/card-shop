@@ -8,11 +8,10 @@ function sse(event: string, data: unknown): Uint8Array {
   return new TextEncoder().encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
-// Web-standard handler — runs identically on Vercel's Node runtime and the Vite dev mount.
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
+// Web-standard handler. Named method export required: Vercel's Node runtime only
+// uses the Request/Response signature for exports named after HTTP methods —
+// a default export gets the legacy (IncomingMessage, ServerResponse) signature.
+export async function POST(req: Request): Promise<Response> {
   // gate LLM spend: only signed-in visitors may talk to Chris
   const auth = await requireUser(req);
   if (!auth.ok) {
