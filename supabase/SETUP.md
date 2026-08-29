@@ -1,63 +1,66 @@
-# Supabase setup (one-time)
+# Supabase setup (CLI workflow)
 
-This stands up the backend for real inventory, admin auth, and card-image
-storage. ~10 minutes. Do this once; after that, adding cards is done in the
-in-app admin panel.
+Backend for real inventory, admin auth, and card-image storage — managed
+through the Supabase CLI so the schema is version-controlled (in
+`supabase/migrations/`) instead of pasted into the web SQL editor.
 
-## 1. Create the project
-1. Go to https://supabase.com → New project. Name it `gem-card-shop` (any name).
-2. Pick a region near you and a strong database password (save it).
-3. Wait for it to provision (~2 min).
+The CLI is a dev dependency, so `npx supabase …` works with no global install.
 
-## 2. Run the schema
-1. In the project, open **SQL Editor** → New query.
-2. Paste the entire contents of `supabase/schema.sql` and click **Run**.
-   - This creates the `cards` table, the `admins` table + `is_admin()`,
-     Row Level Security policies, the customer-safe `cards_public` view, and
-     the `card-images` storage bucket + policies.
+## 1. Create the project (dashboard, once)
+At https://supabase.com → New project. Region near you, save the DB password.
+On the "Create a new project" screen keep **Enable Data API** and **Automatically
+expose new tables** checked; leave **Enable automatic RLS** unchecked (our
+migration turns RLS on explicitly). Grab the **project ref** from the URL or
+Project Settings → General (looks like `abcdxyz…`).
 
-## 3. Create your admin user
-1. **Authentication → Users → Add user** → enter your email + a password
-   (email confirm can be off for yourself). Copy the new user's **UUID**.
-2. Back in **SQL Editor**, run (paste your UUID):
+## 2. Log in + link (interactive — run these yourself with `!`)
+```
+! npx supabase login          # opens a browser to authorize the CLI (one time)
+! npx supabase link --project-ref <your-project-ref>
+```
+`link` will ask for the DB password you saved.
+
+## 3. Apply the schema
+```
+! npm run db:push             # applies supabase/migrations/*.sql to the remote DB
+```
+This creates the `cards` table, `admins` + `is_admin()`, Row Level Security,
+the customer-safe `cards_public` view, and the `card-images` storage bucket +
+policies. Re-runnable safely (the migration is idempotent).
+
+## 4. Create your admin user + keys (dashboard)
+1. **Authentication → Users → Add user** → your email + password → copy the UUID.
+2. In **SQL Editor** (or `npx supabase db execute`), run:
    ```sql
    insert into public.admins (user_id) values ('<your-auth-user-uuid>');
    ```
-   You are now the admin. Anyone else is a customer.
+3. **Project Settings → API** → copy into `.env.local` (and Vercel env):
+   ```
+   VITE_SUPABASE_URL=https://<project>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<anon public key>         # browser-safe (RLS protects data)
+   SUPABASE_SERVICE_ROLE_KEY=<service_role key>     # SERVER-ONLY — never prefix with VITE_
+   ```
 
-## 4. Get your keys
-**Project Settings → API**. Copy three values into `.env.local` (and later into
-Vercel → Project → Settings → Environment Variables):
-
+## 5. Seed + generate types
 ```
-VITE_SUPABASE_URL=https://<project>.supabase.co      # "Project URL"
-VITE_SUPABASE_ANON_KEY=<anon public key>             # "anon / public"  (browser-safe)
-SUPABASE_SERVICE_ROLE_KEY=<service role key>         # "service_role"   (SERVER-ONLY — never VITE_)
-```
-
-- The **anon** key is meant to be public; RLS is what protects your data.
-- The **service_role** key bypasses RLS — keep it out of the browser. It's only
-  used by the seed script and the server-side shopkeeper grounding function.
-
-## 5. Seed the current inventory
-Migrates the existing ~120 mock + real cards into the DB so there's one source
-of truth (all deletable later from the admin panel):
-
-```bash
-node supabase/seed.mjs
+! npm run db:seed             # migrate the 120 bundled cards into the DB
+! npm run db:types            # generate src/lib/database.types.ts for typed access
 ```
 
-Expect `Seeded 120 cards into Supabase.` Verify in **Table Editor → cards**.
+## 6. Verify
+- Reload the shop — identical, now DB-backed.
+- `Ask Chris` reflects DB inventory.
+- Later: enter the back office (admin-gated), click the computer, log in, add a
+  card with scans → it appears on a shelf on refresh.
 
-## 6. Verify it's wired
-- Reload the shop — it should look identical, now reading from the DB.
-- Try `Ask Chris` in-store; his answers should reflect DB inventory.
-- Later: walk into the back office (admin-gated), click the computer, log in,
-  add a card with scans — it appears on a shelf on refresh.
+## Optional — local stack for offline dev/testing
+`npx supabase start` boots a full local Postgres + Studio + Auth (needs Docker).
+Point `.env.local` at the local URL/keys it prints to develop and test the admin
+flow without touching the cloud project. `npx supabase stop` when done.
 
 ## Notes
-- **Card images**: the admin panel uploads front/back scans to the `card-images`
-  bucket and stores their public URLs on the card. The shop renders those over
-  the procedural placeholder art automatically.
-- **Vercel**: add the same three env vars to the Vercel project so production
-  reads the same database.
+- **Migrations are the source of truth.** To change the schema, add a new file
+  under `supabase/migrations/` (or `npx supabase migration new <name>`) and
+  `npm run db:push`. Don't hand-edit tables in the dashboard.
+- The old `supabase/schema.sql` is kept as a readable reference; the CLI applies
+  the copy under `supabase/migrations/`.

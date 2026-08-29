@@ -9,7 +9,10 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "gen:inventory": "node scripts/generateInventory.mjs"
+    "gen:inventory": "node scripts/generateInventory.mjs",
+    "db:push": "supabase db push",
+    "db:types": "supabase gen types typescript --linked > src/lib/database.types.ts",
+    "db:seed": "node supabase/seed.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",
@@ -32,6 +35,7 @@
     "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^6.1.1",
     "playwright": "^1.62.1",
+    "supabase": "^2.116.0",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
