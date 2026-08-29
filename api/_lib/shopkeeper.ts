@@ -38,7 +38,12 @@ export async function runShopkeeper(
   events: ShopkeeperEvents,
   signal?: AbortSignal,
 ): Promise<void> {
-  const client = new Anthropic();
+  // identity-linked API keys must name the workspace they act in; harmless when unset
+  const client = new Anthropic({
+    defaultHeaders: process.env.ANTHROPIC_WORKSPACE_ID
+      ? { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID }
+      : undefined,
+  });
   const model = process.env.SHOPKEEPER_MODEL || 'claude-haiku-4-5';
 
   const { cards, cardsById } = await getInventory();
