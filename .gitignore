@@ -6,3 +6,7 @@ dist
 .vercel
 .DS_Store
 *.log
+
+# Raw 3D source assets (Meshy exports, zips) — keep local, not in git
+models_and_animation/
+*.zip
