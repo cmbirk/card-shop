@@ -138,6 +138,8 @@ Next: an actual back room behind the STAFF ONLY door (desk computer that opens t
 in-world); a Meshy helmet + your own photos for the Collection. Then: Stripe checkout, first-person WASD (the nav rig is already a swappable
 component), pack-ripping, and richer Chris. See the plan doc for detail.
 
+- **Consignment (outside sellers) and a trade room** — idea-phase think-through with staged
+  data models in [`docs/IDEAS-consignment-and-trade-room.md`](docs/IDEAS-consignment-and-trade-room.md).
 - **Branded Google sign-in.** The consent screen currently says "Sign in to
   `<ref>.supabase.co`" because Google shows the redirect URI's domain for unverified apps.
   Fix: Supabase custom domain (Pro + add-on, e.g. `api.gemcardshop.com`) → update the Google
