@@ -2,22 +2,15 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { easing } from 'maath';
-import { CARD_SIZE, SLAB_SIZE } from '@shared/data/shopLayout';
+import { CARD_SIZE } from '@shared/data/shopLayout';
 import { inventoryById } from '../../systems/inventory';
 import { getCardHome } from '../../systems/cardRegistry';
 import { makeDetailMaterials, getDetailGeometries } from './atlas';
-import { makeLabelMaterial } from '../materials';
+import { Slab } from './Slab';
 import { useInspectStore, type InspectMode } from '../../stores/inspectStore';
 import { useBasketStore } from '../../stores/basketStore';
 import { FEEL, easeOutBack, easeOutCubic, easeInOutQuad, easeInCubic } from '../../feel';
 import { sfx } from '../../systems/sfx';
-
-const slabShellMaterial = new THREE.MeshPhysicalMaterial({
-  color: '#ffffff',
-  transparent: true,
-  opacity: 0.15,
-  roughness: 0.05,
-});
 
 export function CardInHand() {
   const heldCardId = useInspectStore((s) => s.heldCardId);
@@ -220,19 +213,7 @@ function HeldCard({ cardId }: { cardId: string }) {
         }}
       />
       <mesh geometry={geos.back} material={detail.back} position-z={-CARD_SIZE.t / 2} rotation-y={Math.PI} />
-      {card.grade && (
-        <mesh material={slabShellMaterial}>
-          <boxGeometry args={[SLAB_SIZE.w, SLAB_SIZE.h, SLAB_SIZE.t]} />
-        </mesh>
-      )}
-      {card.grade && card.images && (
-        <mesh
-          material={makeLabelMaterial(card.grade.label, { bg: '#f5f5f0', fg: '#1a1a1a', size: 54 })}
-          position={[0, SLAB_SIZE.h / 2 - 0.011, SLAB_SIZE.t / 2 + 0.0015]}
-        >
-          <planeGeometry args={[SLAB_SIZE.w * 0.96, 0.019]} />
-        </mesh>
-      )}
+      {card.grade && <Slab card={card} />}
     </group>
   );
 }

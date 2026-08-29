@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import type { Card, Sport } from '@shared/types';
 import { mulberry32 } from '../../systems/rng';
 
@@ -243,6 +244,87 @@ export function drawCardFront(ctx: CanvasRenderingContext2D, card: Card, x: numb
   }
 
   ctx.restore();
+}
+
+interface SlabStyle {
+  bg: string;
+  fg: string;
+  accent: string;
+  logo: string;
+}
+
+const SLAB_STYLES: Record<string, SlabStyle> = {
+  PSA: { bg: '#f4f3ef', fg: '#1a1a1a', accent: '#c8102e', logo: '#c8102e' },
+  BGS: { bg: '#d9dde3', fg: '#12233f', accent: '#c9a227', logo: '#12233f' },
+  TAG: { bg: '#121519', fg: '#f2f2f2', accent: '#18b7a6', logo: '#18b7a6' },
+  SGC: { bg: '#15130f', fg: '#f2e9d8', accent: '#b8892b', logo: '#b8892b' },
+};
+
+/** Landscape grading-label strip that sits at the top of a slab (like a real PSA/TAG flip). */
+export function drawSlabLabel(ctx: CanvasRenderingContext2D, card: Card, w: number, h: number) {
+  const s = SLAB_STYLES[card.grade?.company ?? 'PSA'] ?? SLAB_STYLES.PSA;
+  const u = w / 512;
+  ctx.fillStyle = s.bg;
+  ctx.fillRect(0, 0, w, h);
+  // left accent bar
+  ctx.fillStyle = s.accent;
+  ctx.fillRect(0, 0, 10 * u, h);
+
+  // left column: card identity, small caps
+  ctx.fillStyle = s.fg;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  const lx = 26 * u;
+  ctx.font = `bold ${26 * u}px Arial, sans-serif`;
+  ctx.fillText(`${card.year} ${card.setName}`.toUpperCase().slice(0, 30), lx, h * 0.28);
+  ctx.font = `bold ${30 * u}px Arial, sans-serif`;
+  ctx.fillText(card.playerName.toUpperCase().slice(0, 26), lx, h * 0.56);
+  ctx.font = `${22 * u}px Arial, sans-serif`;
+  ctx.fillStyle = s.accent;
+  const line3 = [card.cardNumber, card.grade?.certNumber ? `CERT ${card.grade.certNumber}` : '']
+    .filter(Boolean)
+    .join('   ');
+  ctx.fillText(line3.toUpperCase().slice(0, 34), lx, h * 0.82);
+
+  // right block: company logo + big grade
+  const rx = w - 14 * u;
+  ctx.textAlign = 'right';
+  ctx.fillStyle = s.logo;
+  ctx.font = `900 ${34 * u}px Arial, sans-serif`;
+  ctx.fillText(card.grade?.company ?? 'PSA', rx, h * 0.3);
+  ctx.fillStyle = s.fg;
+  ctx.font = `900 ${52 * u}px Arial, sans-serif`;
+  const gradeTxt = card.grade
+    ? `${card.grade.value}${card.grade.label.replace(new RegExp(`^${card.grade.company}\\s*${card.grade.value}\\s*`), '').trim() ? ' ' + card.grade.label.replace(new RegExp(`^${card.grade.company}\\s*${card.grade.value}\\s*`), '').trim() : ''}`
+    : '';
+  ctx.fillText(gradeTxt.slice(0, 12), rx, h * 0.68);
+
+  // hairline divider under label
+  ctx.strokeStyle = s.accent;
+  ctx.lineWidth = 3 * u;
+  ctx.beginPath();
+  ctx.moveTo(0, h - 2 * u);
+  ctx.lineTo(w, h - 2 * u);
+  ctx.stroke();
+}
+
+/** Slab label as a texture material (cached). */
+const slabLabelCache = new Map<string, THREE.CanvasTexture>();
+export function makeSlabLabelTexture(card: Card): THREE.CanvasTexture {
+  const key = card.id;
+  const cached = slabLabelCache.get(key);
+  if (cached) return cached;
+  const w = 512;
+  const h = 132;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  drawSlabLabel(c.getContext('2d')!, card, w, h);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  slabLabelCache.set(key, tex);
+  return tex;
 }
 
 /** Card back. `withStats` = per-card seeded stat table (used for the hi-res inspect texture). */

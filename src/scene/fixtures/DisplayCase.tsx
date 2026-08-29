@@ -10,8 +10,8 @@ export function DisplayCase({ cards }: { cards: PlacedCard[] }) {
       <mesh material={MAT.walnut} position={[0, 0.25, 0]} castShadow>
         <boxGeometry args={[1.6, 0.5, 0.6]} />
       </mesh>
-      {/* glass box */}
-      <mesh material={MAT.glass} position={[0, 0.75, 0]}>
+      {/* glass box — raycast disabled so clicks reach the cards inside */}
+      <mesh material={MAT.glass} position={[0, 0.75, 0]} raycast={() => null}>
         <boxGeometry args={[1.6, 0.5, 0.6]} />
       </mesh>
       {/* glass shelf + velvet riser for the back row */}

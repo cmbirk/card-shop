@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, useCursor } from '@react-three/drei';
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import { easing } from 'maath';
 import type { Card } from '@shared/types';
-import { CARD_SIZE, SLAB_SIZE } from '@shared/data/shopLayout';
+import { CARD_SIZE } from '@shared/data/shopLayout';
 import type { SlotTransform } from '../../systems/placement';
 import { getCardVisual } from './atlas';
-import { makeLabelMaterial } from '../materials';
+import { Slab } from './Slab';
 import { registerCard, unregisterCard } from '../../systems/cardRegistry';
 import { useInspectStore } from '../../stores/inspectStore';
 import { useBasketStore } from '../../stores/basketStore';
@@ -17,14 +17,6 @@ import { useDialogueStore } from '../../stores/dialogueStore';
 import { formatCents } from '../../stores/basketStore';
 import { FEEL } from '../../feel';
 import { sfx } from '../../systems/sfx';
-
-const slabShellMaterial = new THREE.MeshPhysicalMaterial({
-  color: '#ffffff',
-  transparent: true,
-  opacity: 0.15,
-  roughness: 0.05,
-  metalness: 0,
-});
 
 /** A card in its home slot (shelf / bin / case). Hover lifts it; click picks it up. */
 export function CardMesh({ card, slot }: { card: Card; slot: SlotTransform }) {
@@ -87,20 +79,7 @@ export function CardMesh({ card, slot }: { card: Card; slot: SlotTransform }) {
           position-z={-CARD_SIZE.t / 2}
           rotation-y={Math.PI}
         />
-        {card.grade && (
-          <mesh material={slabShellMaterial} position-z={0}>
-            <boxGeometry args={[SLAB_SIZE.w, SLAB_SIZE.h, SLAB_SIZE.t]} />
-          </mesh>
-        )}
-        {card.grade && card.images && (
-          // real scans don't bake a slab label into the art — add the plate on the shell
-          <mesh
-            material={makeLabelMaterial(card.grade.label, { bg: '#f5f5f0', fg: '#1a1a1a', size: 54 })}
-            position={[0, SLAB_SIZE.h / 2 - 0.011, SLAB_SIZE.t / 2 + 0.0015]}
-          >
-            <planeGeometry args={[SLAB_SIZE.w * 0.96, 0.019]} />
-          </mesh>
-        )}
+        {card.grade && <Slab card={card} />}
         {hovered && !hidden && (
           <Html position={[0, CARD_SIZE.h * 0.72, 0]} center distanceFactor={0.9} style={{ pointerEvents: 'none' }}>
             <div className="price-chip">
