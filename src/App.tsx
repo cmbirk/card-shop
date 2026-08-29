@@ -6,6 +6,7 @@ import { Shop } from './scene/Shop';
 import { StationController } from './scene/StationController';
 import { Waypoints } from './scene/Waypoints';
 import { Shopkeeper } from './scene/Shopkeeper';
+import { Maya } from './scene/Maya';
 import { Basket3D } from './scene/Basket';
 import { CardInHand } from './scene/cards/CardInHand';
 import { UIOverlay } from './ui/UIOverlay';
@@ -50,6 +51,7 @@ export default function App() {
         <fog attach="fog" args={['#241a10', 10, 24]} />
         <Shop />
         <Shopkeeper />
+        <Maya />
         <CardInHand />
         <Basket3D />
         <Waypoints />
