@@ -7,7 +7,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
     return { error };
   }
   componentDidCatch(error: Error) {
-    console.error('[GEM] scene crashed:', error);
+    console.error('[shop] scene crashed:', error);
   }
   render() {
     if (!this.state.error) return this.props.children;

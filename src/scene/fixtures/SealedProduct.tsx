@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
+import { SHOP_NAME } from '@shared/launch';
 import type { Sport } from '@shared/types';
 import { mulberry32, spread } from '../../systems/rng';
 
@@ -39,7 +40,7 @@ function productMaterials(sport: Sport, variant: number): THREE.Material[] {
   ctx.fillStyle = '#ffd97a';
   ctx.textAlign = 'center';
   ctx.font = 'bold 34px Georgia, serif';
-  ctx.fillText('GEM', 128, 58);
+  ctx.fillText(SHOP_NAME, 128, 58);
   ctx.fillStyle = '#efe6c8';
   ctx.font = 'bold 22px system-ui, sans-serif';
   ctx.fillText(variant === 0 ? 'WAX PACKS' : 'BLASTER BOX', 128, 96);

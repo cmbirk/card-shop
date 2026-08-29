@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { MAT } from './materials';
+import { SHOP_NAME } from '@shared/launch';
 
 const texLoader = new THREE.TextureLoader();
 const matboard = new THREE.MeshStandardMaterial({ color: '#f5f0e4', roughness: 0.9 });
@@ -47,7 +48,7 @@ function posterMaterial(title: string, subtitle: string, hue: number): THREE.Mes
   ctx.font = 'italic 28px Georgia, serif';
   ctx.fillText(subtitle, 256, 560);
   ctx.font = 'bold 22px Georgia, serif';
-  ctx.fillText('★ GEM · CARDS & COLLECTIBLES ★', 256, 620);
+  ctx.fillText(`★ ${SHOP_NAME} · CARDS & COLLECTIBLES ★`, 256, 620);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.85 });

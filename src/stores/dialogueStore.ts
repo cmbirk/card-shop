@@ -8,7 +8,7 @@ import { useNavStore } from './navStore';
 import { useShopkeeperStore } from './shopkeeperStore';
 import { bubbleHoldSeconds } from '../feel';
 import { useAuthStore } from './authStore';
-import { SOFT_OPENING } from '@shared/launch';
+import { SOFT_OPENING, SHOP_NAME } from '@shared/launch';
 
 const HISTORY_CAP = 40; // ~20 turns
 
@@ -87,8 +87,8 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     const newHere = useAuthStore.getState().firstVisit && !welcomed;
     const content =
       SOFT_OPENING && newHere
-        ? "Hey there, welcome to GEM! Name's Chris. Full disclosure — we're still getting the shop ready to open, so the register's in test mode: nothing's charged and nothing ships. But browse all you like, pick things up, ask me about anything, and if you want to try the register, I'll walk you through it."
-        : "Hey there, welcome to GEM! Name's Chris. Browse all you like — holler if you want to know what something's worth, or hand me anything you like and I'll hold it up front for you.";
+        ? `Hey there, welcome to ${SHOP_NAME}! Name's Chris. Full disclosure — we're still getting the shop ready to open, so the register's in test mode: nothing's charged and nothing ships. But browse all you like, pick things up, ask me about anything, and if you want to try the register, I'll walk you through it.`
+        : `Hey there, welcome to ${SHOP_NAME}! Name's Chris. Browse all you like — holler if you want to know what something's worth, or hand me anything you like and I'll hold it up front for you.`;
     try {
       localStorage.setItem('gem.welcomed', '1');
     } catch {

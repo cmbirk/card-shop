@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { MAT, makeLabelMaterial } from '../materials';
+import { SHOP_NAME } from '@shared/launch';
 import { useAuthStore } from '../../stores/authStore';
 import { useNavStore } from '../../stores/navStore';
 import { useUIStore } from '../../stores/uiStore';
@@ -16,7 +17,7 @@ function screenMaterial(): THREE.MeshStandardMaterial {
   ctx.fillRect(0, 0, 512, 384);
   ctx.fillStyle = '#9fdca8';
   ctx.font = 'bold 30px ui-monospace, Menlo, monospace';
-  ctx.fillText('GEM BACK OFFICE v2.0', 40, 80);
+  ctx.fillText(`${SHOP_NAME} BACK OFFICE v2.0`, 40, 80);
   ctx.font = '22px ui-monospace, Menlo, monospace';
   ctx.fillStyle = '#7fc38a';
   ctx.fillText('inventory · import · users', 40, 130);

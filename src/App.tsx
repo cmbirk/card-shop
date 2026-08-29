@@ -12,6 +12,7 @@ import { UIOverlay } from './ui/UIOverlay';
 import { loadInventory } from './systems/inventory';
 import { useAuthStore } from './stores/authStore';
 import { ErrorBoundary } from './ui/ErrorBoundary';
+import { SHOP_NAME } from '@shared/launch';
 import { resumeCheckout } from './systems/checkoutReturn';
 
 export default function App() {
@@ -38,7 +39,7 @@ export default function App() {
         }}
       >
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 40, letterSpacing: 4 }}>GEM</div>
+          <div style={{ fontSize: 40, letterSpacing: 4 }}>{SHOP_NAME}</div>
           <div style={{ fontSize: 13, opacity: 0.7, marginTop: 8 }}>opening up the shop…</div>
         </div>
       </div>

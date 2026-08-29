@@ -1,4 +1,4 @@
-# GEM — a walkable 3D trading-card shop
+# TLC (Toploader Cards) — a walkable 3D trading-card shop
 
 A browser trading-card shop built like a game, not a storefront. You arrive outside at dusk,
 sign the guestbook, and step into a cozy hobby shop: browse cards by sport on wooden shelves,
@@ -6,7 +6,7 @@ dig through bargain bins, admire graded slabs in the glass case, pick any card u
 inspect it, drop it in a basket, and check out at the counter — where **Chris**, the AI
 shopkeeper (Claude-powered), knows every card in stock, with **Maya** minding the good stuff.
 
-Live at **[gemcardshop.com](https://gemcardshop.com)**. Built with React Three Fiber + Vite +
+Live at **[toploadercards.com](https://toploadercards.com)**. Built with React Three Fiber + Vite +
 TypeScript, on Vercel (static client + `/api` serverless functions), backed by Supabase
 (Postgres inventory + Auth + Storage).
 
@@ -55,7 +55,7 @@ npm run db:types   # regenerate src/lib/database.types.ts
 
 Push to GitHub → import in Vercel (Vite preset auto-detected) → set the env vars above →
 deploy. The client goes to the CDN; `api/*.ts` become Node serverless functions on the same
-origin. A custom domain (e.g. gemcardshop.com) bypasses Vercel's SSO wall — the app protects
+origin. A custom domain (e.g. toploadercards.com) bypasses Vercel's SSO wall — the app protects
 itself via the guestbook + the token gate below.
 
 ## How it's put together
@@ -142,9 +142,9 @@ component), pack-ripping, and richer Chris. See the plan doc for detail.
   data models in [`docs/IDEAS-consignment-and-trade-room.md`](docs/IDEAS-consignment-and-trade-room.md).
 - **Branded Google sign-in.** The consent screen currently says "Sign in to
   `<ref>.supabase.co`" because Google shows the redirect URI's domain for unverified apps.
-  Fix: Supabase custom domain (Pro + add-on, e.g. `api.gemcardshop.com`) → update the Google
+  Fix: Supabase custom domain (Pro + add-on, e.g. `api.toploadercards.com`) → update the Google
   client's redirect URI/origins + `VITE_SUPABASE_URL` → then optionally publish the OAuth
-  consent screen with `gemcardshop.com` as an authorized domain (needs privacy/terms pages +
+  consent screen with `toploadercards.com` as an authorized domain (needs privacy/terms pages +
   Search Console verification) so it reads "Sign in to GEM". Deferred — not needed yet.
 
 Football card scans in `public/cards/football/` are 1894 Mayo Cut Plug cards via Wikimedia

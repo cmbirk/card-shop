@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../stores/authStore';
 import { useUIStore } from '../stores/uiStore';
+import { SHOP_NAME } from '@shared/launch';
 
 // The guestbook sign-in. Everyone signs in on entry; admins are just accounts
 // flagged in the admins table. Google (one-click) + email magic link.
@@ -27,7 +28,7 @@ export function SignInPanel() {
     <div className="modal-backdrop">
       <div className="modal signin">
         <div className="signin-sheet-head">
-          <div className="signin-title">The GEM Guestbook</div>
+          <div className="signin-title">The {SHOP_NAME} Guestbook</div>
           <div className="signin-sub">Sign in to come on in — welcome to the shop.</div>
         </div>
 

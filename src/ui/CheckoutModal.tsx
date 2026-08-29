@@ -2,7 +2,7 @@ import { useBasketStore, basketTotalCents, formatCents } from '../stores/basketS
 import { useUIStore } from '../stores/uiStore';
 import { inventoryById } from '../systems/inventory';
 import { sfx } from '../systems/sfx';
-import { SOFT_OPENING } from '@shared/launch';
+import { SOFT_OPENING, SHOP_NAME, SHOP_FULL_NAME } from '@shared/launch';
 import { useDialogueStore } from '../stores/dialogueStore';
 import { startCheckout, CheckoutConflict } from '../api/checkout';
 
@@ -128,7 +128,8 @@ export function CheckoutModal() {
           <h2>Thanks for stopping by!</h2>
           <div className="receipt">
             {receipt.testMode && <div className="r-stamp">TEST · NOT A SALE</div>}
-            <div className="r-center">★ GEM ★</div>
+            <div className="r-center">★ {SHOP_NAME} ★</div>
+            <div className="r-center">{SHOP_FULL_NAME.toUpperCase()}</div>
             <div className="r-center" style={{ marginBottom: 8 }}>CARDS · COLLECTIBLES</div>
             {receipt.items.map((i) => (
               <div className="r-row" key={i.id}>

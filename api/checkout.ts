@@ -1,4 +1,5 @@
 import { requireUser } from './_lib/auth.js';
+import { SHOP_NAME } from '../shared/launch.js';
 import { getStripe, serviceClient, json, publicOrigin, RESERVE_MINUTES, isTestKey, cancelPendingOrder } from './_lib/stripe.js';
 
 export const maxDuration = 30;
@@ -79,7 +80,7 @@ export async function POST(req: Request): Promise<Response> {
         },
       })),
       custom_text: {
-        submit: { message: "Soft opening — GEM's register is in test mode. Nothing is charged and nothing ships. Thanks for trying it out!" },
+        submit: { message: `Soft opening — ${SHOP_NAME}'s register is in test mode. Nothing is charged and nothing ships. Thanks for trying it out!` },
       },
       success_url: `${origin}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/?checkout=cancel&order_id=${orderId}`,

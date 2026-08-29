@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDialogueStore } from '../stores/dialogueStore';
+import { SHOP_NAME } from '@shared/launch';
 import { useBasketStore } from '../stores/basketStore';
 import { useUIStore } from '../stores/uiStore';
 
@@ -26,7 +27,7 @@ export function ChatWindow() {
   return (
     <div className="chat-window">
       <div className="chat-header">
-        <span>Chris — GEM</span>
+        <span>Chris — {SHOP_NAME}</span>
         <button onClick={() => useDialogueStore.getState().close()} title="Close">✕</button>
       </div>
       <div className="chat-messages" ref={scrollRef}>

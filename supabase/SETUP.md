@@ -53,7 +53,7 @@ one-time OAuth client:
    real customers (no verification is needed for basic email/profile scopes).
 3. **APIs & Services → Credentials → Create credentials → OAuth client ID**
    - Application type: **Web application**, name `GEM Supabase`
-   - **Authorized JavaScript origins:** `https://gemcardshop.com`, `http://localhost:5199`
+   - **Authorized JavaScript origins:** `https://toploadercards.com`, `http://localhost:5199`
    - **Authorized redirect URIs:** exactly one —
      `https://plifvdhdmeslbweojhhr.supabase.co/auth/v1/callback`
      (Google redirects to *Supabase*, which then bounces back to the app.)
@@ -61,7 +61,7 @@ one-time OAuth client:
 4. **Supabase dashboard → Authentication → Providers → Google** → Enable → paste Client ID +
    Client secret → Save.
 5. **Supabase → Authentication → URL Configuration:**
-   - Site URL: `https://gemcardshop.com`
+   - Site URL: `https://toploadercards.com`
    - Redirect URLs: add `http://localhost:5199/**` and `https://*.vercel.app/**` (preview deploys).
    Without these the post-login bounce lands on the Site URL instead of where you clicked.
 6. Test: `npm run dev`, click the front door → **Continue with Google**. Your
@@ -86,7 +86,7 @@ panel's Status dropdown. The check constraint in `20260829120000_personal_status
 ## 4e. Stripe (test mode)
 `.env.local` + Vercel: `STRIPE_SECRET_KEY` (sk_test), `VITE_STRIPE_PUBLISHABLE_KEY`, and
 `STRIPE_WEBHOOK_SECRET`. For prod, add a webhook endpoint in the Stripe dashboard →
-`https://gemcardshop.com/api/stripe-webhook` with events `checkout.session.completed` and
+`https://toploadercards.com/api/stripe-webhook` with events `checkout.session.completed` and
 `checkout.session.expired`, and paste its signing secret into Vercel. Locally a throwaway
 `whsec_localdev_…` value works for synthetic signed events. Migration `20260830100000_orders.sql`
 adds `orders`, `reserve_cards()` / `release_order()`. Test card: 4242 4242 4242 4242.

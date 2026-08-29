@@ -6,6 +6,7 @@ import { MAT, makeLabelMaterial } from './materials';
 import { PBR } from './pbr';
 import { useNavStore } from '../stores/navStore';
 import { useAuthStore } from '../stores/authStore';
+import { SHOP_NAME } from '@shared/launch';
 import { useUIStore } from '../stores/uiStore';
 import { supabaseConfigured } from '../lib/supabase';
 
@@ -92,7 +93,7 @@ export function Facade() {
         <boxGeometry args={[ROOM.width + 0.8, 0.16, 0.2]} />
       </mesh>
       {/* GEM sign */}
-      <mesh material={makeLabelMaterial('GEM', { bg: '#1f3d33', fg: '#ffd97a', size: 92 })} position={[0, 2.72, 0.06]}>
+      <mesh material={makeLabelMaterial(SHOP_NAME, { bg: '#1f3d33', fg: '#ffd97a', size: 92 })} position={[0, 2.72, 0.06]}>
         <planeGeometry args={[2.6, 0.65]} />
       </mesh>
       <mesh material={makeLabelMaterial('Cards · Collectibles', { bg: '#1f3d33', fg: '#f2e8d5', size: 34 })} position={[0, 2.28, 0.06]}>

@@ -1,5 +1,6 @@
 import { MAT, makeLabelMaterial } from '../materials';
 import { HoldPile } from './HoldPile';
+import { SHOP_NAME } from '@shared/launch';
 
 /** Checkout counter: 3.0 x 0.9 x 0.6, top at y=1.0, register + paper bag props. */
 export function Counter() {
@@ -46,7 +47,7 @@ export function Counter() {
       <mesh material={MAT.cream} position={[0.35, 1.1, 0.1]} rotation-x={-0.3}>
         <boxGeometry args={[0.3, 0.12, 0.02]} />
       </mesh>
-      <mesh material={makeLabelMaterial('GEM', { bg: '#2e5e4e', fg: '#ffd97a' })} position={[0, 0.55, 0.315]}>
+      <mesh material={makeLabelMaterial(SHOP_NAME, { bg: '#2e5e4e', fg: '#ffd97a' })} position={[0, 0.55, 0.315]}>
         <planeGeometry args={[1.4, 0.35]} />
       </mesh>
     </group>

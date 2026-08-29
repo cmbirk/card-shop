@@ -5,6 +5,7 @@ import { useBasketStore } from '../stores/basketStore';
 import { useAuthStore } from '../stores/authStore';
 import { fetchOrder, cancelOrder } from '../api/checkout';
 import { reloadInventory } from './inventory';
+import { SHOP_NAME } from '@shared/launch';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -67,7 +68,7 @@ export async function resumeCheckout(): Promise<void> {
       dlg.say(
         order.test_mode
           ? "Bagged and tagged — well, test-bagged. In real life these'd be sleeved and heading home with you. Thanks for trying the register!"
-          : "Bagged and tagged. Thanks for shopping GEM — I'll get these sleeved and on their way.",
+          : `Bagged and tagged. Thanks for shopping ${SHOP_NAME} — I'll get these sleeved and on their way.`,
       );
       await reloadInventory(); // sold cards leave the shelves
       done();

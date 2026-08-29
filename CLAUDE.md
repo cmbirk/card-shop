@@ -1,8 +1,8 @@
-# GEM — a walkable 3D trading-card shop
+# TLC (Toploader Cards) — a walkable 3D trading-card shop
 
 A browser card shop built like a game, not a storefront. You arrive outside, sign the
 guestbook, step in, browse cards by sport as real 3D objects (pick up, flip, inspect),
-chat with Chris the AI shopkeeper, carry a basket, and check out. Production: **gemcardshop.com**.
+chat with Chris the AI shopkeeper, carry a basket, and check out. Production: **toploadercards.com** (gemcardshop.com 308-redirects to it). The shop name on signs/receipts/persona is `SHOP_NAME` in `shared/launch.ts` — never hard-code it.
 
 **Stack:** React Three Fiber + Vite + TypeScript · Vercel (static client + `/api` serverless
 functions) · Supabase (Postgres inventory + Auth + Storage) · Claude (Haiku 4.5) shopkeeper.
@@ -37,7 +37,7 @@ src/
   `export function POST(req: Request)` / `GET()` — a `export default handler` gets the legacy
   `(req,res)` signature and `req.headers.get` throws. Relative imports need **`.js` extensions**;
   JSON imports need **`with { type: 'json' }`**. The Vite dev mount masks all of this, so it only
-  breaks *deployed* — **verify prod functions, not just dev** (`/deploy-check`, curl the domain).
+  breaks *deployed* — **verify prod functions, not just dev** (`/deploy-check`, curl toploadercards.com).
 - **Supabase security is RLS, not key secrecy.** The anon key is public by design; customers read
   the `cards_public` view (admin columns hidden); admin writes go browser→Supabase under the JWT,
   gated by `is_admin()`. Service role key is **server-only** (grounding fn). `/api/chat` verifies
