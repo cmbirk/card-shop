@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { ContactShadows, Environment, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
-import { shopLayout, ROOM } from '@shared/data/shopLayout';
+import { shopLayout, ROOM, ANNEX, ANNEX_DOOR } from '@shared/data/shopLayout';
 import type { Fixture } from '@shared/types';
 import { inventory, useInventoryVersion } from '../systems/inventory';
 import { assignCards } from '../systems/placement';
@@ -16,6 +16,8 @@ import { useInspectStore } from '../stores/inspectStore';
 import { Facade } from './Facade';
 import { WallArt } from './WallArt';
 import { BackOfficeDoor } from './BackOfficeDoor';
+import { ColtsRoom } from './ColtsRoom';
+import { ColtsDoor } from './ColtsDoor';
 
 function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false);
@@ -95,6 +97,100 @@ function DustMotes() {
   );
 }
 
+/** Main-room west wall with an opening for the Colts Room doorway (plus header + trim). */
+function WestWall() {
+  const D = ROOM.depth;
+  const H = ROOM.height;
+  const x = -ROOM.width / 2;
+  const z0 = ANNEX_DOOR.z - ANNEX_DOOR.width / 2;
+  const z1 = ANNEX_DOOR.z + ANNEX_DOOR.width / 2;
+  const northLen = z0 + D / 2; // from the north corner to the door
+  const southLen = D / 2 - z1; // from the door to the south corner
+  return (
+    <group>
+      <mesh material={MAT.wall} position={[x, H / 2, -D / 2 + northLen / 2]} rotation-y={Math.PI / 2}>
+        <planeGeometry args={[northLen, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[x, H / 2, z1 + southLen / 2]} rotation-y={Math.PI / 2}>
+        <planeGeometry args={[southLen, H]} />
+      </mesh>
+      {/* header above the opening */}
+      <mesh material={MAT.wall} position={[x, (H + ANNEX_DOOR.height) / 2, ANNEX_DOOR.z]} rotation-y={Math.PI / 2}>
+        <planeGeometry args={[ANNEX_DOOR.width, H - ANNEX_DOOR.height]} />
+      </mesh>
+      {/* door casing */}
+      {[z0, z1].map((z) => (
+        <mesh key={z} material={MAT.dark} position={[x, ANNEX_DOOR.height / 2, z]}>
+          <boxGeometry args={[0.14, ANNEX_DOOR.height, 0.08]} />
+        </mesh>
+      ))}
+      <mesh material={MAT.dark} position={[x, ANNEX_DOOR.height + 0.04, ANNEX_DOOR.z]}>
+        <boxGeometry args={[0.14, 0.08, ANNEX_DOOR.width + 0.08]} />
+      </mesh>
+    </group>
+  );
+}
+
+/** The Colts Room shell: floor, walls, ceiling, and a cool blue wash. Memorabilia lives in ColtsRoom.tsx. */
+function AnnexShell() {
+  // a SpotLight's target must be in the scene graph or it aims at the world origin
+  const caseTarget = useMemo(() => new THREE.Object3D(), []);
+  const w = ANNEX.xMax - ANNEX.xMin;
+  const d = ANNEX.zMax - ANNEX.zMin;
+  const cx = (ANNEX.xMin + ANNEX.xMax) / 2;
+  const cz = (ANNEX.zMin + ANNEX.zMax) / 2;
+  const H = ANNEX.height;
+  const D = ROOM.depth;
+  return (
+    <group>
+      <mesh material={MAT.floor} position={[cx, 0, cz]} rotation-x={-Math.PI / 2} receiveShadow>
+        <planeGeometry args={[w, d]} />
+      </mesh>
+      <mesh material={MAT.cream} position={[cx, H, cz]} rotation-x={Math.PI / 2}>
+        <planeGeometry args={[w, d]} />
+      </mesh>
+      {/* west (far) wall */}
+      <mesh material={MAT.wall} position={[ANNEX.xMin, H / 2, cz]} rotation-y={Math.PI / 2}>
+        <planeGeometry args={[d, H]} />
+      </mesh>
+      {/* north + south walls */}
+      <mesh material={MAT.wall} position={[cx, H / 2, ANNEX.zMin]}>
+        <planeGeometry args={[w, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[cx, H / 2, ANNEX.zMax]} rotation-y={Math.PI}>
+        <planeGeometry args={[w, H]} />
+      </mesh>
+      {/* east wall: the main room's west wall seen from inside, plus the stretch past the main room's north corner */}
+      {ANNEX.zMin < -D / 2 && (
+        <mesh material={MAT.wall} position={[ANNEX.xMax, H / 2, (ANNEX.zMin + -D / 2) / 2]} rotation-y={-Math.PI / 2}>
+          <planeGeometry args={[-D / 2 - ANNEX.zMin, H]} />
+        </mesh>
+      )}
+      <mesh material={MAT.wall} position={[ANNEX.xMax - 0.005, H / 2, (-D / 2 + ANNEX_DOOR.z - ANNEX_DOOR.width / 2) / 2]} rotation-y={-Math.PI / 2}>
+        <planeGeometry args={[ANNEX_DOOR.z - ANNEX_DOOR.width / 2 + D / 2, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[ANNEX.xMax - 0.005, H / 2, (ANNEX_DOOR.z + ANNEX_DOOR.width / 2 + ANNEX.zMax) / 2]} rotation-y={-Math.PI / 2}>
+        <planeGeometry args={[ANNEX.zMax - (ANNEX_DOOR.z + ANNEX_DOOR.width / 2), H]} />
+      </mesh>
+      {/* blue wainscot band all round — team colours without a logo */}
+      {[
+        { p: [ANNEX.xMin + 0.01, 0.45, cz] as const, r: Math.PI / 2, len: d },
+        { p: [cx, 0.45, ANNEX.zMin + 0.01] as const, r: 0, len: w },
+        { p: [cx, 0.45, ANNEX.zMax - 0.01] as const, r: Math.PI, len: w },
+      ].map((b, i) => (
+        <mesh key={i} position={[b.p[0], b.p[1], b.p[2]]} rotation-y={b.r}>
+          <planeGeometry args={[b.len, 0.9]} />
+          <meshStandardMaterial color="#123a6b" roughness={0.85} />
+        </mesh>
+      ))}
+      {/* lighting: cool ambient wash + a warm spot on the case */}
+      <pointLight position={[cx, 2.6, cz]} intensity={0.9} distance={6} color="#cfe0ff" />
+      <primitive object={caseTarget} position={[-8.5, 0.8, -3.2]} />
+      <spotLight target={caseTarget} position={[-7.6, 2.8, -3.2]} angle={0.5} penumbra={0.6} intensity={6} distance={5} color="#ffe3b0" />
+    </group>
+  );
+}
+
 function Pennant({ x, z, hue, rot }: { x: number; z: number; hue: number; rot: number }) {
   const mat = useMemo(
     () => new THREE.MeshStandardMaterial({ color: `hsl(${hue}, 55%, 45%)`, side: THREE.DoubleSide, roughness: 0.9 }),
@@ -157,9 +253,8 @@ export function Shop() {
       <mesh material={MAT.wall} position={[0, H / 2, -D / 2]}>
         <planeGeometry args={[W, H]} />
       </mesh>
-      <mesh material={MAT.wall} position={[-W / 2, H / 2, 0]} rotation-y={Math.PI / 2}>
-        <planeGeometry args={[D, H]} />
-      </mesh>
+      {/* west wall, split around the Colts Room doorway */}
+      <WestWall />
       <mesh material={MAT.wall} position={[W / 2, H / 2, 0]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[D, H]} />
       </mesh>
@@ -170,9 +265,20 @@ export function Shop() {
       <mesh material={MAT.wainscot} position={[0, 0.45, -D / 2 + 0.01]}>
         <planeGeometry args={[W, 0.9]} />
       </mesh>
-      <mesh material={MAT.wainscot} position={[-W / 2 + 0.01, 0.45, 0]} rotation-y={Math.PI / 2}>
-        <planeGeometry args={[D, 0.9]} />
-      </mesh>
+      {(() => {
+        const z0 = ANNEX_DOOR.z - ANNEX_DOOR.width / 2;
+        const z1 = ANNEX_DOOR.z + ANNEX_DOOR.width / 2;
+        return (
+          <>
+            <mesh material={MAT.wainscot} position={[-W / 2 + 0.01, 0.45, (-D / 2 + z0) / 2]} rotation-y={Math.PI / 2}>
+              <planeGeometry args={[z0 + D / 2, 0.9]} />
+            </mesh>
+            <mesh material={MAT.wainscot} position={[-W / 2 + 0.01, 0.45, (z1 + D / 2) / 2]} rotation-y={Math.PI / 2}>
+              <planeGeometry args={[D / 2 - z1, 0.9]} />
+            </mesh>
+          </>
+        );
+      })()}
       <mesh material={MAT.wainscot} position={[W / 2 - 0.01, 0.45, 0]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[D, 0.9]} />
       </mesh>
@@ -237,6 +343,9 @@ export function Shop() {
         <boxGeometry args={[0.4, 0.3, 0.35]} />
       </mesh>
 
+      <AnnexShell />
+      <ColtsRoom />
+      <ColtsDoor />
       <CeilingFan />
       <DustMotes />
       <WallArt />
@@ -246,7 +355,13 @@ export function Shop() {
       {shopLayout.fixtures.map((f) => (
         <FixtureGroup key={f.id} fixture={f}>
           {f.kind === 'shelf' && <Shelf fixture={f} cards={placed.get(f.id) ?? []} />}
-          {f.kind === 'displayCase' && <DisplayCase cards={placed.get(f.id) ?? []} />}
+          {f.kind === 'displayCase' && (
+            <DisplayCase
+              cards={placed.get(f.id) ?? []}
+              title={f.id === 'case-colts' ? "Chris's Collection" : undefined}
+              glow={f.id === 'case-colts' ? '#cfe0ff' : undefined}
+            />
+          )}
           {f.kind === 'bin' && <Bin fixtureId={f.id} cards={placed.get(f.id) ?? []} />}
           {f.kind === 'counter' && <Counter />}
         </FixtureGroup>

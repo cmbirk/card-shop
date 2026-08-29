@@ -3,7 +3,7 @@ import { MAT, makeLabelMaterial } from '../materials';
 import { CardMesh } from '../cards/CardMesh';
 
 /** Glass display case for the good stuff: wood base, glass top box, interior warm light. */
-export function DisplayCase({ cards }: { cards: PlacedCard[] }) {
+export function DisplayCase({ cards, title = 'The Good Stuff', glow = '#ffd9a0' }: { cards: PlacedCard[]; title?: string; glow?: string }) {
   return (
     <group>
       {/* cabinet base */}
@@ -33,8 +33,8 @@ export function DisplayCase({ cards }: { cards: PlacedCard[] }) {
         </mesh>
       ))}
       {/* interior glow — the good stuff literally glows */}
-      <pointLight position={[0, 0.95, 0]} intensity={2} distance={1.6} color="#ffd9a0" />
-      <mesh material={makeLabelMaterial('The Good Stuff', { bg: '#3b2a1a', fg: '#ffd97a', size: 42 })} position={[0, 1.25, 0.1]}>
+      <pointLight position={[0, 0.95, 0]} intensity={2} distance={1.6} color={glow} />
+      <mesh material={makeLabelMaterial(title, { bg: '#3b2a1a', fg: '#ffd97a', size: title.length > 14 ? 32 : 42 })} position={[0, 1.25, 0.1]}>
         <planeGeometry args={[0.9, 0.22]} />
       </mesh>
       {cards.map(({ card, slot }) => (

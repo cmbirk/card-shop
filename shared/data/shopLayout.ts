@@ -6,6 +6,11 @@ const D90 = Math.PI / 2;
 // Room: 10m wide (X) x 8m deep (Z), 3m ceiling. Eye height 1.6m.
 export const ROOM = { width: 10, depth: 8, height: 3 } as const;
 
+// The Colts Room: a small annex off the west wall (Chris's personal collection + memorabilia).
+// Reached through an open doorway beside the hockey shelf, next to the back-office door.
+export const ANNEX = { xMin: -9, xMax: -5, zMin: -5.2, zMax: -1.2, height: 3 } as const;
+export const ANNEX_DOOR = { z: -3.2, width: 1.0, height: 2.2 } as const; // on the west wall (x = -5)
+
 export const shopLayout: ShopLayout = {
   entry: 'outside',
   fixtures: [
@@ -28,6 +33,16 @@ export const shopLayout: ShopLayout = {
       slots: { rows: 2, cols: 5, spacing: [0.28, 0.25] },
       stationId: 'case',
       label: 'The Good Stuff — Graded & Premium',
+    },
+    {
+      id: 'case-colts',
+      kind: 'displayCase',
+      position: [-8.5, 0, -3.2],
+      rotationY: D90,
+      accepts: { status: 'personal' },
+      slots: { rows: 2, cols: 5, spacing: [0.28, 0.25] },
+      stationId: 'colts-case',
+      label: "Chris's Collection — Not for Sale",
     },
     {
       id: 'shelf-hockey',
@@ -123,7 +138,23 @@ export const shopLayout: ShopLayout = {
       target: [-4.6, 1.35, -1.5],
       yawRange: 1.15,
       pitchRange: 0.4,
-      neighbors: ['shelf-football', 'bins', 'counter'],
+      neighbors: ['shelf-football', 'bins', 'counter', 'colts-door'],
+    },
+    {
+      id: 'colts-door',
+      position: [-3.9, 1.6, -3.2],
+      target: [-7, 1.4, -3.2],
+      yawRange: 0.9,
+      pitchRange: 0.35,
+      neighbors: ['shelf-hockey', 'counter', 'colts-case'],
+    },
+    {
+      id: 'colts-case',
+      position: [-6.4, 1.5, -3.2],
+      target: [-8.6, 1.0, -3.2],
+      yawRange: 1.4,
+      pitchRange: 0.45,
+      neighbors: ['colts-door'],
     },
     {
       id: 'shelf-football',
@@ -187,7 +218,7 @@ export const shopLayout: ShopLayout = {
       target: [0, 1.3, -3.6],
       yawRange: 1.1,
       pitchRange: 0.35,
-      neighbors: ['bins', 'case', 'shelf-hockey'],
+      neighbors: ['bins', 'case', 'shelf-hockey', 'colts-door'],
     },
   ],
 };

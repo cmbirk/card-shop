@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useNavStore } from './navStore';
+import { inventoryById } from '../systems/inventory';
 
 export type InspectMode = 'idle' | 'pickingUp' | 'inspecting' | 'returning' | 'toBasket';
 
@@ -37,6 +38,8 @@ export const useInspectStore = create<InspectState>((set, get) => ({
     if (get().mode === 'inspecting') set({ mode: 'returning' });
   },
   sendToBasket: () => {
+    const id = get().heldCardId;
+    if (id && inventoryById.get(id)?.status === 'personal') return; // Chris's own — not for sale
     if (get().mode === 'inspecting') set({ mode: 'toBasket' });
   },
   flip: () => set((s) => ({ requestFlip: s.requestFlip + 1 })),

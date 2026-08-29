@@ -12,11 +12,11 @@ import { listAllCards, saveCard, deleteCard, uploadCardImage, blankCard, suggest
 // itself from non-admins.
 
 const SPORTS: Card['sport'][] = ['baseball', 'basketball', 'football', 'hockey', 'tcg'];
-const CATEGORIES = ['rookies', 'vintage', 'stars', 'graded-slabs', 'budget-box', 'budget-box-b'];
+const CATEGORIES = ['rookies', 'vintage', 'stars', 'graded-slabs', 'budget-box', 'budget-box-b', 'colts-room'];
 const RARITIES: Card['rarity'][] = ['common', 'rare', 'premium', 'graded'];
 const AUTOGRAPHS: NonNullable<Card['autograph']>[] = ['none', 'on-card', 'sticker'];
 const RELICS: NonNullable<Card['relic']>[] = ['none', 'jersey', 'patch', 'multi-patch', 'bat', 'other'];
-const STATUSES: NonNullable<Card['status']>[] = ['available', 'reserved', 'sold'];
+const STATUSES: NonNullable<Card['status']>[] = ['available', 'reserved', 'sold', 'personal'];
 const GRADERS: GradeCompany[] = ['PSA', 'BGS', 'TAG', 'SGC', 'CGC'];
 const CONDITIONS: RawCondition[] = ['NM-MT', 'NM', 'EX-MT', 'EX', 'VG-EX', 'VG', 'GOOD', 'POOR'];
 

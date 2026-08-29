@@ -5,7 +5,7 @@ export type Rarity = 'common' | 'rare' | 'premium' | 'graded';
 export type GradeCompany = 'PSA' | 'BGS' | 'TAG' | 'SGC' | 'CGC';
 export type AutographKind = 'none' | 'on-card' | 'sticker';
 export type RelicKind = 'none' | 'jersey' | 'patch' | 'multi-patch' | 'bat' | 'other';
-export type CardStatus = 'available' | 'reserved' | 'sold';
+export type CardStatus = 'available' | 'reserved' | 'sold' | 'personal'; // personal = Chris's own collection, not for sale
 export type RawCondition = 'NM-MT' | 'NM' | 'EX-MT' | 'EX' | 'VG-EX' | 'VG' | 'GOOD' | 'POOR';
 
 export interface Grade {
@@ -52,7 +52,7 @@ export interface Card {
 
   // commerce
   price: number; // list price, integer cents
-  status?: CardStatus; // available | reserved | sold
+  status?: CardStatus; // available | reserved | sold | personal
   quantity?: number; // usually 1 for singles
   costBasis?: number; // ADMIN-ONLY, integer cents — never selected into the public client
   acquiredDate?: string; // ADMIN-ONLY, ISO date
@@ -86,7 +86,7 @@ export interface Fixture {
   kind: FixtureKind;
   position: Vec3;
   rotationY: number; // radians
-  accepts: { sport?: Sport; category?: string; featured?: boolean };
+  accepts: { sport?: Sport; category?: string; featured?: boolean; status?: CardStatus };
   slots: { rows: number; cols: number; spacing: [number, number] };
   stationId: string;
   label: string;

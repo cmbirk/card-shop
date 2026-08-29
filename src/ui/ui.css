@@ -487,6 +487,11 @@
   }
 }
 
+.inspect-hud .price.personal {
+  font-size: 13px;
+  color: #9fc1ff;
+}
+
 /* ---- back office (admin) ---- */
 .back-office-btn {
   position: absolute;

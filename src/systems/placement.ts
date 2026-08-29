@@ -18,6 +18,9 @@ const SHELF_ROW_Y = [0.5, 0.9, 1.3, 1.7];
 
 function matches(card: Card, fixture: Fixture): boolean {
   const a = fixture.accepts;
+  // personal (not-for-sale) cards only ever go in a fixture that asks for them
+  if (a.status) return card.status === a.status;
+  if (card.status === 'personal') return false;
   if (a.featured) return !!card.featured;
   if (card.featured) return false;
   if (a.sport && card.sport !== a.sport) return false;

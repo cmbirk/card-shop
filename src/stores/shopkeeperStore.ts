@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { ANNEX, ANNEX_DOOR } from '@shared/data/shopLayout';
 
 // Where Chris is. Pure state — <Shopkeeper/> does the actual locomotion and
 // reports arrivals; dialogueStore.askAbout() drives the visit.
@@ -41,9 +42,9 @@ export const useShopkeeperStore = create<ShopkeeperState>((set, get) => ({
   leave: () => {
     const { pose, spot } = get();
     if ((pose === 'visiting' || pose === 'walkingOut') && spot) {
+      // retrace the outbound route (minus the spot itself) from wherever he currently is, then home
       const out = pathToSpot(spot);
-      // home via the counter end we came around — from wherever he currently is
-      set((s) => ({ pose: 'walkingBack', path: [out[1], out[0], SHOPKEEPER_HOME], legId: s.legId + 1 }));
+      set((s) => ({ pose: 'walkingBack', path: [...out.slice(0, -1).reverse(), SHOPKEEPER_HOME], legId: s.legId + 1 }));
     }
   },
   arrivedHome: () => {
@@ -57,9 +58,12 @@ export const useShopkeeperStore = create<ShopkeeperState>((set, get) => ({
  */
 export function pathToSpot(spot: readonly [number, number]): [number, number][] {
   const side = spot[0] < 0 ? -2.0 : 2.0;
-  return [
+  const path: [number, number][] = [
     [side, SHOPKEEPER_HOME[1]],
     [side, -2.4],
-    [spot[0], spot[1]],
   ];
+  // the Colts Room is through the doorway on the west wall
+  if (spot[0] < ANNEX.xMax) path.push([ANNEX.xMax + 0.6, ANNEX_DOOR.z], [ANNEX.xMax - 0.6, ANNEX_DOOR.z]);
+  path.push([spot[0], spot[1]]);
+  return path;
 }

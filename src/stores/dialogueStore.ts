@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { ChatMessage, ChatRequest } from '@shared/types';
-import { shopLayout } from '@shared/data/shopLayout';
+import { shopLayout, ROOM, ANNEX } from '@shared/data/shopLayout';
 import { streamChat } from '../api/chat';
 import { useBasketStore } from './basketStore';
 import { useInspectStore } from './inspectStore';
@@ -47,6 +47,15 @@ function greetSpot(stationId: string): { spot: [number, number]; facing: number 
   const rx = -fz;
   const rz = fx;
   const spot: [number, number] = [cx + rx * 1.6 + fx * 1.0, cz + rz * 1.6 + fz * 1.0];
+  // keep him inside whichever room the customer is standing in
+  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+  if (cx < ANNEX.xMax) {
+    spot[0] = clamp(spot[0], ANNEX.xMin + 0.5, ANNEX.xMax - 0.5);
+    spot[1] = clamp(spot[1], ANNEX.zMin + 1.0, ANNEX.zMax - 0.5); // clear of the corner plinth
+  } else {
+    spot[0] = clamp(spot[0], -ROOM.width / 2 + 0.5, ROOM.width / 2 - 0.5);
+    spot[1] = clamp(spot[1], -ROOM.depth / 2 + 0.5, ROOM.depth / 2 - 0.5);
+  }
   const facing = Math.atan2(cx - spot[0], cz - spot[1]); // model faces +Z at rest
   return { spot, facing };
 }

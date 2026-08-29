@@ -27,6 +27,7 @@ export function InspectHud() {
 
   if (!heldCardId || mode !== 'inspecting') return null;
   const card = inventoryById.get(heldCardId)!;
+  const personal = card.status === 'personal';
 
   return (
     <div className="inspect-hud">
@@ -37,7 +38,7 @@ export function InspectHud() {
         {card.foil ? ' · Foil' : ''}
       </div>
       <p className="blurb">{card.lore.blurb}</p>
-      <div className="price">{formatCents(card.price)}</div>
+      {personal ? <div className="price personal">From Chris's own collection · not for sale</div> : <div className="price">{formatCents(card.price)}</div>}
       <div className="inspect-actions">
         <button className="btn secondary" onClick={() => useInspectStore.getState().flip()}>
           Flip
@@ -50,9 +51,11 @@ export function InspectHud() {
         >
           {pose === 'walkingOut' ? 'Chris is coming…' : pose === 'visiting' ? 'Chris is here' : pose === 'walkingBack' ? 'Chris is heading back' : 'Ask Chris'}
         </button>
-        <button className="btn" onClick={() => useInspectStore.getState().sendToBasket()}>
-          Add to basket
-        </button>
+        {!personal && (
+          <button className="btn" onClick={() => useInspectStore.getState().sendToBasket()}>
+            Add to basket
+          </button>
+        )}
         <button className="btn secondary" onClick={() => useInspectStore.getState().putBack()}>
           Put back
         </button>

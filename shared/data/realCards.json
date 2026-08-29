@@ -252,6 +252,126 @@
         "funFact": "A half-point off the coveted BGS 10 Black Label.",
         "investmentNote": "blue-chip rookie"
       }
+    },
+    {
+      "id": "colts-manning-98-rc",
+      "playerName": "Peyton Manning",
+      "team": "Indianapolis Colts",
+      "year": 1998,
+      "setName": "Topps",
+      "cardNumber": "#360",
+      "brand": "Topps",
+      "isRookie": true,
+      "rawCondition": "NM-MT",
+      "seed": 180001,
+      "lore": {
+        "blurb": "Chris's first big pull \u2014 the '98 Manning rookie he opened himself the week the season started.",
+        "funFact": "He's never had it graded. Says the corners tell the story better than a slab would.",
+        "investmentNote": "never selling"
+      },
+      "sport": "football",
+      "category": "colts-room",
+      "rarity": "premium",
+      "price": 0,
+      "status": "personal",
+      "quantity": 1,
+      "foil": false
+    },
+    {
+      "id": "colts-harrison-96-rc",
+      "playerName": "Marvin Harrison",
+      "team": "Indianapolis Colts",
+      "year": 1996,
+      "setName": "SP",
+      "cardNumber": "#10",
+      "brand": "Upper Deck",
+      "isRookie": true,
+      "rawCondition": "NM",
+      "seed": 180002,
+      "lore": {
+        "blurb": "Marvin's SP rookie. Quiet card for the quietest superstar the franchise ever had.",
+        "funFact": "Chris traded a whole binder of 90s inserts for this one at a show in Carmel.",
+        "investmentNote": "never selling"
+      },
+      "sport": "football",
+      "category": "colts-room",
+      "rarity": "premium",
+      "price": 0,
+      "status": "personal",
+      "quantity": 1,
+      "foil": false
+    },
+    {
+      "id": "colts-james-99-rc",
+      "playerName": "Edgerrin James",
+      "team": "Indianapolis Colts",
+      "year": 1999,
+      "setName": "Bowman Chrome",
+      "cardNumber": "#178",
+      "brand": "Topps",
+      "isRookie": true,
+      "rawCondition": "NM-MT",
+      "seed": 180003,
+      "lore": {
+        "blurb": "Edge's Bowman Chrome rookie \u2014 the dreads, the visor, the whole era in one card.",
+        "funFact": "Pulled from a pack Chris bought with lawn-mowing money the summer of 1999.",
+        "investmentNote": "never selling"
+      },
+      "sport": "football",
+      "category": "colts-room",
+      "rarity": "premium",
+      "price": 0,
+      "status": "personal",
+      "quantity": 1,
+      "foil": false
+    },
+    {
+      "id": "colts-wayne-01-rc",
+      "playerName": "Reggie Wayne",
+      "team": "Indianapolis Colts",
+      "year": 2001,
+      "setName": "Topps",
+      "cardNumber": "#311",
+      "brand": "Topps",
+      "isRookie": true,
+      "rawCondition": "NM",
+      "seed": 180004,
+      "lore": {
+        "blurb": "Reggie's rookie. The other half of the greatest receiving duo the Colts ever ran.",
+        "funFact": "Signed in blue Sharpie at a training-camp autograph line in Terre Haute.",
+        "investmentNote": "never selling"
+      },
+      "sport": "football",
+      "category": "colts-room",
+      "rarity": "premium",
+      "price": 0,
+      "status": "personal",
+      "quantity": 1,
+      "foil": false
+    },
+    {
+      "id": "colts-freeney-02-rc",
+      "playerName": "Dwight Freeney",
+      "team": "Indianapolis Colts",
+      "year": 2002,
+      "setName": "Topps Chrome",
+      "cardNumber": "#164",
+      "brand": "Topps",
+      "isRookie": true,
+      "rawCondition": "NM-MT",
+      "seed": 180005,
+      "lore": {
+        "blurb": "Freeney's Topps Chrome rookie \u2014 the spin move, immortalized in refractor foil.",
+        "funFact": "Chris keeps it front and centre because the spin move is still the best thing he ever saw live.",
+        "investmentNote": "never selling"
+      },
+      "sport": "football",
+      "category": "colts-room",
+      "rarity": "premium",
+      "price": 0,
+      "status": "personal",
+      "quantity": 1,
+      "foil": true
     }
   ]
 }

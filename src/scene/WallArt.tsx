@@ -53,7 +53,7 @@ function posterMaterial(title: string, subtitle: string, hue: number): THREE.Mes
   return new THREE.MeshStandardMaterial({ map: tex, roughness: 0.85 });
 }
 
-function Framed({
+export function Framed({
   material,
   position,
   rotationY,
