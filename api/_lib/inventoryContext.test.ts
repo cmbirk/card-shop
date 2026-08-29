@@ -1,9 +1,17 @@
-import { describe, it, expect } from 'vitest';
-import { buildInventoryContext, cards } from './inventoryContext';
+import { describe, it, expect, beforeAll } from 'vitest';
+import type { Card } from '../../shared/types';
+import { buildInventoryContext, getInventory } from './inventoryContext';
+
+// Supabase is unconfigured in tests, so getInventory falls back to bundled data.
+let cards: Card[];
+let text: string;
+beforeAll(async () => {
+  cards = (await getInventory()).cards;
+  text = buildInventoryContext(cards);
+});
 
 describe('shopkeeper inventory grounding', () => {
   it('mentions every card exactly once', () => {
-    const text = buildInventoryContext();
     for (const card of cards) {
       const marker = `[${card.id}]`;
       const first = text.indexOf(marker);
@@ -13,13 +21,11 @@ describe('shopkeeper inventory grounding', () => {
   });
 
   it('includes exact sticker prices', () => {
-    const text = buildInventoryContext();
-    const sample = cards[0];
-    expect(text).toContain(`$${(sample.price / 100).toFixed(2)}`);
+    expect(text).toContain(`$${(cards[0].price / 100).toFixed(2)}`);
   });
 
   it('is comfortably inside the prompt budget', () => {
     // ~4 chars/token heuristic; grounding should stay well under ~20K tokens
-    expect(buildInventoryContext().length).toBeLessThan(80_000);
+    expect(text.length).toBeLessThan(80_000);
   });
 });

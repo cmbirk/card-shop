@@ -1,13 +1,41 @@
 // Relative imports only — keeps the Vercel function bundler happy without alias config.
+import { createClient } from '@supabase/supabase-js';
 import type { Card, InventoryFile } from '../../shared/types';
+import { rowToCard, type CardRow } from '../../shared/cardMapping';
 import inventoryJson from '../../shared/data/inventory.json';
 import realCardsJson from '../../shared/data/realCards.json';
 
-export const cards: Card[] = [
+const bundled: Card[] = [
   ...(inventoryJson as InventoryFile).cards,
   ...(realCardsJson as unknown as InventoryFile).cards,
 ];
-export const cardsById: Map<string, Card> = new Map(cards.map((c) => [c.id, c]));
+
+// Live inventory for the shopkeeper's grounding: fetched from Supabase (service
+// role, server-side) with a short TTL cache so freshly-added cards show up
+// without a redeploy; falls back to bundled data when Supabase isn't configured.
+const SUPA_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const SUPA_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supa = SUPA_URL && SUPA_KEY ? createClient(SUPA_URL, SUPA_KEY, { auth: { persistSession: false } }) : null;
+
+const TTL_MS = 60_000;
+let cache: { at: number; cards: Card[]; byId: Map<string, Card> } | null = null;
+
+export async function getInventory(): Promise<{ cards: Card[]; cardsById: Map<string, Card> }> {
+  if (cache && Date.now() - cache.at < TTL_MS) return { cards: cache.cards, cardsById: cache.byId };
+  let cards = bundled;
+  if (supa) {
+    try {
+      const { data, error } = await supa.from('cards').select('*').neq('status', 'sold');
+      if (error) throw error;
+      if (data && data.length) cards = (data as CardRow[]).map(rowToCard);
+    } catch (err) {
+      console.warn('[grounding] Supabase read failed, using bundled data:', (err as Error).message);
+    }
+  }
+  const byId = new Map(cards.map((c) => [c.id, c]));
+  cache = { at: Date.now(), cards, byId };
+  return { cards, cardsById: byId };
+}
 
 const SHELF_LABEL: Record<string, string> = {
   baseball: 'the Baseball shelf (right wall, near the entrance)',
@@ -35,7 +63,7 @@ function cardLine(c: Card): string {
 }
 
 /** Full inventory grounding text, grouped by physical location in the shop. */
-export function buildInventoryContext(): string {
+export function buildInventoryContext(cards: Card[]): string {
   const groups = new Map<string, Card[]>();
   for (const c of cards) {
     const loc = where(c);

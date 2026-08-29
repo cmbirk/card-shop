@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { ChatMessage } from '../../shared/types';
-import { buildInventoryContext, cardsById, priceStr } from './inventoryContext';
+import type { Card, ChatMessage } from '../../shared/types';
+import { buildInventoryContext, getInventory, priceStr } from './inventoryContext';
 
 const PERSONA = `You are Chris, the owner of GEM, a small neighborhood trading-card shop (GEM as in gem mint — the grade every collector chases). A customer is standing at your counter, in your shop, talking to you.
 
@@ -17,18 +17,11 @@ Below is your complete current inventory, grouped by where it sits in the shop. 
 
 `;
 
-let systemPrompt: string | null = null;
-
-function getSystemPrompt(): string {
-  if (!systemPrompt) systemPrompt = PERSONA + buildInventoryContext();
-  return systemPrompt;
-}
-
-function basketContext(basket: string[]): string {
+function basketContext(basket: string[], cardsById: Map<string, Card>): string {
   if (basket.length === 0) return "[The customer's basket is empty.]";
   const lines = basket
     .map((id) => cardsById.get(id))
-    .filter((c) => c !== undefined)
+    .filter((c): c is Card => c !== undefined)
     .map((c) => `${c.playerName} ${c.year} ${c.setName} (${priceStr(c.price)})`);
   return `[The customer's basket currently holds: ${lines.join('; ')}.]`;
 }
@@ -48,10 +41,13 @@ export async function runShopkeeper(
   const client = new Anthropic();
   const model = process.env.SHOPKEEPER_MODEL || 'claude-haiku-4-5';
 
+  const { cards, cardsById } = await getInventory();
+  const systemPrompt = PERSONA + buildInventoryContext(cards);
+
   // volatile basket context rides on the last user turn — never in the cached system prompt
   const apiMessages = messages.map((m, i) =>
     i === messages.length - 1 && m.role === 'user'
-      ? { role: m.role, content: `${basketContext(basket)}\n\n${m.content}` }
+      ? { role: m.role, content: `${basketContext(basket, cardsById)}\n\n${m.content}` }
       : { role: m.role, content: m.content },
   );
 
@@ -62,7 +58,7 @@ export async function runShopkeeper(
       system: [
         {
           type: 'text',
-          text: getSystemPrompt(),
+          text: systemPrompt,
           cache_control: { type: 'ephemeral' }, // stable prefix → turns 2+ hit provider cache
         },
       ],
