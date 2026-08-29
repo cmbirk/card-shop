@@ -7,6 +7,8 @@ import { useInspectStore } from './inspectStore';
 import { useNavStore } from './navStore';
 import { useShopkeeperStore } from './shopkeeperStore';
 import { bubbleHoldSeconds } from '../feel';
+import { useAuthStore } from './authStore';
+import { SOFT_OPENING } from '@shared/launch';
 
 const HISTORY_CAP = 40; // ~20 turns
 
@@ -75,16 +77,27 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
   gesture$: (g) => set((s) => ({ gesture: g, gestureId: s.gestureId + 1 })),
   greet: () => {
     if (get().messages.length > 0) return;
+    // first-timers during the soft opening hear that we're not ringing up sales yet
+    let welcomed = false;
+    try {
+      welcomed = localStorage.getItem('gem.welcomed') === '1';
+    } catch {
+      /* private mode */
+    }
+    const newHere = useAuthStore.getState().firstVisit && !welcomed;
+    const content =
+      SOFT_OPENING && newHere
+        ? "Hey there, welcome to GEM! Name's Chris. Full disclosure — we're still getting the shop ready to open, so the register's not ringing up sales just yet. But browse all you like: pick things up, ask me about anything, and I'll hold whatever catches your eye up front for when we open."
+        : "Hey there, welcome to GEM! Name's Chris. Browse all you like — holler if you want to know what something's worth, or hand me anything you like and I'll hold it up front for you.";
+    try {
+      localStorage.setItem('gem.welcomed', '1');
+    } catch {
+      /* private mode */
+    }
     set((s) => ({
       gesture: 'wave',
       gestureId: s.gestureId + 1,
-      messages: [
-        {
-          role: 'assistant' as const,
-          content:
-            "Hey there, welcome to GEM! Name's Chris. Browse all you like — holler if you want to know what something's worth, or hand me anything you like and I'll hold it up front for you.",
-        },
-      ],
+      messages: [{ role: 'assistant' as const, content }],
     }));
   },
   say: (text) => set((s) => ({ messages: [...s.messages, { role: 'assistant' as const, content: text }] })),

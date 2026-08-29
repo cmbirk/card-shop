@@ -13,6 +13,7 @@ import { SignInPanel } from './SignInPanel';
 import { AdminPanel } from './AdminPanel';
 import { useAuthStore } from '../stores/authStore';
 import { useBasketStore } from '../stores/basketStore';
+import { SOFT_OPENING } from '@shared/launch';
 
 /** Maya's one canned line about the top slab in the case — no API, once per session. */
 function mayaCaseLine(): string | null {
@@ -93,6 +94,7 @@ export function UIOverlay() {
               : 'Click a glowing spot to walk over · click a card to pick it up'}
         </p>
       </div>
+      {SOFT_OPENING && <div className="soft-open-ribbon">Opening soon · browse away, nothing's for sale yet</div>}
       {isAdmin && (
         <button className="btn secondary back-office-btn" onClick={() => useUIStore.getState().setAdminOpen(true)}>
           🗝 Back office

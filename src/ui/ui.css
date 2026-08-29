@@ -499,6 +499,27 @@
   color: #9fc1ff;
 }
 
+.soft-open-ribbon {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(24, 16, 8, 0.85);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+.soft-open-note {
+  font-size: 12px;
+  color: var(--gold);
+  margin: -4px 0 12px;
+  line-height: 1.4;
+}
+
 /* ---- back office (admin) ---- */
 .back-office-btn {
   position: absolute;

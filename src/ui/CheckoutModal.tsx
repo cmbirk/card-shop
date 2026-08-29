@@ -2,6 +2,7 @@ import { useBasketStore, basketTotalCents, formatCents } from '../stores/basketS
 import { useUIStore } from '../stores/uiStore';
 import { inventoryById } from '../systems/inventory';
 import { sfx } from '../systems/sfx';
+import { SOFT_OPENING } from '@shared/launch';
 
 const MOODS: { label: string; positive: boolean }[] = [
   { label: 'Excited to get these home and show them off!', positive: true },
@@ -41,7 +42,8 @@ export function CheckoutModal() {
     return (
       <div className="modal-backdrop">
         <div className="modal">
-          <h2>Ring up what's on hold?</h2>
+          <h2>{SOFT_OPENING ? "Here's what you've got on hold" : "Ring up what's on hold?"}</h2>
+          {SOFT_OPENING && <p className="soft-open-note">We're not ringing up real sales yet — this is a dry run. Nothing is charged and nothing ships.</p>}
           <div className="receipt">
             {items.map((id) => {
               const c = inventoryById.get(id)!;
@@ -71,7 +73,7 @@ export function CheckoutModal() {
                 useBasketStore.getState().clear();
               }}
             >
-              Confirm purchase
+              {SOFT_OPENING ? 'Pretend to buy' : 'Confirm purchase'}
             </button>
           </div>
         </div>
