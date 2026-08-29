@@ -5,6 +5,7 @@ import { easing } from 'maath';
 import { CARD_SIZE } from '@shared/data/shopLayout';
 import { inventoryById } from '../../systems/inventory';
 import { getCardHome } from '../../systems/cardRegistry';
+import { HOLD_PILE_ID } from '../fixtures/HoldPile';
 import { makeDetailMaterials, getDetailGeometries, isRefractor, type SweepUniforms } from './atlas';
 import { Slab } from './Slab';
 import { useInspectStore, type InspectMode } from '../../stores/inspectStore';
@@ -21,6 +22,7 @@ export function CardInHand() {
 const _v = new THREE.Vector3();
 const _q = new THREE.Quaternion();
 const _e = new THREE.Euler();
+const _qFlat = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0)); // lying face-up on the counter
 
 function HeldCard({ cardId }: { cardId: string }) {
   const card = inventoryById.get(cardId)!;
@@ -214,17 +216,30 @@ function HeldCard({ cardId }: { cardId: string }) {
         break;
       }
       case 'toBasket': {
-        a.t += dt / FEEL.toBasketDuration;
-        const k = easeInCubic(Math.min(a.t, 1));
-        // basket anchor, camera-relative, recomputed every frame
-        _v.set(FEEL.basketAnchor[0], FEEL.basketAnchor[1], FEEL.basketAnchor[2]).applyQuaternion(camera.quaternion);
-        _v.add(camera.position);
+        // off to the counter: fly to the hold pile's next slot with a toss arc, fading out at the end
+        a.t += dt / FEEL.toHoldDuration;
+        const kt = Math.min(a.t, 1);
+        const k = easeInCubic(kt);
+        const pile = getCardHome(HOLD_PILE_ID);
+        if (pile) {
+          const n = useBasketStore.getState().items.length;
+          _v.set(n * FEEL.holdFanSpread, 0.01, 0);
+          pile.localToWorld(_v);
+          pile.getWorldQuaternion(_q);
+          _q.multiply(_qFlat);
+        } else {
+          _v.set(-0.55, 1.05, -3.08);
+        }
         g.position.lerpVectors(a.startPos, _v, k);
-        g.position.y += Math.sin(Math.PI * Math.min(a.t, 1)) * 0.08; // toss arc
-        g.scale.setScalar(THREE.MathUtils.lerp(a.startScale, 0.4, k));
+        g.position.y += Math.sin(Math.PI * kt) * 0.5; // high toss across the shop
+        g.quaternion.slerpQuaternions(a.startQuat, _q, k);
+        g.scale.setScalar(THREE.MathUtils.lerp(a.startScale, 1, k));
+        const fade = kt < 0.8 ? 1 : 1 - (kt - 0.8) / 0.2;
+        detail.front.transparent = detail.back.transparent = fade < 1;
+        detail.front.opacity = detail.back.opacity = fade;
         if (a.t >= 1) {
           useBasketStore.getState().add(cardId);
-          sfx.basket();
+          sfx.hold();
           st.transitionDone();
         }
         break;

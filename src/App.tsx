@@ -7,7 +7,6 @@ import { StationController } from './scene/StationController';
 import { Waypoints } from './scene/Waypoints';
 import { Shopkeeper } from './scene/Shopkeeper';
 import { Maya } from './scene/Maya';
-import { Basket3D } from './scene/Basket';
 import { CardInHand } from './scene/cards/CardInHand';
 import { UIOverlay } from './ui/UIOverlay';
 import { loadInventory } from './systems/inventory';
@@ -58,7 +57,6 @@ export default function App() {
         <Shopkeeper />
         <Maya />
         <CardInHand />
-        <Basket3D />
         <Waypoints />
         <StationController />
         <AdaptiveDpr pixelated />

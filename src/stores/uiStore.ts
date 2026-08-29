@@ -10,7 +10,7 @@ interface UIState {
   checkoutPhase: CheckoutPhase;
   soldIds: string[]; // purchased this session — stay off shelves
   lastReceipt: { items: string[]; total: number } | null;
-  tantrumCount: number; // increments when the customer storms out; Basket3D reacts
+  tantrumCount: number; // increments when the customer storms out; the hold pile gets swept off the counter
   signInOpen: boolean; // guestbook sign-in panel
   adminOpen: boolean; // back-office admin panel
   setPhase: (p: CheckoutPhase) => void;

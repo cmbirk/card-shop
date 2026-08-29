@@ -79,7 +79,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
         {
           role: 'assistant' as const,
           content:
-            "Hey there, welcome to GEM! Name's Chris. Browse all you like — holler if you want to know what something's worth, or bring your basket up when you're ready.",
+            "Hey there, welcome to GEM! Name's Chris. Browse all you like — holler if you want to know what something's worth, or hand me anything you like and I'll hold it up front for you.",
         },
       ],
     }));

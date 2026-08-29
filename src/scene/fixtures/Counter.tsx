@@ -1,4 +1,5 @@
 import { MAT, makeLabelMaterial } from '../materials';
+import { HoldPile } from './HoldPile';
 
 /** Checkout counter: 3.0 x 0.9 x 0.6, top at y=1.0, register + paper bag props. */
 export function Counter() {
@@ -35,6 +36,8 @@ export function Counter() {
           <meshBasicMaterial color="#9fdca8" />
         </mesh>
       </group>
+      {/* the customer's picks, held up front */}
+      <HoldPile />
       {/* paper bag */}
       <mesh material={MAT.cardboard} position={[0.9, 1.16, 0]} castShadow>
         <boxGeometry args={[0.22, 0.28, 0.14]} />

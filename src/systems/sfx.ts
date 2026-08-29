@@ -38,7 +38,7 @@ export const sfx = {
   pickup: () => tone(500, 0.12, 'triangle', 0.06, 900),
   flip: () => tone(300, 0.08, 'triangle', 0.05, 600),
   putBack: () => tone(700, 0.08, 'sine', 0.05, 400),
-  basket: () => {
+  hold: () => {
     tone(220, 0.12, 'triangle', 0.08, 160);
     setTimeout(() => tone(1320, 0.18, 'sine', 0.05, 1760), 70);
   },

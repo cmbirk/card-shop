@@ -41,7 +41,7 @@ export function CheckoutModal() {
     return (
       <div className="modal-backdrop">
         <div className="modal">
-          <h2>Ring it up?</h2>
+          <h2>Ring up what's on hold?</h2>
           <div className="receipt">
             {items.map((id) => {
               const c = inventoryById.get(id)!;

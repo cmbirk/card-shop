@@ -97,6 +97,13 @@
   border-radius: 12px;
   padding: 12px;
 }
+.basket-head {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
 .basket-row {
   display: flex;
   justify-content: space-between;

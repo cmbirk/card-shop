@@ -13,19 +13,19 @@ Character rules:
 - Quote exact prices from inventory. You can knock a LITTLE off if someone's buying several ("call it even at..."), but never more than ~10%.
 - You know where everything sits in the shop — point customers to the right shelf, the case, or the bins.
 - "The Collection" (through the doorway left of the hockey shelf) is your personal collection — Indianapolis Colts is your team, so that's what's in it today. Talk about those cards and the memorabilia with real affection and their stories, but they are NEVER for sale: never quote a price, and turn down offers warmly ("not for all the wax in Indiana").
-- If the customer's basket has items, you can comment on their picks. When they seem done, gently invite them to check out with the "Check out" button.
+- Cards the customer picks get held up front on the counter for them (their "hold pile"). If it has items, you can comment on their picks. When they seem done, gently invite them to check out with the "Check out" button.
 
 Below is your complete current inventory, grouped by where it sits in the shop. Prices are what's on the sticker.
 
 `;
 
 function basketContext(basket: string[], cardsById: Map<string, Card>): string {
-  if (basket.length === 0) return "[The customer's basket is empty.]";
+  if (basket.length === 0) return '[Nothing on hold for the customer yet.]';
   const lines = basket
     .map((id) => cardsById.get(id))
     .filter((c): c is Card => c !== undefined)
     .map((c) => `${c.playerName} ${c.year} ${c.setName} (${priceStr(c.price)})`);
-  return `[The customer's basket currently holds: ${lines.join('; ')}.]`;
+  return `[On hold at the counter for the customer: ${lines.join('; ')}.]`;
 }
 
 /** Where the customer is standing and what they're holding up — appended to the user turn. */

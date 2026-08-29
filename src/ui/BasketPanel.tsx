@@ -9,10 +9,12 @@ export function BasketPanel() {
   const [open, setOpen] = useState(false);
   const total = basketTotalCents(items);
 
+  if (items.length === 0) return null;
   return (
     <>
-      {open && items.length > 0 && (
+      {open && (
         <div className="basket-panel">
+          <div className="basket-head">Chris is holding these up front</div>
           {items.map((id) => {
             const card = inventoryById.get(id)!;
             return (
@@ -31,12 +33,12 @@ export function BasketPanel() {
             <span>{formatCents(total)}</span>
           </div>
           <button className="btn" style={{ width: '100%', marginTop: 10 }} onClick={() => useNavStore.getState().goTo('counter')}>
-            Take to counter →
+            Walk to the counter →
           </button>
         </div>
       )}
       <button className="basket-pill" onClick={() => setOpen((o) => !o)}>
-        🧺 {items.length} · {formatCents(total)}
+        🗂 On hold · {items.length} · {formatCents(total)}
       </button>
     </>
   );

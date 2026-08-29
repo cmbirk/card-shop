@@ -15,7 +15,7 @@ export const FEEL = {
   flipDuration: 0.4,
   flipPullback: 0.05,
   returnDuration: 0.35,
-  toBasketDuration: 0.5,
+  toHoldDuration: 0.7, // fly from the shelf to the hold pile on the counter
   dragLambda: 12,
   inspectDistance: 0.38,
   inspectMinDistance: 0.22,
@@ -34,10 +34,8 @@ export const FEEL = {
   riffleFlickTilt: (-45 * Math.PI) / 180, // flicked-forward cards lie against the front wall
   riffleWheelStep: 40, // px of wheel per card (trackpads)
 
-  // basket
-  basketLambda: 8,
-  basketAnchor: [0.24, -0.22, -0.75] as const,
-  basketScale: 0.5,
+  // hold pile (the counter)
+  holdFanSpread: 0.03, // x offset per card in the fanned stack
 
   // shopkeeper
   headLookLambda: 6,
