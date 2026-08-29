@@ -13,9 +13,11 @@
       "rarity": "premium",
       "price": 45000,
       "seed": 18941,
-      "images": { "front": "/cards/football/mayo-dunlop-f.jpg" },
+      "images": {
+        "front": "/cards/football/mayo-dunlop-f.jpg"
+      },
       "lore": {
-        "blurb": "The famous anonymous card of the Mayo set — issued with no name on the front.",
+        "blurb": "The famous anonymous card of the Mayo set \u2014 issued with no name on the front.",
         "funFact": "Collectors hunted for decades before the player was identified as John Dunlop of Harvard.",
         "investmentNote": "blue-chip of this set"
       }
@@ -30,10 +32,16 @@
       "setName": "Mayo Cut Plug",
       "cardNumber": "N302",
       "rarity": "graded",
-      "grade": { "company": "PSA", "value": 4, "label": "PSA 4 VG-EX" },
+      "grade": {
+        "company": "PSA",
+        "value": 4,
+        "label": "PSA 4 VG-EX"
+      },
       "price": 38000,
       "seed": 18942,
-      "images": { "front": "/cards/football/mayo-brewer-f.jpg" },
+      "images": {
+        "front": "/cards/football/mayo-brewer-f.jpg"
+      },
       "lore": {
         "blurb": "A crisp example from the first true football card set ever printed.",
         "investmentNote": "steady riser"
@@ -49,10 +57,16 @@
       "setName": "Mayo Cut Plug",
       "cardNumber": "N302",
       "rarity": "graded",
-      "grade": { "company": "SGC", "value": 3, "label": "SGC 3 VG" },
+      "grade": {
+        "company": "SGC",
+        "value": 3,
+        "label": "SGC 3 VG"
+      },
       "price": 21000,
       "seed": 18943,
-      "images": { "front": "/cards/football/mayo-acton-f.jpg" },
+      "images": {
+        "front": "/cards/football/mayo-acton-f.jpg"
+      },
       "lore": {
         "blurb": "Tobacco-era cardboard with the wear to prove it survived 130 years.",
         "investmentNote": "undervalued right now"
@@ -68,12 +82,18 @@
       "setName": "Mayo Cut Plug",
       "cardNumber": "N302",
       "rarity": "graded",
-      "grade": { "company": "TAG", "value": 5, "label": "TAG 5 EX" },
+      "grade": {
+        "company": "TAG",
+        "value": 5,
+        "label": "TAG 5 EX"
+      },
       "price": 26000,
       "seed": 18944,
-      "images": { "front": "/cards/football/mayo-beale-f.jpg" },
+      "images": {
+        "front": "/cards/football/mayo-beale-f.jpg"
+      },
       "lore": {
-        "blurb": "TAG-graded with full transparency report — modern grading meets 1890s cardboard.",
+        "blurb": "TAG-graded with full transparency report \u2014 modern grading meets 1890s cardboard.",
         "investmentNote": "sleeper pick among collectors"
       }
     },
@@ -87,12 +107,18 @@
       "setName": "Mayo Cut Plug",
       "cardNumber": "N302",
       "rarity": "graded",
-      "grade": { "company": "PSA", "value": 2, "label": "PSA 2 GOOD" },
+      "grade": {
+        "company": "PSA",
+        "value": 2,
+        "label": "PSA 2 GOOD"
+      },
       "price": 17500,
       "seed": 18945,
-      "images": { "front": "/cards/football/mayo-murphy-f.jpg" },
+      "images": {
+        "front": "/cards/football/mayo-murphy-f.jpg"
+      },
       "lore": {
-        "blurb": "Low-grade, big character — the kind of card that starts conversations.",
+        "blurb": "Low-grade, big character \u2014 the kind of card that starts conversations.",
         "investmentNote": "peaked in the 90s, holding steady"
       }
     },
@@ -108,10 +134,42 @@
       "rarity": "premium",
       "price": 19000,
       "seed": 18946,
-      "images": { "front": "/cards/football/mayo-stillman-f.jpg" },
+      "images": {
+        "front": "/cards/football/mayo-stillman-f.jpg"
+      },
       "lore": {
-        "blurb": "Raw and honest — never slabbed, straight from a turn-of-the-century album.",
+        "blurb": "Raw and honest \u2014 never slabbed, straight from a turn-of-the-century album.",
         "investmentNote": "steady riser"
+      }
+    },
+    {
+      "id": "fb-psa-69792918",
+      "sport": "football",
+      "category": "graded-slabs",
+      "playerName": "Peyton Manning",
+      "team": "Indianapolis Colts",
+      "year": 2021,
+      "setName": "Donruss Optic Downtown",
+      "cardNumber": "#DT18",
+      "rarity": "graded",
+      "grade": {
+        "company": "PSA",
+        "value": 10,
+        "label": "PSA 10 GEM MINT",
+        "certNumber": "69792918"
+      },
+      "price": 187100,
+      "foil": true,
+      "seed": 69792918,
+      "featured": true,
+      "images": {
+        "front": "/cards/psa/psa-69792918-f.jpg",
+        "back": "/cards/psa/psa-69792918-b.jpg"
+      },
+      "lore": {
+        "blurb": "The Downtown \u2014 the case-hit insert every football collector rips for, in a perfect GEM MINT 10.",
+        "funFact": "Population 322 in PSA 10 with zero graded higher. This is the ceiling.",
+        "investmentNote": "blue-chip of this set"
       }
     }
   ]

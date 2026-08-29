@@ -28,7 +28,8 @@ export function priceStr(cents: number): string {
 }
 
 function cardLine(c: Card): string {
-  const grade = c.grade ? `, ${c.grade.label}` : c.foil ? ', foil' : '';
+  const cert = c.grade?.certNumber ? ` (cert #${c.grade.certNumber})` : '';
+  const grade = c.grade ? `, ${c.grade.label}${cert}` : c.foil ? ', foil' : '';
   const note = c.lore.investmentNote ? ` (${c.lore.investmentNote})` : '';
   return `- [${c.id}] ${c.playerName}, ${c.year} ${c.setName} ${c.cardNumber}, ${c.team}${grade} — ${priceStr(c.price)}${note}. ${c.lore.blurb}`;
 }

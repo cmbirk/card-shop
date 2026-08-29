@@ -12,7 +12,7 @@ export interface Card {
   setName: string;
   cardNumber: string;
   rarity: Rarity;
-  grade?: { company: 'PSA' | 'BGS' | 'TAG' | 'SGC'; value: number; label: string };
+  grade?: { company: 'PSA' | 'BGS' | 'TAG' | 'SGC'; value: number; label: string; certNumber?: string };
   price: number; // integer cents
   foil?: boolean;
   seed: number; // drives procedural art + placement jitter
