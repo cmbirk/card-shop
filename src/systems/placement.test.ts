@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { assignCards } from './placement';
-import { inventory } from './inventory';
+import { bundledInventory as inventory } from './inventory';
 import { shopLayout } from '@shared/data/shopLayout';
 
 describe('placement', () => {

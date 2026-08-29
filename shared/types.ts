@@ -2,23 +2,75 @@ export type Sport = 'baseball' | 'basketball' | 'football' | 'hockey' | 'tcg';
 
 export type Rarity = 'common' | 'rare' | 'premium' | 'graded';
 
+export type GradeCompany = 'PSA' | 'BGS' | 'TAG' | 'SGC' | 'CGC';
+export type AutographKind = 'none' | 'on-card' | 'sticker';
+export type RelicKind = 'none' | 'jersey' | 'patch' | 'multi-patch' | 'bat' | 'other';
+export type CardStatus = 'available' | 'reserved' | 'sold';
+export type RawCondition = 'NM-MT' | 'NM' | 'EX-MT' | 'EX' | 'VG-EX' | 'VG' | 'GOOD' | 'POOR';
+
+export interface Grade {
+  company: GradeCompany;
+  value: number;
+  label: string;
+  certNumber?: string;
+  subgrades?: { centering?: number; corners?: number; edges?: number; surface?: number };
+  autoGrade?: number;
+}
+
 export interface Card {
   id: string;
   sport: Sport;
-  category: string; // 'rookies' | 'vintage' | 'stars' | 'graded-slabs' | 'budget-box'
+  category: string; // shelf grouping: 'rookies' | 'vintage' | 'stars' | 'graded-slabs' | 'budget-box'
   playerName: string;
   team: string;
   year: number;
   setName: string;
   cardNumber: string;
   rarity: Rarity;
-  grade?: { company: 'PSA' | 'BGS' | 'TAG' | 'SGC'; value: number; label: string; certNumber?: string };
-  price: number; // integer cents
+
+  // identity
+  brand?: string; // Topps, Panini, Upper Deck, Bowman…
+  subset?: string; // insert/subset name, e.g. "Downtown", "Young Guns"
+
+  // variant / parallel
+  parallel?: string; // "Base", "Refractor", "Silver Prizm", "Gold"…
+  printRun?: number | null; // the /X (null = unnumbered)
+  serialNumber?: number; // the specific copy, e.g. 113 of /125
+  variation?: string; // SP / SSP / photo variation / error note
+
+  // features ("hits")
+  isRookie?: boolean;
+  autograph?: AutographKind;
+  relic?: RelicKind;
+  isInsert?: boolean;
+  isError?: boolean;
+
+  // condition / grading
+  graded?: boolean;
+  grade?: Grade;
+  rawCondition?: RawCondition; // when ungraded
+
+  // commerce
+  price: number; // list price, integer cents
+  status?: CardStatus; // available | reserved | sold
+  quantity?: number; // usually 1 for singles
+  costBasis?: number; // ADMIN-ONLY, integer cents — never selected into the public client
+  acquiredDate?: string; // ADMIN-ONLY, ISO date
+  acquiredFrom?: string; // ADMIN-ONLY
+
+  // media
   foil?: boolean;
-  seed: number; // drives procedural art + placement jitter
-  images?: { front: string; back?: string }; // real scans override procedural art
+  images?: { front: string; back?: string; extra?: string[] }; // real scans override procedural art
+
+  // presentation / AI grounding
   lore: { blurb: string; funFact?: string; investmentNote?: string };
   featured?: boolean; // display case
+  section?: string; // optional fixture override; else auto by sport
+
+  // system
+  seed: number; // drives procedural art + placement jitter
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface InventoryFile {

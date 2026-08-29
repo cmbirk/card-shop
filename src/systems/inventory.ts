@@ -1,10 +1,50 @@
 import type { Card, InventoryFile } from '@shared/types';
+import { rowToCard, type CardRow } from '@shared/cardMapping';
 import inventoryJson from '@shared/data/inventory.json';
 import realCardsJson from '@shared/data/realCards.json';
+import { supabase } from '../lib/supabase';
 
-export const inventory: Card[] = [
+// Live inventory. Populated by loadInventory() before the shop renders:
+// from Supabase when configured, otherwise the bundled mock data (so the app
+// works during setup). The scene consumes these as Card[] / Map — the arrays
+// are mutated in place so existing imports stay valid.
+
+/** The mock + real cards bundled at build time — fallback and test fixture. */
+export const bundledInventory: Card[] = [
   ...(inventoryJson as InventoryFile).cards,
   ...(realCardsJson as unknown as InventoryFile).cards,
 ];
 
-export const inventoryById: Map<string, Card> = new Map(inventory.map((c) => [c.id, c]));
+export const inventory: Card[] = [];
+export const inventoryById: Map<string, Card> = new Map();
+
+function setInventory(cards: Card[]) {
+  inventory.length = 0;
+  inventory.push(...cards);
+  inventoryById.clear();
+  for (const c of cards) inventoryById.set(c.id, c);
+}
+
+let loaded: Promise<void> | null = null;
+
+/** Load inventory once (Supabase → fallback bundled). Idempotent. */
+export function loadInventory(): Promise<void> {
+  if (loaded) return loaded;
+  loaded = (async () => {
+    if (supabase) {
+      try {
+        // customer-safe view: omits cost_basis / acquisition columns
+        const { data, error } = await supabase.from('cards_public').select('*');
+        if (error) throw error;
+        if (data && data.length) {
+          setInventory((data as CardRow[]).map(rowToCard));
+          return;
+        }
+      } catch (err) {
+        console.warn('[inventory] Supabase read failed, using bundled data:', (err as Error).message);
+      }
+    }
+    setInventory(bundledInventory);
+  })();
+  return loaded;
+}

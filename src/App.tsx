@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AdaptiveDpr } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
@@ -8,8 +9,35 @@ import { Shopkeeper } from './scene/Shopkeeper';
 import { Basket3D } from './scene/Basket';
 import { CardInHand } from './scene/cards/CardInHand';
 import { UIOverlay } from './ui/UIOverlay';
+import { loadInventory } from './systems/inventory';
 
 export default function App() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    loadInventory().then(() => setReady(true));
+  }, []);
+
+  if (!ready) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          display: 'grid',
+          placeItems: 'center',
+          background: '#1a120b',
+          color: '#ffd97a',
+          fontFamily: 'Georgia, serif',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 40, letterSpacing: 4 }}>GEM</div>
+          <div style={{ fontSize: 13, opacity: 0.7, marginTop: 8 }}>opening up the shop…</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Canvas

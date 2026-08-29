@@ -67,8 +67,8 @@ function BasketMesh() {
           x: t * 0.055,
           y: 0.04 - Math.abs(t) * 0.004, // stand up out of the basket
           z: -0.014 + i * 0.004,
-          // counter the basket's forward tilt so faces point at the viewer, fanned
-          rot: [0.52 + spread(rand) * 0.04, t * 0.4 + spread(rand) * 0.05, spread(rand) * 0.02] as [number, number, number],
+          // lean back slightly in the tipped-toward-viewer basket so faces show, fanned
+          rot: [-0.18 + spread(rand) * 0.04, t * 0.4 + spread(rand) * 0.05, spread(rand) * 0.02] as [number, number, number],
         };
       }),
     [visible],
@@ -148,7 +148,7 @@ export function Basket3D() {
     const spin = a.drop * 3;
 
     _pos.set(halfW - MARGIN_X, -halfH + MARGIN_Y + dropY, -DIST);
-    _euler.set(-0.42, -0.32, spin); // tip opening toward viewer to show contents
+    _euler.set(0.5, -0.32, spin); // +X tips the opening toward the viewer to show contents
     _rot.setFromEuler(_euler);
     _scl.setScalar(0.82);
     _local.compose(_pos, _rot, _scl);

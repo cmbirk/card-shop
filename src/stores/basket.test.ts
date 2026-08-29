@@ -1,6 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { basketTotalCents, formatCents } from './basketStore';
-import { inventory } from '../systems/inventory';
+import { inventory, loadInventory } from '../systems/inventory';
+
+// populates the live inventory/inventoryById singletons from bundled data
+// (Supabase is unconfigured in tests, so loadInventory falls back)
+beforeAll(() => loadInventory());
 
 describe('basket money math', () => {
   it('totals integer cents exactly', () => {
