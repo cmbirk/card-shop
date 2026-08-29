@@ -38,6 +38,16 @@ export function AdminPanel() {
     if (open && isAdmin) void refresh();
   }, [open, isAdmin]);
 
+  // Esc leaves the computer and puts you back in the office
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !(e.target as HTMLElement | null)?.closest('textarea')) useUIStore.getState().setAdminOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
   if (!open || !isAdmin) return null;
 
   const close = () => useUIStore.getState().setAdminOpen(false);
@@ -47,7 +57,7 @@ export function AdminPanel() {
   };
 
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop admin-backdrop">
       <div className="modal admin">
         <div className="admin-head">
           <div>
@@ -70,8 +80,8 @@ export function AdminPanel() {
             <button className="btn secondary" onClick={() => void useAuthStore.getState().signOut().then(close)}>
               Sign out
             </button>
-            <button className="btn secondary" onClick={close}>
-              ✕
+            <button className="btn admin-exit" onClick={close} title="Back to the office (Esc)">
+              ← Back to the office
             </button>
           </div>
         </div>
