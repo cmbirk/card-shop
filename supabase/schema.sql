@@ -1,4 +1,7 @@
--- GEM card shop — Supabase schema. Run this in the Supabase SQL editor once.
+-- GEM card shop — Supabase schema (READABLE REFERENCE COPY).
+-- The live schema is applied via the CLI: an identical copy lives in
+-- supabase/migrations/ and is applied with `npm run db:push`. Edit the schema
+-- by adding a new migration, not by hand-running this file. See supabase/SETUP.md.
 -- Sets up the cards table, admin gating, Row Level Security, a customer-safe
 -- public view, and the storage bucket policies for card scans.
 
