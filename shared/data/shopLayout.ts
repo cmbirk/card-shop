@@ -141,6 +141,22 @@ export const shopLayout: ShopLayout = {
       neighbors: ['shelf-football', 'bins', 'counter', 'collection-door'],
     },
     {
+      id: 'office-door',
+      position: [-3, 1.6, -2.6],
+      target: [-3, 1.4, -5],
+      yawRange: 0.8,
+      pitchRange: 0.35,
+      neighbors: ['counter', 'shelf-hockey', 'collection-door', 'office'],
+    },
+    {
+      id: 'office',
+      position: [-3, 1.5, -4.9],
+      target: [-3, 1.1, -6.6],
+      yawRange: 1.3,
+      pitchRange: 0.45,
+      neighbors: ['office-door'],
+    },
+    {
       id: 'collection-door',
       position: [-3.9, 1.6, -3.2],
       target: [-7, 1.4, -3.2],
@@ -218,7 +234,7 @@ export const shopLayout: ShopLayout = {
       target: [0, 1.3, -3.6],
       yawRange: 1.1,
       pitchRange: 0.35,
-      neighbors: ['bins', 'case', 'shelf-hockey', 'collection-door'],
+      neighbors: ['bins', 'case', 'shelf-hockey', 'collection-door', 'office-door'],
     },
   ],
 };
@@ -229,3 +245,7 @@ export const SLAB_SIZE = { w: 0.085, h: 0.135, t: 0.01 } as const;
 
 // "Staff Only" door to the back office, on the north wall left of the counter.
 export const BACK_OFFICE_DOOR = { position: [-3.0, 0, -ROOM.depth / 2] as const, width: 1.0, height: 2.2 } as const;
+
+// The back office itself: a small room behind the north wall, straight through the STAFF ONLY door.
+// Admin-only (the door gate); the desk computer opens the admin panel.
+export const OFFICE = { xMin: -4.6, xMax: -1.4, zMin: -7.2, zMax: -ROOM.depth / 2, height: 3 } as const;

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { ChatMessage, ChatRequest } from '@shared/types';
-import { shopLayout, ROOM, ANNEX } from '@shared/data/shopLayout';
+import { shopLayout, ROOM, ANNEX, OFFICE } from '@shared/data/shopLayout';
 import { streamChat } from '../api/chat';
 import { useBasketStore } from './basketStore';
 import { useInspectStore } from './inspectStore';
@@ -52,6 +52,9 @@ function greetSpot(stationId: string): { spot: [number, number]; facing: number 
   if (cx < ANNEX.xMax) {
     spot[0] = clamp(spot[0], ANNEX.xMin + 0.5, ANNEX.xMax - 0.5);
     spot[1] = clamp(spot[1], ANNEX.zMin + 1.0, ANNEX.zMax - 0.5); // clear of the corner plinth
+  } else if (cz < OFFICE.zMax) {
+    spot[0] = clamp(spot[0], OFFICE.xMin + 0.5, OFFICE.xMax - 0.5);
+    spot[1] = clamp(spot[1], OFFICE.zMin + 0.8, OFFICE.zMax - 0.5);
   } else {
     spot[0] = clamp(spot[0], -ROOM.width / 2 + 0.5, ROOM.width / 2 - 0.5);
     spot[1] = clamp(spot[1], -ROOM.depth / 2 + 0.5, ROOM.depth / 2 - 0.5);

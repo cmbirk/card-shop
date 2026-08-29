@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
 import CameraControlsImpl from 'camera-controls';
 import * as THREE from 'three';
-import { shopLayout, ANNEX, ANNEX_DOOR } from '@shared/data/shopLayout';
+import { shopLayout, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
 import type { Station, Vec3 } from '@shared/types';
 import { useNavStore } from '../stores/navStore';
 import { useShopkeeperStore } from '../stores/shopkeeperStore';
@@ -13,17 +13,30 @@ import { sfx } from '../systems/sfx';
 const stations = new Map<string, Station>(shopLayout.stations.map((s) => [s.id, s]));
 const MIDPOINT: Vec3 = [0, 1.6, 1.2];
 const ANNEX_DOORWAY: Vec3 = [ANNEX.xMax, 1.6, ANNEX_DOOR.z];
+const OFFICE_DOORWAY: Vec3 = [BACK_OFFICE_DOOR.position[0], 1.6, OFFICE.zMax];
+
+type Room = 'main' | 'annex' | 'office';
+/** Which room a station is in (the side rooms are never adjacent to each other). */
+export function roomOf(pos: readonly [number, number, number]): Room {
+  if (pos[0] < ANNEX.xMax) return 'annex';
+  if (pos[2] < OFFICE.zMax) return 'office';
+  return 'main';
+}
+const DOORWAY: Record<Exclude<Room, 'main'>, Vec3> = { annex: ANNEX_DOORWAY, office: OFFICE_DOORWAY };
 
 /** Intermediate camera positions so a glide never cuts through a wall. */
 function waypoints(from: Station | undefined, to: Station): Vec3[] {
   if (!from) return [];
-  const inAnnex = (s: Station) => s.position[0] < ANNEX.xMax;
-  const wps: Vec3[] = inAnnex(from) !== inAnnex(to) ? [ANNEX_DOORWAY] : [];
-  // wall-to-wall hops swing through the open center aisle (the doorway counts as the west wall)
-  const fx = inAnnex(from) ? ANNEX_DOORWAY[0] : from.position[0];
-  const tx = inAnnex(to) ? ANNEX_DOORWAY[0] : to.position[0];
+  const rf = roomOf(from.position);
+  const rt = roomOf(to.position);
+  const wps: Vec3[] = [];
+  if (rf !== 'main') wps.push(DOORWAY[rf]); // leave the side room through its door
+  // wall-to-wall hops swing through the open center aisle (a doorway counts as its wall)
+  const fx = rf === 'main' ? from.position[0] : DOORWAY[rf][0];
+  const tx = rt === 'main' ? to.position[0] : DOORWAY[rt][0];
   const crossing = Math.abs(fx) > 3 && Math.abs(tx) > 3 && Math.sign(fx) !== Math.sign(tx);
-  if (crossing) wps.push(MIDPOINT);
+  if (crossing && rf !== rt) wps.push(MIDPOINT);
+  if (rt !== 'main' && rf !== rt) wps.push(DOORWAY[rt]); // enter the side room through its door
   return wps;
 }
 

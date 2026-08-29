@@ -34,6 +34,10 @@ export const FEEL = {
   riffleFlickTilt: (-45 * Math.PI) / 180, // flicked-forward cards lie against the front wall
   riffleWheelStep: 40, // px of wheel per card (trackpads)
 
+  // back office door
+  doorSwingLambda: 6,
+  doorOpenAngle: -1.9, // rad, swings into the office
+
   // hold pile (the counter)
   holdFanSpread: 0.03, // x offset per card in the fanned stack
 

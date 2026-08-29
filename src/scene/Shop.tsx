@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { ContactShadows, Environment, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
-import { shopLayout, ROOM, ANNEX, ANNEX_DOOR } from '@shared/data/shopLayout';
+import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
 import type { Fixture } from '@shared/types';
 import { inventory, useInventoryVersion } from '../systems/inventory';
 import { assignCards } from '../systems/placement';
@@ -11,6 +11,7 @@ import { Shelf } from './fixtures/Shelf';
 import { DisplayCase } from './fixtures/DisplayCase';
 import { Counter } from './fixtures/Counter';
 import { Bin } from './fixtures/Bin';
+import { Desk } from './fixtures/Desk';
 import { useNavStore } from './../stores/navStore';
 import { useInspectStore } from '../stores/inspectStore';
 import { Facade } from './Facade';
@@ -127,6 +128,107 @@ function WestWall() {
       <mesh material={MAT.dark} position={[x, ANNEX_DOOR.height + 0.04, ANNEX_DOOR.z]}>
         <boxGeometry args={[0.14, 0.08, ANNEX_DOOR.width + 0.08]} />
       </mesh>
+    </group>
+  );
+}
+
+/** Main-room north wall with an opening for the back-office door (the door + frame are BackOfficeDoor). */
+function NorthWall() {
+  const W = ROOM.width;
+  const H = ROOM.height;
+  const z = -ROOM.depth / 2;
+  const x0 = BACK_OFFICE_DOOR.position[0] - BACK_OFFICE_DOOR.width / 2;
+  const x1 = BACK_OFFICE_DOOR.position[0] + BACK_OFFICE_DOOR.width / 2;
+  return (
+    <group>
+      <mesh material={MAT.wall} position={[(-W / 2 + x0) / 2, H / 2, z]}>
+        <planeGeometry args={[x0 + W / 2, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[(x1 + W / 2) / 2, H / 2, z]}>
+        <planeGeometry args={[W / 2 - x1, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[BACK_OFFICE_DOOR.position[0], (H + BACK_OFFICE_DOOR.height) / 2, z]}>
+        <planeGeometry args={[BACK_OFFICE_DOOR.width, H - BACK_OFFICE_DOOR.height]} />
+      </mesh>
+    </group>
+  );
+}
+
+/** The back office: a plain little room behind the north wall — bare bulb, boxes, filing cabinet, the desk. */
+function OfficeShell() {
+  const w = OFFICE.xMax - OFFICE.xMin;
+  const d = OFFICE.zMax - OFFICE.zMin;
+  const cx = (OFFICE.xMin + OFFICE.xMax) / 2;
+  const cz = (OFFICE.zMin + OFFICE.zMax) / 2;
+  const H = OFFICE.height;
+  const x0 = BACK_OFFICE_DOOR.position[0] - BACK_OFFICE_DOOR.width / 2;
+  const x1 = BACK_OFFICE_DOOR.position[0] + BACK_OFFICE_DOOR.width / 2;
+  return (
+    <group>
+      <mesh material={MAT.floor} position={[cx, 0, cz]} rotation-x={-Math.PI / 2} receiveShadow>
+        <planeGeometry args={[w, d]} />
+      </mesh>
+      <mesh material={MAT.cream} position={[cx, H, cz]} rotation-x={Math.PI / 2}>
+        <planeGeometry args={[w, d]} />
+      </mesh>
+      {/* far (north) wall, west, east */}
+      <mesh material={MAT.wall} position={[cx, H / 2, OFFICE.zMin]}>
+        <planeGeometry args={[w, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[OFFICE.xMin, H / 2, cz]} rotation-y={Math.PI / 2}>
+        <planeGeometry args={[d, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[OFFICE.xMax, H / 2, cz]} rotation-y={-Math.PI / 2}>
+        <planeGeometry args={[d, H]} />
+      </mesh>
+      {/* south wall = the shop's north wall from behind, split around the door */}
+      <mesh material={MAT.wall} position={[(OFFICE.xMin + x0) / 2, H / 2, OFFICE.zMax - 0.005]} rotation-y={Math.PI}>
+        <planeGeometry args={[x0 - OFFICE.xMin, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[(x1 + OFFICE.xMax) / 2, H / 2, OFFICE.zMax - 0.005]} rotation-y={Math.PI}>
+        <planeGeometry args={[OFFICE.xMax - x1, H]} />
+      </mesh>
+      <mesh material={MAT.wall} position={[BACK_OFFICE_DOOR.position[0], (H + BACK_OFFICE_DOOR.height) / 2, OFFICE.zMax - 0.005]} rotation-y={Math.PI}>
+        <planeGeometry args={[BACK_OFFICE_DOOR.width, H - BACK_OFFICE_DOOR.height]} />
+      </mesh>
+      {/* bare bulb */}
+      <mesh position={[cx, H - 0.25, cz]}>
+        <sphereGeometry args={[0.04, 12, 12]} />
+        <meshBasicMaterial color="#fff4d6" />
+      </mesh>
+      <mesh material={MAT.dark} position={[cx, H - 0.12, cz]}>
+        <cylinderGeometry args={[0.01, 0.01, 0.24, 6]} />
+      </mesh>
+      <pointLight position={[cx, H - 0.3, cz]} intensity={1.6} distance={6} color="#fff0d0" />
+      {/* the desk against the far wall, facing the door */}
+      <Desk position={[-3, 0, OFFICE.zMin + 0.45]} rotationY={0} />
+      {/* filing cabinet + boxes */}
+      <group position={[OFFICE.xMin + 0.3, 0, OFFICE.zMin + 0.35]}>
+        <mesh material={MAT.dark} position={[0, 0.65, 0]} castShadow>
+          <boxGeometry args={[0.45, 1.3, 0.6]} />
+        </mesh>
+        {[0.25, 0.65, 1.05].map((y) => (
+          <mesh key={y} material={MAT.cream} position={[0, y, 0.305]}>
+            <boxGeometry args={[0.36, 0.02, 0.01]} />
+          </mesh>
+        ))}
+      </group>
+      <mesh material={MAT.cardboard} position={[OFFICE.xMax - 0.5, 0.25, OFFICE.zMin + 0.6]} rotation-y={0.15} castShadow>
+        <boxGeometry args={[0.6, 0.5, 0.5]} />
+      </mesh>
+      <mesh material={MAT.cardboard} position={[OFFICE.xMax - 0.55, 0.68, OFFICE.zMin + 0.62]} rotation-y={-0.1} castShadow>
+        <boxGeometry args={[0.5, 0.36, 0.45]} />
+      </mesh>
+      {/* corkboard */}
+      <mesh position={[OFFICE.xMax - 0.02, 1.7, cz]} rotation-y={-Math.PI / 2}>
+        <planeGeometry args={[0.9, 0.6]} />
+        <meshStandardMaterial color="#b08a5a" roughness={1} />
+      </mesh>
+      {[['TO GRADE', -0.25, 0.12], ['SHOW SAT', 0.2, 0.05], ['CALL PSA', -0.05, -0.15]].map(([t, dz, dy]) => (
+        <mesh key={t as string} material={makeLabelMaterial(t as string, { bg: '#efe6c8', fg: '#3b2a1a', size: 56 })} position={[OFFICE.xMax - 0.03, 1.7 + (dy as number), cz + (dz as number)]} rotation-y={-Math.PI / 2}>
+          <planeGeometry args={[0.24, 0.07]} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -249,10 +351,8 @@ export function Shop() {
       </mesh>
       <ContactShadows position={[0, 0.005, 0]} scale={12} far={2} blur={2.5} opacity={0.35} frames={1} />
 
-      {/* walls */}
-      <mesh material={MAT.wall} position={[0, H / 2, -D / 2]}>
-        <planeGeometry args={[W, H]} />
-      </mesh>
+      {/* walls (north wall is split around the back-office door) */}
+      <NorthWall />
       {/* west wall, split around the Collection doorway */}
       <WestWall />
       <mesh material={MAT.wall} position={[W / 2, H / 2, 0]} rotation-y={-Math.PI / 2}>
@@ -262,9 +362,20 @@ export function Shop() {
         <planeGeometry args={[W, H]} />
       </mesh>
       {/* wainscot strips */}
-      <mesh material={MAT.wainscot} position={[0, 0.45, -D / 2 + 0.01]}>
-        <planeGeometry args={[W, 0.9]} />
-      </mesh>
+      {(() => {
+        const x0 = BACK_OFFICE_DOOR.position[0] - BACK_OFFICE_DOOR.width / 2;
+        const x1 = BACK_OFFICE_DOOR.position[0] + BACK_OFFICE_DOOR.width / 2;
+        return (
+          <>
+            <mesh material={MAT.wainscot} position={[(-W / 2 + x0) / 2, 0.45, -D / 2 + 0.01]}>
+              <planeGeometry args={[x0 + W / 2, 0.9]} />
+            </mesh>
+            <mesh material={MAT.wainscot} position={[(x1 + W / 2) / 2, 0.45, -D / 2 + 0.01]}>
+              <planeGeometry args={[W / 2 - x1, 0.9]} />
+            </mesh>
+          </>
+        );
+      })()}
       {(() => {
         const z0 = ANNEX_DOOR.z - ANNEX_DOOR.width / 2;
         const z1 = ANNEX_DOOR.z + ANNEX_DOOR.width / 2;
@@ -344,6 +455,7 @@ export function Shop() {
       </mesh>
 
       <AnnexShell />
+      <OfficeShell />
       <ShowcaseRoom />
       <ShowcaseDoor />
       <CeilingFan />

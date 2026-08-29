@@ -12,6 +12,7 @@ import { CheckoutModal } from './CheckoutModal';
 import { SignInPanel } from './SignInPanel';
 import { AdminPanel } from './AdminPanel';
 import { useAuthStore } from '../stores/authStore';
+import { useBasketStore } from '../stores/basketStore';
 
 /** Maya's one canned line about the top slab in the case — no API, once per session. */
 function mayaCaseLine(): string | null {
@@ -76,6 +77,7 @@ export function UIOverlay() {
   const mode = useNavStore((s) => s.mode);
   const showStepBack = mode === 'station' && station !== 'outside' && station !== 'center' && station !== 'entry';
   const isAdmin = useAuthStore((s) => s.isAdmin);
+  const holding = useBasketStore((s) => s.items.length > 0);
   return (
     <div className="overlay">
       <NavEffects />
@@ -84,7 +86,7 @@ export function UIOverlay() {
         <p>
           {outside
             ? 'Click the front door to step inside'
-            : station === 'counter'
+            : station === 'counter' && holding
               ? 'Your picks are on the counter · click one to put it back · talk to Chris to check out'
               : station === 'bins'
               ? 'Scroll over a bin to thumb through it · click the card that\'s up to pick it up'

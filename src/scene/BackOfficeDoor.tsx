@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { useCursor } from '@react-three/drei';
 import { BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
 import { MAT, makeLabelMaterial } from './materials';
 import { useAuthStore } from '../stores/authStore';
-import { useUIStore } from '../stores/uiStore';
 import { useNavStore } from '../stores/navStore';
 import { useDialogueStore } from '../stores/dialogueStore';
+import { FEEL } from '../feel';
 
 const STAFF_SIGN = makeLabelMaterial('STAFF ONLY', { bg: '#efe6c8', fg: '#3b2a1a', size: 56 });
 
 /**
- * The door to the back office, on the north wall beside the counter.
- * Admins click it to open the back-office panel; everyone else gets waved off by Chris.
+ * The door to the back office, on the north wall beside the counter. Admins walk up to it and
+ * through (it swings open); everyone else gets waved off by Chris. The room behind it has the desk
+ * computer that opens the admin panel.
  */
 export function BackOfficeDoor() {
   const [hovered, setHovered] = useState(false);
@@ -19,16 +22,27 @@ export function BackOfficeDoor() {
   useCursor(hovered);
   const { width: w, height: h } = BACK_OFFICE_DOOR;
   const [x, , z] = BACK_OFFICE_DOOR.position;
+  const hinge = useRef<THREE.Group>(null!);
+
+  // swings open whenever the customer is heading into / standing in the office
+  useFrame((_, dt) => {
+    if (!hinge.current) return;
+    const nav = useNavStore.getState();
+    const open = nav.currentStation === 'office' || nav.targetStation === 'office';
+    hinge.current.rotation.y = THREE.MathUtils.damp(hinge.current.rotation.y, open ? FEEL.doorOpenAngle : 0, FEEL.doorSwingLambda, dt);
+  });
 
   return (
     <group
       position={[x, h / 2, z + 0.03]}
       onClick={(e) => {
-        if (useNavStore.getState().currentStation === 'outside') return;
+        const nav = useNavStore.getState();
+        if (nav.currentStation === 'outside') return;
         e.stopPropagation();
         setHovered(false);
         if (useAuthStore.getState().isAdmin) {
-          useUIStore.getState().setAdminOpen(true);
+          // walk up to it, then through; from inside, back out
+          nav.goTo(nav.currentStation === 'office' ? 'office-door' : nav.currentStation === 'office-door' ? 'office' : 'office-door');
           return;
         }
         const dlg = useDialogueStore.getState();
@@ -46,6 +60,9 @@ export function BackOfficeDoor() {
       <mesh material={MAT.dark} position={[0, 0, -0.01]}>
         <boxGeometry args={[w + 0.12, h + 0.08, 0.04]} />
       </mesh>
+      {/* everything below the frame hangs on a hinge at the left jamb */}
+      <group ref={hinge} position={[-w / 2, 0, 0]}>
+      <group position={[w / 2, 0, 0]}>
       {/* door slab */}
       <mesh material={MAT.walnut}>
         <boxGeometry args={[w, h, 0.06]} />
@@ -71,6 +88,8 @@ export function BackOfficeDoor() {
           <meshBasicMaterial color={isAdmin ? '#ffd97a' : '#ffffff'} transparent opacity={isAdmin ? 0.25 : 0.08} depthWrite={false} />
         </mesh>
       )}
+      </group>
+      </group>
     </group>
   );
 }
