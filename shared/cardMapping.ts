@@ -34,6 +34,7 @@ export interface CardRow {
   acquired_date?: string | null;
   acquired_from?: string | null;
   foil: boolean;
+  landscape?: boolean;
   image_front: string | null;
   image_back: string | null;
   image_extra: string[];
@@ -80,6 +81,7 @@ export function rowToCard(r: CardRow): Card {
     acquiredDate: r.acquired_date ?? undefined,
     acquiredFrom: r.acquired_from ?? undefined,
     foil: r.foil,
+    landscape: !!r.landscape,
     images,
     lore: r.lore ?? { blurb: '' },
     featured: r.featured,
@@ -123,6 +125,7 @@ export function cardToRow(c: Card): Partial<CardRow> {
     acquired_date: c.acquiredDate ?? null,
     acquired_from: c.acquiredFrom ?? null,
     foil: !!c.foil,
+    landscape: !!c.landscape,
     image_front: c.images?.front ?? null,
     image_back: c.images?.back ?? null,
     image_extra: c.images?.extra ?? [],

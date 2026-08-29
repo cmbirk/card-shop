@@ -75,6 +75,7 @@ export type Database = {
           is_error: boolean
           is_insert: boolean
           is_rookie: boolean
+          landscape: boolean
           lore: Json
           parallel: string | null
           player_name: string
@@ -116,6 +117,7 @@ export type Database = {
           is_error?: boolean
           is_insert?: boolean
           is_rookie?: boolean
+          landscape?: boolean
           lore?: Json
           parallel?: string | null
           player_name: string
@@ -157,6 +159,7 @@ export type Database = {
           is_error?: boolean
           is_insert?: boolean
           is_rookie?: boolean
+          landscape?: boolean
           lore?: Json
           parallel?: string | null
           player_name?: string
@@ -233,6 +236,7 @@ export type Database = {
           is_error: boolean | null
           is_insert: boolean | null
           is_rookie: boolean | null
+          landscape: boolean | null
           lore: Json | null
           parallel: string | null
           player_name: string | null
@@ -271,6 +275,7 @@ export type Database = {
           is_error?: boolean | null
           is_insert?: boolean | null
           is_rookie?: boolean | null
+          landscape?: boolean | null
           lore?: Json | null
           parallel?: string | null
           player_name?: string | null
@@ -309,6 +314,7 @@ export type Database = {
           is_error?: boolean | null
           is_insert?: boolean | null
           is_rookie?: boolean | null
+          landscape?: boolean | null
           lore?: Json | null
           parallel?: string | null
           player_name?: string | null

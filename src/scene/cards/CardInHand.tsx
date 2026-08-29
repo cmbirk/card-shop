@@ -250,6 +250,7 @@ function HeldCard({ cardId }: { cardId: string }) {
 
   return (
     <group ref={group}>
+      <group rotation-z={card.landscape ? Math.PI / 2 : 0}>
       <mesh
         geometry={geos.front}
         material={detail.front}
@@ -260,6 +261,7 @@ function HeldCard({ cardId }: { cardId: string }) {
         }}
       />
       <mesh geometry={geos.back} material={detail.back} position-z={-CARD_SIZE.t / 2} rotation-y={Math.PI} />
+      </group>
       {card.grade && <Slab card={card} />}
     </group>
   );

@@ -121,10 +121,12 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
     try {
       const prepared = await prepareScan(file, setStage); // HEIC → JPEG, downscale
       setStage('uploading…');
-      const url = await uploadCardImage(prepared, id, side);
+      const url = await uploadCardImage(prepared.file, id, side);
       setCard((c) => ({
         ...c,
         id,
+        // the front scan decides the card's orientation
+        ...(side === 'front' ? { landscape: prepared.landscape } : {}),
         images: side === 'front' ? { ...(c.images ?? {}), front: url } : { front: c.images?.front ?? '', ...c.images, back: url },
       }));
     } catch (err) {
@@ -273,6 +275,9 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
             </label>
             <label>
               <input data-1p-ignore type="checkbox" checked={!!card.foil} onChange={(e) => patch({ foil: e.target.checked })} /> Foil
+            </label>
+            <label title="Set automatically from the front scan; override if needed">
+              <input data-1p-ignore type="checkbox" checked={!!card.landscape} onChange={(e) => patch({ landscape: e.target.checked })} /> Horizontal card
             </label>
             <label>
               <input data-1p-ignore type="checkbox" checked={!!card.featured} onChange={(e) => patch({ featured: e.target.checked })} /> Featured (display case)

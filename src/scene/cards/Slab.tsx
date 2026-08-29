@@ -23,16 +23,19 @@ const shellMat = new THREE.MeshPhysicalMaterial({
 const edgeMat = new THREE.MeshPhysicalMaterial({ color: '#eef1f4', transparent: true, opacity: 0.32, roughness: 0.15 });
 const footMat = new THREE.MeshStandardMaterial({ color: '#e8eaee', roughness: 0.5 });
 
-/** The plastic holder + grading label. Sized SLAB_SIZE, card window centered. */
+/** The plastic holder + grading label. Sized SLAB_SIZE (or the wide horizontal holder), card window centered. */
 export function Slab({ card }: { card: Card }) {
   const labelTex = useMemo(() => makeSlabLabelTexture(card), [card]);
   const labelMat = useMemo(() => new THREE.MeshBasicMaterial({ map: labelTex }), [labelTex]);
 
-  const W = SLAB_SIZE.w;
-  const H = SLAB_SIZE.h;
+  // horizontal cards sit sideways in a wider holder; the label stays on top
+  const cardW = card.landscape ? CARD_SIZE.h : CARD_SIZE.w;
+  const cardH = card.landscape ? CARD_SIZE.w : CARD_SIZE.h;
+  const labelH = (SLAB_SIZE.h - CARD_SIZE.h) / 2 - 0.004; // same label band either way
+  const W = card.landscape ? cardW + (SLAB_SIZE.w - CARD_SIZE.w) : SLAB_SIZE.w;
+  const H = card.landscape ? cardH + 2 * (labelH + 0.004) : SLAB_SIZE.h;
   const T = SLAB_SIZE.t;
-  const labelH = (H - CARD_SIZE.h) / 2 - 0.004; // fills space above the card
-  const labelY = CARD_SIZE.h / 2 + 0.004 + labelH / 2;
+  const labelY = cardH / 2 + 0.004 + labelH / 2;
   const zFront = T / 2;
 
   return (
@@ -60,7 +63,7 @@ export function Slab({ card }: { card: Card }) {
         <planeGeometry args={[W - 0.006, labelH]} />
       </mesh>
       {/* white foot below the card */}
-      <mesh material={footMat} raycast={noRay} position={[0, -(CARD_SIZE.h / 2 + 0.004 + labelH / 2), zFront - 0.0006]}>
+      <mesh material={footMat} raycast={noRay} position={[0, -(cardH / 2 + 0.004 + labelH / 2), zFront - 0.0006]}>
         <planeGeometry args={[W - 0.006, labelH]} />
       </mesh>
     </group>

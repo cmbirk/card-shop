@@ -118,8 +118,12 @@ function toTexture(ctx: CanvasRenderingContext2D): THREE.CanvasTexture {
   return tex;
 }
 
-/** Paint a real scan over a canvas region once it loads (contain-fit on a dark mat). */
-function paintScan(url: string, ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, tex: THREE.Texture) {
+/**
+ * Paint a real scan over a canvas region once it loads (contain-fit on a dark mat).
+ * `turn` = ±1 rotates a landscape scan a quarter turn into the portrait cell (the mesh turns it
+ * back), so horizontal cards keep full resolution instead of letterboxing.
+ */
+function paintScan(url: string, ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, tex: THREE.Texture, turn = 0) {
   const img = new Image();
   // scans in Supabase Storage are cross-origin; without this the atlas canvas is tainted and
   // WebGL refuses to upload it (SecurityError on texSubImage2D) — every card in the atlas goes blank
@@ -128,10 +132,22 @@ function paintScan(url: string, ctx: CanvasRenderingContext2D, x: number, y: num
   img.onload = () => {
     ctx.fillStyle = '#181410';
     ctx.fillRect(x, y, w, h);
-    const s = Math.min(w / img.width, h / img.height);
-    const dw = img.width * s;
-    const dh = img.height * s;
-    ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    if (turn) {
+      // draw into a box of the cell's swapped size, rotated about the cell centre
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate((turn * Math.PI) / 2);
+      const s = Math.min(h / img.width, w / img.height);
+      const dw = img.width * s;
+      const dh = img.height * s;
+      ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+      ctx.restore();
+    } else {
+      const s = Math.min(w / img.width, h / img.height);
+      const dw = img.width * s;
+      const dh = img.height * s;
+      ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    }
     tex.needsUpdate = true;
   };
   img.src = url;
@@ -175,7 +191,7 @@ export function buildCardVisuals(): Map<string, CardVisual> {
     const cell = i % PER_ATLAS;
     const cx = (cell % COLS) * CELL_W;
     const cy = Math.floor(cell / COLS) * CELL_H;
-    paintScan(card.images.front, ctxs[a], cx, cy, CELL_W, CELL_H, atlasTextures[a]);
+    paintScan(card.images.front, ctxs[a], cx, cy, CELL_W, CELL_H, atlasTextures[a], card.landscape ? 1 : 0);
   });
 
   // shared per-sport backs
@@ -266,8 +282,9 @@ export function makeDetailMaterials(card: Card): {
   drawCardBack(bctx, card.sport, 0, 0, fw, fh, card);
   const frontTex = toTexture(fctx);
   const backTex = toTexture(bctx);
-  if (card.images?.front) paintScan(card.images.front, fctx, 0, 0, fw, fh, frontTex);
-  if (card.images?.back) paintScan(card.images.back, bctx, 0, 0, fw, fh, backTex);
+  // landscape: both faces turn the same way (verified on a real horizontal slab, front + back)
+  if (card.images?.front) paintScan(card.images.front, fctx, 0, 0, fw, fh, frontTex, card.landscape ? 1 : 0);
+  if (card.images?.back) paintScan(card.images.back, bctx, 0, 0, fw, fh, backTex, card.landscape ? 1 : 0);
   frontTex.anisotropy = 8;
   // refractors get the real treatment in hand: clearcoat + iridescence + a tilt-driven light sweep
   const front = isRefractor(card)

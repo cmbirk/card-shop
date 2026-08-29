@@ -60,6 +60,7 @@ export interface Card {
 
   // media
   foil?: boolean;
+  landscape?: boolean; // horizontal card: scan is wider than tall; renders sideways
   images?: { front: string; back?: string; extra?: string[] }; // real scans override procedural art
 
   // presentation / AI grounding

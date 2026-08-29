@@ -21,7 +21,8 @@ describe('shopkeeper inventory grounding', () => {
   });
 
   it('includes exact sticker prices', () => {
-    expect(text).toContain(`$${(cards[0].price / 100).toFixed(2)}`);
+    const forSale = cards.find((c) => c.status !== 'personal') ?? cards[0]; // personal cards carry no price
+    expect(text).toContain(`$${(forSale.price / 100).toFixed(2)}`);
   });
 
   it('is comfortably inside the prompt budget', () => {

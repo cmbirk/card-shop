@@ -57,6 +57,7 @@ export function CardMesh({ card, slot, onClickOverride }: { card: Card; slot: Sl
   return (
     <group ref={group} position={slot.position} rotation={slot.rotation} visible={!hidden}>
       <group ref={inner}>
+        <group rotation-z={card.landscape ? Math.PI / 2 : 0}>
         <mesh
           geometry={visual.frontGeometry}
           material={visual.frontMaterial}
@@ -84,6 +85,7 @@ export function CardMesh({ card, slot, onClickOverride }: { card: Card; slot: Sl
           position-z={-CARD_SIZE.t / 2}
           rotation-y={Math.PI}
         />
+        </group>
         {card.grade && <Slab card={card} />}
         {hovered && !hidden && (
           <Html position={[0, CARD_SIZE.h * 0.72, 0]} center distanceFactor={0.9} style={{ pointerEvents: 'none' }}>

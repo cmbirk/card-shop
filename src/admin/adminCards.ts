@@ -63,7 +63,8 @@ export async function uploadCardImage(file: File, cardId: string, side: 'front' 
 export function newCardId(sport: Card['sport'] = 'baseball'): string {
   const bytes = new Uint8Array(4);
   crypto.getRandomValues(bytes);
-  return `${sport.slice(0, 2)}-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
+  const prefix = sport === 'basketball' ? 'bk' : sport.slice(0, 2);
+  return `${prefix}-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
 /** A blank card scaffold for the "add" form. */
@@ -109,7 +110,7 @@ export function suggestId(c: Card): string {
 export const CSV_COLUMNS = [
   'id', 'sport', 'category', 'playerName', 'team', 'year', 'setName', 'cardNumber', 'brand', 'subset',
   'parallel', 'printRun', 'serialNumber', 'variation', 'rarity', 'isRookie', 'autograph', 'relic', 'isInsert',
-  'isError', 'foil', 'featured', 'gradeCompany', 'gradeValue', 'gradeLabel', 'certNumber', 'rawCondition',
+  'isError', 'foil', 'landscape', 'featured', 'gradeCompany', 'gradeValue', 'gradeLabel', 'certNumber', 'rawCondition',
   'price', 'status', 'quantity', 'costBasis', 'acquiredDate', 'acquiredFrom', 'imageFront', 'imageBack',
   'blurb', 'funFact', 'investmentNote', 'seed',
 ] as const;
@@ -233,6 +234,7 @@ function recordToCard(r: Record<string, unknown>): { card?: Card; errors: string
     acquiredDate: str(r.acquiredDate),
     acquiredFrom: str(r.acquiredFrom),
     foil: truthy(r.foil),
+    landscape: truthy(r.landscape),
     images,
     lore,
     featured: truthy(r.featured),
@@ -313,4 +315,4 @@ export function exportCsv(cards: Card[]): string {
 export const CSV_TEMPLATE =
   CSV_COLUMNS.join(',') +
   '\n' +
-  ',baseball,rookies,Jane Example,Harbor City Herons,2024,Pennant Craze,#12,Topps,,Base,,,,common,yes,none,none,no,no,no,no,,,,,NM-MT,4.99,available,1,1.50,2026-08-01,card show,,,"A sample rookie — replace me.",,,\n';
+  ',baseball,rookies,Jane Example,Harbor City Herons,2024,Pennant Craze,#12,Topps,,Base,,,,common,yes,none,none,no,no,no,no,no,,,,,NM-MT,4.99,available,1,1.50,2026-08-01,card show,,,"A sample rookie — replace me.",,,\n';

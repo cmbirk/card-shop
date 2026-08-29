@@ -46,8 +46,16 @@ async function decodeHeic(file: File): Promise<ImageBitmap> {
   throw new Error(`Couldn't decode this HEIC (${errors[0]}). Workaround: in Photos, File → Export → Export 1 Photo as JPEG, then drop that.`);
 }
 
-/** Any dropped image → a ≤1600px JPEG File. Throws a readable error for non-images. */
-export async function prepareScan(file: File, onStage?: (s: string) => void): Promise<File> {
+export interface PreparedScan {
+  file: File;
+  width: number;
+  height: number;
+  /** wider than tall → a horizontal card */
+  landscape: boolean;
+}
+
+/** Any dropped image → a ≤1600px JPEG File (+ its dimensions). Throws a readable error for non-images. */
+export async function prepareScan(file: File, onStage?: (s: string) => void): Promise<PreparedScan> {
   if (!file.type.startsWith('image/') && !isHeic(file)) throw new Error(`"${file.name}" isn't an image.`);
   let bitmap = await decodeNative(file);
   if (!bitmap && isHeic(file)) {
@@ -68,7 +76,7 @@ export async function prepareScan(file: File, onStage?: (s: string) => void): Pr
   const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/jpeg', QUALITY));
   if (!blob) throw new Error('JPEG encode failed.');
   const base = file.name.replace(/\.[^.]+$/, '') || 'scan';
-  return new File([blob], `${base}.jpg`, { type: 'image/jpeg' });
+  return { file: new File([blob], `${base}.jpg`, { type: 'image/jpeg' }), width: w, height: h, landscape: w > h * 1.05 };
 }
 
 /** Pull the first image file out of a drop/paste, incl. Photos.app drags (which arrive as items). */

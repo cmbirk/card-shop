@@ -87,7 +87,7 @@ function HeldCard({ id, index, setRef }: { id: string; index: number; setRef: (e
 
   return (
     <group ref={setRef} position={[x, y, 0]} rotation={[-Math.PI / 2, 0, rz]}>
-      <group ref={inner}>
+      <group ref={inner} rotation-z={card.landscape ? Math.PI / 2 : 0}>
         <mesh
           geometry={visual.frontGeometry}
           material={visual.frontMaterial}
