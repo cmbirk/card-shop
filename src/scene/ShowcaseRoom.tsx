@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { ANNEX, ANNEX_DOOR } from '@shared/data/shopLayout';
-import { showcase, type ShowcaseItem } from '@shared/data/showcase';
+import { showcase, ROOM_NAME, type ShowcaseItem } from '@shared/data/showcase';
 import { MAT, makeLabelMaterial } from './materials';
 import { Framed } from './WallArt';
 
-// The Colts Room's memorabilia: all primitives + canvas textures, no assets, no logos
-// (team colours, numbers and a plain horseshoe shape only — the marks are the NFL's).
+// The Collection's memorabilia (Colts-themed today): all primitives + canvas textures, no assets,
+// no logos (team colours, numbers and a plain horseshoe shape only — the marks are the NFL's).
 
 const BLUE = '#002C5F';
 const WHITE = '#f4f4f2';
@@ -178,14 +178,14 @@ function StadiumSeat({ item }: { item: ShowcaseItem }) {
 }
 
 /** Sign over the doorway (main-room side) + the room's memorabilia. */
-export function ColtsRoom() {
+export function ShowcaseRoom() {
   const mats = useMemo(
     () => ({
       j18: jerseyMaterial('18', true),
       j88: jerseyMaterial('88', false),
       pennants: new Map(showcase.filter((i) => i.kind === 'pennant').map((i) => [i.id, pennantMaterial(i.detail ?? '')])),
       tickets: ticketsMaterial((showcase.find((i) => i.kind === 'tickets')?.detail ?? '').split('|')),
-      doorSign: makeLabelMaterial('The Colts Room', { bg: BLUE, fg: WHITE, size: 44 }),
+      doorSign: makeLabelMaterial(ROOM_NAME, { bg: BLUE, fg: WHITE, size: 44 }),
       insideSign: makeLabelMaterial('Not for sale — ask Chris', { bg: '#efe6c8', fg: '#1a1a1a', size: 30 }),
     }),
     [],

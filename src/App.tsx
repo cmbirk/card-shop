@@ -48,6 +48,9 @@ export default function App() {
         dpr={[1, 2]}
         camera={{ fov: 55, near: 0.05, far: 50, position: [0, 1.6, 9.2] }}
         style={{ position: 'fixed', inset: 0 }}
+        onCreated={(st) => {
+          if (import.meta.env.DEV) (window as unknown as { __three?: unknown }).__three = st; // scene probe for verify.mjs `eval`
+        }}
       >
         <color attach="background" args={['#241a10']} />
         <fog attach="fog" args={['#241a10', 10, 24]} />

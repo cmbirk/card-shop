@@ -56,6 +56,7 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
   else if (cmd === 'adminFlag') await page.evaluate(() => window.__auth?.setState({ isAdmin: true }));
   else if (cmd === 'admin') await page.evaluate(() => { window.__auth?.setState({ isAdmin: true }); window.__ui?.getState().setAdminOpen(true); });
   else if (cmd === 'ask') await page.evaluate((id) => { window.__inspect?.getState().pickUp(id); const t = setInterval(() => { if (window.__inspect?.getState().mode === 'inspecting') { clearInterval(t); window.__dialogue?.getState().askAbout(id); } }, 100); }, a[0]);
+  else if (cmd === 'eval') console.log('EVAL', JSON.stringify(await page.evaluate(a.join(','))));
   else if (cmd === 'look') await page.evaluate(([x, y, z]) => { const c = window.__cam; if (!c) return; c.minAzimuthAngle = -Infinity; c.maxAzimuthAngle = Infinity; c.minPolarAngle = 0.05; c.maxPolarAngle = Math.PI - 0.05; return c.setLookAt(c.camera.position.x, c.camera.position.y, c.camera.position.z, Number(x), Number(y), Number(z), false); }, a);
   else if (cmd === 'wheel') await page.mouse.wheel(0, Number(a[0]));
   else if (cmd === 'riffle') await page.evaluate(([id, n]) => window.__bin?.getState().step(id, Number(n), 99), a);

@@ -62,7 +62,7 @@ export function pathToSpot(spot: readonly [number, number]): [number, number][] 
     [side, SHOPKEEPER_HOME[1]],
     [side, -2.4],
   ];
-  // the Colts Room is through the doorway on the west wall
+  // the Collection annex is through the doorway on the west wall
   if (spot[0] < ANNEX.xMax) path.push([ANNEX.xMax + 0.6, ANNEX_DOOR.z], [ANNEX.xMax - 0.6, ANNEX_DOOR.z]);
   path.push([spot[0], spot[1]]);
   return path;

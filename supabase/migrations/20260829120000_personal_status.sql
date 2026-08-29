@@ -1,4 +1,4 @@
--- cards.status gains 'personal': Chris's own collection, displayed in the Colts Room,
+-- cards.status gains 'personal': Chris's own collection, displayed in the Collection annex,
 -- never for sale. Rides the public view unchanged; the client hides price/basket for it.
 alter table public.cards drop constraint if exists cards_status_check;
 alter table public.cards

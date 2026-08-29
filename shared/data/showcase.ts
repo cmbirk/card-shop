@@ -1,5 +1,8 @@
-// Memorabilia in the Colts Room — data, so Chris (the AI) can talk about each piece
-// and the scene can lay them out. Positions are world metres inside ANNEX.
+// Memorabilia in the Collection (the showcase annex; Colts-themed today) — data, so Chris (the AI)
+// can talk about each piece and the scene can lay them out. Positions are world metres inside ANNEX.
+
+/** Display name of the showcase annex. Chris's personal, not-for-sale stuff. */
+export const ROOM_NAME = 'The Collection';
 
 export interface ShowcaseItem {
   id: string;

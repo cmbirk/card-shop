@@ -6,6 +6,7 @@ import { FEEL } from '../feel';
 import { useMayaStore } from '../stores/mayaStore';
 
 const MODEL_URL = '/models/maya.glb';
+const _euler = new THREE.Euler(0, 0, 0, 'YXZ');
 
 // Maya — a second staffer standing behind the Good Stuff display case. Idle
 // loop + lazy head-look toward the player. Same Meshy rig as Chris, so she
@@ -16,6 +17,7 @@ export function Maya() {
   const { scene, animations } = useGLTF(MODEL_URL);
   const { actions } = useAnimations(animations, group);
   const headBone = useRef<THREE.Bone | null>(null);
+  const headBind = useRef(new THREE.Quaternion());
   const look = useRef({ yaw: 0, pitch: 0 });
   const rot = useRef(new THREE.Quaternion());
   const line = useMayaStore((s) => s.line);
@@ -52,7 +54,10 @@ export function Maya() {
           s.needsUpdate = true;
         }
       }
-      if ((o as THREE.Bone).isBone && o.name === 'Head') headBone.current = o as THREE.Bone;
+      if ((o as THREE.Bone).isBone && o.name === 'Head') {
+        headBone.current = o as THREE.Bone;
+        headBind.current.copy(o.quaternion);
+      }
     });
   }, [scene]);
 
@@ -98,8 +103,9 @@ export function Maya() {
     const L = look.current;
     L.yaw = THREE.MathUtils.damp(L.yaw, THREE.MathUtils.clamp(yaw, -0.9, 0.9), FEEL.headLookLambda, dt);
     L.pitch = THREE.MathUtils.damp(L.pitch, THREE.MathUtils.clamp(pitch, -0.35, 0.35), FEEL.headLookLambda, dt);
-    rot.current.setFromEuler(new THREE.Euler(L.pitch, L.yaw, 0, 'YXZ'));
-    head.quaternion.multiply(rot.current);
+    _euler.set(L.pitch, L.yaw, 0);
+    rot.current.setFromEuler(_euler);
+    head.quaternion.copy(headBind.current).multiply(rot.current); // replace the clip's head pose, don't add to it
   });
 
   return (

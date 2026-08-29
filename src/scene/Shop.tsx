@@ -16,8 +16,8 @@ import { useInspectStore } from '../stores/inspectStore';
 import { Facade } from './Facade';
 import { WallArt } from './WallArt';
 import { BackOfficeDoor } from './BackOfficeDoor';
-import { ColtsRoom } from './ColtsRoom';
-import { ColtsDoor } from './ColtsDoor';
+import { ShowcaseRoom } from './ShowcaseRoom';
+import { ShowcaseDoor } from './ShowcaseDoor';
 
 function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false);
@@ -97,7 +97,7 @@ function DustMotes() {
   );
 }
 
-/** Main-room west wall with an opening for the Colts Room doorway (plus header + trim). */
+/** Main-room west wall with an opening for the Collection doorway (plus header + trim). */
 function WestWall() {
   const D = ROOM.depth;
   const H = ROOM.height;
@@ -131,7 +131,7 @@ function WestWall() {
   );
 }
 
-/** The Colts Room shell: floor, walls, ceiling, and a cool blue wash. Memorabilia lives in ColtsRoom.tsx. */
+/** The Collection annex shell: floor, walls, ceiling, and a cool blue wash. Memorabilia lives in ShowcaseRoom.tsx. */
 function AnnexShell() {
   // a SpotLight's target must be in the scene graph or it aims at the world origin
   const caseTarget = useMemo(() => new THREE.Object3D(), []);
@@ -253,7 +253,7 @@ export function Shop() {
       <mesh material={MAT.wall} position={[0, H / 2, -D / 2]}>
         <planeGeometry args={[W, H]} />
       </mesh>
-      {/* west wall, split around the Colts Room doorway */}
+      {/* west wall, split around the Collection doorway */}
       <WestWall />
       <mesh material={MAT.wall} position={[W / 2, H / 2, 0]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[D, H]} />
@@ -344,8 +344,8 @@ export function Shop() {
       </mesh>
 
       <AnnexShell />
-      <ColtsRoom />
-      <ColtsDoor />
+      <ShowcaseRoom />
+      <ShowcaseDoor />
       <CeilingFan />
       <DustMotes />
       <WallArt />
@@ -358,8 +358,8 @@ export function Shop() {
           {f.kind === 'displayCase' && (
             <DisplayCase
               cards={placed.get(f.id) ?? []}
-              title={f.id === 'case-colts' ? "Chris's Collection" : undefined}
-              glow={f.id === 'case-colts' ? '#cfe0ff' : undefined}
+              title={f.id === 'case-collection' ? "Chris's Collection" : undefined}
+              glow={f.id === 'case-collection' ? '#cfe0ff' : undefined}
             />
           )}
           {f.kind === 'bin' && <Bin fixtureId={f.id} cards={placed.get(f.id) ?? []} />}

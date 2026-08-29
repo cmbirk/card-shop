@@ -1,7 +1,7 @@
 // Relative imports only — keeps the Vercel function bundler happy without alias config.
 import { createClient } from '@supabase/supabase-js';
 import type { Card, InventoryFile } from '../../shared/types';
-import { showcase } from '../../shared/data/showcase.js';
+import { showcase, ROOM_NAME } from '../../shared/data/showcase.js';
 import { rowToCard, type CardRow } from '../../shared/cardMapping.js';
 import inventoryJson from '../../shared/data/inventory.json' with { type: 'json' };
 import realCardsJson from '../../shared/data/realCards.json' with { type: 'json' };
@@ -49,7 +49,7 @@ const SHELF_LABEL: Record<string, string> = {
 };
 
 function where(card: Card): string {
-  if (card.status === 'personal') return "the Colts Room (through the doorway left of the hockey shelf) — Chris's PERSONAL collection, NOT FOR SALE";
+  if (card.status === 'personal') return `${ROOM_NAME} (through the doorway left of the hockey shelf) — Chris's PERSONAL collection, NOT FOR SALE`;
   if (card.featured) return 'the glass display case (near the counter)';
   if (card.category.startsWith('budget-box')) return 'the bargain bins (middle of the shop)';
   return SHELF_LABEL[card.sport];
@@ -80,6 +80,6 @@ export function buildInventoryContext(cards: Card[]): string {
   for (const [loc, group] of groups) {
     sections.push(`## In ${loc}:\n${group.map(cardLine).join('\n')}`);
   }
-  sections.push(`## Also in the Colts Room (memorabilia, not for sale):\n${showcase.map((i) => `- ${i.name}: ${i.blurb}`).join('\n')}`);
+  sections.push(`## Also in ${ROOM_NAME} (memorabilia, not for sale):\n${showcase.map((i) => `- ${i.name}: ${i.blurb}`).join('\n')}`);
   return sections.join('\n\n');
 }

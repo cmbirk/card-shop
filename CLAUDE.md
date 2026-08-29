@@ -21,8 +21,9 @@ src/
   stores/          zustand: nav, basket, inspect, dialogue, ui, auth
   systems/         inventory (live Supabase read + bundled fallback), placement, rng, sfx
   scene/           Shop, Facade, StationController (glide nav), fixtures/, cards/, Shopkeeper (Chris),
-                   Maya, Basket, BackOfficeDoor (STAFF ONLY → admin panel), ColtsRoom + ColtsDoor
-                   (annex off the west wall; ANNEX/ANNEX_DOOR in shopLayout), materials/pbr
+                   Maya, Basket, BackOfficeDoor (STAFF ONLY → admin panel), ShowcaseRoom + ShowcaseDoor
+                   ("The Collection" annex off the west wall; ANNEX/ANNEX_DOOR in shopLayout;
+                   display name = ROOM_NAME in shared/data/showcase.ts), materials/pbr
   admin/           adminCards.ts — Supabase CRUD + scan upload under the admin JWT
   ui/              DOM overlays: chat, basket, inspect, checkout, sign-in, AdminPanel (back office)
 ```
@@ -48,7 +49,7 @@ src/
 - **Cards are data; positions are derived.** `placement.ts` maps inventory → shelf slots; never
   store 3D positions on a card. `shared/data/shopLayout.ts` is the scene source of truth.
 - **`status: 'personal'` = not for sale.** Only a fixture with `accepts.status` takes them
-  (`case-colts`); `InspectHud`/`inspectStore` hide price + basket; grounding lists them without a
+  (`case-collection`); `InspectHud`/`inspectStore` hide price + basket; grounding lists them without a
   price. Memorabilia is data too (`shared/data/showcase.ts`) so Chris can talk about it.
 - **Two rooms: glides route through `ANNEX_DOORWAY`** (`StationController.waypoints`) and Chris's
   walk path goes through the door (`pathToSpot`). A station's "room" is `position.x < ANNEX.xMax`.

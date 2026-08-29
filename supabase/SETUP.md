@@ -72,7 +72,7 @@ Note: a Google user and a magic-link user with the same email are the **same** S
 (identities are linked by verified email), so the admins row works either way.
 
 ## 4c. Personal (not-for-sale) cards
-`status = 'personal'` marks a card as Chris's own — it shows in the Colts Room case, can be
+`status = 'personal'` marks a card as Chris's own — it shows in the Collection (showcase annex) case, can be
 inspected but not bought, and Chris will talk about it but never price it. Set it from the admin
 panel's Status dropdown. The check constraint in `20260829120000_personal_status.sql` limits
 `status` to available / reserved / sold / personal.

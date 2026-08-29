@@ -102,8 +102,8 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
 - **Refractors flash when you tilt them.** Foils and non-base parallels get a clearcoat/iridescent
   material in hand plus a light band that sweeps across the face as you tilt (with a shimmer sound);
   shelf cards keep the cheap foil shader.
-- **The Colts Room.** A small annex through a doorway beside the hockey shelf (next to the
-  back-office door): Chris's personal Indianapolis Colts collection in its own case — cards with
+- **The Collection.** A small annex through a doorway beside the hockey shelf (next to the
+  back-office door): Chris's personal collection (Indianapolis Colts today) in its own case — cards with
   `status: 'personal'` that you can pick up and inspect but never buy — plus memorabilia (framed
   #18/#88 jerseys, pennants, ticket stubs, a signed ball on a plinth, a salvaged stadium seat), all
   procedural primitives, no team marks. Chris knows every piece (`shared/data/showcase.ts` rides
@@ -125,7 +125,7 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
 ## Roadmap
 
 Next: an actual back room behind the STAFF ONLY door (desk computer that opens the panel
-in-world); a Meshy helmet + your own photos for the Colts Room. Then: Stripe checkout, first-person WASD (the nav rig is already a swappable
+in-world); a Meshy helmet + your own photos for the Collection. Then: Stripe checkout, first-person WASD (the nav rig is already a swappable
 component), pack-ripping, and richer Chris. See the plan doc for detail.
 
 - **Branded Google sign-in.** The consent screen currently says "Sign in to

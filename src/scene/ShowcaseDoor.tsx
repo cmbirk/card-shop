@@ -4,10 +4,10 @@ import { ANNEX, ANNEX_DOOR } from '@shared/data/shopLayout';
 import { useNavStore } from '../stores/navStore';
 
 /**
- * The open doorway into the Colts Room. Click it from the shop to walk up to it;
+ * The open doorway into the Collection (the showcase annex). Click it from the shop to walk up to it;
  * click again from the threshold to step inside. Invisible plane filling the opening.
  */
-export function ColtsDoor() {
+export function ShowcaseDoor() {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
   const ok = () => {
@@ -22,7 +22,7 @@ export function ColtsDoor() {
           e.stopPropagation();
           setHovered(false);
           const nav = useNavStore.getState();
-          nav.goTo(nav.currentStation === 'colts-door' ? 'colts-case' : nav.currentStation === 'colts-case' ? 'colts-door' : 'colts-door');
+          nav.goTo(nav.currentStation === 'collection-door' ? 'collection-case' : nav.currentStation === 'collection-case' ? 'collection-door' : 'collection-door');
         }}
         onPointerOver={(e) => {
           if (!ok()) return;

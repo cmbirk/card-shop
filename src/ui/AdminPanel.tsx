@@ -12,7 +12,7 @@ import { listAllCards, saveCard, deleteCard, uploadCardImage, blankCard, suggest
 // itself from non-admins.
 
 const SPORTS: Card['sport'][] = ['baseball', 'basketball', 'football', 'hockey', 'tcg'];
-const CATEGORIES = ['rookies', 'vintage', 'stars', 'graded-slabs', 'budget-box', 'budget-box-b', 'colts-room'];
+const CATEGORIES = ['rookies', 'vintage', 'stars', 'graded-slabs', 'budget-box', 'budget-box-b', 'collection'];
 const RARITIES: Card['rarity'][] = ['common', 'rare', 'premium', 'graded'];
 const AUTOGRAPHS: NonNullable<Card['autograph']>[] = ['none', 'on-card', 'sticker'];
 const RELICS: NonNullable<Card['relic']>[] = ['none', 'jersey', 'patch', 'multi-patch', 'bat', 'other'];

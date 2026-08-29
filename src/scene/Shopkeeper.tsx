@@ -51,6 +51,7 @@ export function Shopkeeper() {
   const current = useRef<THREE.AnimationAction | null>(null);
   const oneShot = useRef<THREE.AnimationAction | null>(null);
   const headBone = useRef<THREE.Bone | null>(null);
+  const headBind = useRef(new THREE.Quaternion()); // the rig's neutral head pose (level, facing forward)
   const headRest = useRef(new THREE.Quaternion());
   const look = useRef({ yaw: 0, pitch: 0 });
 
@@ -96,7 +97,10 @@ export function Shopkeeper() {
           s.needsUpdate = true;
         }
       }
-      if ((o as THREE.Bone).isBone && o.name === 'Head') headBone.current = o as THREE.Bone;
+      if ((o as THREE.Bone).isBone && o.name === 'Head') {
+        headBone.current = o as THREE.Bone;
+        headBind.current.copy(o.quaternion); // captured before the mixer ever writes it
+      }
     });
   }, [scene]);
 
@@ -211,10 +215,12 @@ export function Shopkeeper() {
     r.rotation.y = yaw.current;
   });
 
-  // lazy head look-at, layered on top of the animation (runs after the mixer's frame update)
+  // lazy head look-at. The clips move the head too (the wave looks at the ceiling), so the look
+  // REPLACES the animated head pose (bind pose + look) — except during the nod, which is head-driven.
   useFrame((state, dt) => {
     const head = headBone.current;
     if (!head) return;
+    const nodding = oneShot.current !== null && useDialogueStore.getState().gesture === 'nod';
     const cam = state.camera.position;
     const r = root.current;
     const dx = cam.x - r.position.x;
@@ -235,6 +241,7 @@ export function Shopkeeper() {
     // additive: the mixer has already written this frame's pose into head.quaternion
     _euler.set(L.pitch, L.yaw, 0);
     headRest.current.setFromEuler(_euler);
+    if (!nodding) head.quaternion.copy(headBind.current);
     head.quaternion.multiply(headRest.current);
   });
 
