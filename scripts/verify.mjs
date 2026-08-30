@@ -50,6 +50,8 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
   else if (cmd === 'click') await page.mouse.click(Number(a[0]), Number(a[1]));
   else if (cmd === 'dblclick') await page.mouse.dblclick(Number(a[0]), Number(a[1]));
   else if (cmd === 'move') await page.mouse.move(Number(a[0]), Number(a[1]));
+  else if (cmd === 'keydown') await page.keyboard.down(a[0]);
+  else if (cmd === 'keyup') await page.keyboard.up(a[0]);
   else if (cmd === 'key') await page.keyboard.press(a[0]);
   else if (cmd === 'clickText') await page.getByText(a.join(','), { exact: false }).first().click();
   else if (cmd === 'basket') await page.evaluate((ids) => ids.forEach((id) => window.__basket?.getState().add(id)), a);

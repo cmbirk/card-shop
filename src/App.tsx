@@ -5,6 +5,7 @@ import { AdaptiveDpr } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { Shop } from './scene/Shop';
 import { StationController } from './scene/StationController';
+import { WalkController } from './scene/WalkController';
 import { Waypoints } from './scene/Waypoints';
 import { Shopkeeper } from './scene/Shopkeeper';
 import { Maya } from './scene/Maya';
@@ -67,6 +68,7 @@ export default function App() {
         <CardInHand />
         <Waypoints />
         <StationController />
+        <WalkController />
         <AdaptiveDpr pixelated />
         <EffectComposer>
           <Bloom luminanceThreshold={0.95} intensity={0.35} mipmapBlur />

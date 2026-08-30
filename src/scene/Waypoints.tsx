@@ -15,7 +15,7 @@ function WaypointDisc({ station }: { station: Station }) {
   const mode = useNavStore((s) => s.mode);
   const dialogueOpen = useDialogueStore((s) => s.isOpen);
 
-  const visible = mode === 'station' && !dialogueOpen && station.id !== current && current !== 'outside';
+  const visible = (mode === 'station' || mode === 'freewalk') && !dialogueOpen && station.id !== current && current !== 'outside';
 
   useFrame((state, dt) => {
     if (!ref.current) return;

@@ -25,7 +25,9 @@ const REST = { position: [0, 0, 0] as [number, number, number], rotation: [0, 0,
 /** Can the customer thumb through bins right now? (parked at the bins, nothing in hand) */
 function canRiffle(): boolean {
   const nav = useNavStore.getState();
-  return nav.mode === 'station' && nav.currentStation === 'bins' && useInspectStore.getState().mode === 'idle';
+  if (useInspectStore.getState().mode !== 'idle') return false;
+  if (nav.mode === 'station') return nav.currentStation === 'bins';
+  return nav.mode === 'freewalk' && nav.currentStation === 'bins'; // nearest-station tracking keeps this honest
 }
 
 /**

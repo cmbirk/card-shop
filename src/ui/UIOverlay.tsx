@@ -93,7 +93,7 @@ export function UIOverlay() {
               ? 'Your picks are on the counter · click one to put it back · talk to Chris to check out'
               : station === 'bins'
               ? 'Scroll over a bin to thumb through it · click the card that\'s up to pick it up'
-              : 'Click a glowing spot to walk over · click a card to pick it up · scroll to lean back'}
+              : 'Click a glowing spot — or just walk with WASD/arrows · click a card to pick it up · scroll to lean back'}
         </p>
       </div>
       {SOFT_OPENING && <div className="soft-open-ribbon">Opening soon · browse away, nothing's for sale yet</div>}

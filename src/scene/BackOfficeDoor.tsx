@@ -50,7 +50,7 @@ export function BackOfficeDoor() {
         dlg.say("Ah — that's the back office, staff only I'm afraid. Nothing but boxes and a very old computer back there anyway.");
       }}
       onPointerOver={(e) => {
-        if (useNavStore.getState().currentStation === 'outside') return;
+        if (useNavStore.getState().currentStation === 'outside') return; // (freewalk clicks fall through to goTo below)
         e.stopPropagation();
         setHovered(true);
       }}

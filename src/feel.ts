@@ -1,6 +1,13 @@
 // Every game-feel constant lives here — tune the whole shop from one file.
 
 export const FEEL = {
+  // freewalk (WASD/arrows)
+  walkSpeed: 1.9, // m/s
+  walkAccelLambda: 9, // damp toward the input velocity
+  walkEyeHeight: 1.6,
+  walkLookX: 0.0075, // drag-to-look sensitivity, rad/px
+  walkLookY: 0.0062,
+
   // camera
   zoomOutRange: 3.5, // how far you can lean back from a station, metres (wall-clamped)
   zoomOutSpeed: 0.0028, // dolly metres per wheel px

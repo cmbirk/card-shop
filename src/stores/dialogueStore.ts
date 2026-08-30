@@ -7,6 +7,7 @@ import { useInspectStore } from './inspectStore';
 import { useNavStore } from './navStore';
 import { useShopkeeperStore } from './shopkeeperStore';
 import { bubbleHoldSeconds } from '../feel';
+import { walkPose } from '../scene/WalkController';
 import { useAuthStore } from './authStore';
 import { useUIStore } from './uiStore';
 import { SOFT_OPENING, SHOP_NAME } from '@shared/launch';
@@ -122,7 +123,21 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
       useInspectStore.getState().mode === 'inspecting' &&
       useNavStore.getState().currentStation === station;
 
-    const dest = station === 'counter' ? null : greetSpot(station);
+    const dest =
+      walkPose.active
+        ? (() => {
+            // stand ~1.8 m off the walker's right shoulder, facing them
+            const rx = -Math.cos(walkPose.yaw);
+            const rz = Math.sin(walkPose.yaw);
+            const spot: [number, number] = [walkPose.x + rx * 1.6 - Math.sin(walkPose.yaw) * 0.8, walkPose.z + rz * 1.6 - Math.cos(walkPose.yaw) * 0.8];
+            const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+            spot[0] = clamp(spot[0], -ROOM.width / 2 + 0.5, ROOM.width / 2 - 0.5);
+            spot[1] = clamp(spot[1], -ROOM.depth / 2 + 0.5, ROOM.depth / 2 - 0.5);
+            return { spot, facing: Math.atan2(walkPose.x - spot[0], walkPose.z - spot[1]) };
+          })()
+        : station === 'counter'
+          ? null
+          : greetSpot(station);
     if (dest) {
       keeper.visit(dest.spot, dest.facing);
       const arrived = await new Promise<boolean>((resolve) => {

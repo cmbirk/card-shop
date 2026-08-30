@@ -11,6 +11,8 @@ interface NavState {
   goTo: (id: string) => void;
   arrived: (id: string) => void;
   setMode: (mode: NavMode) => void;
+  /** Freewalk only: keep currentStation pointing at wherever the walker is nearest (context stays honest). */
+  setCurrentSilently: (id: string) => void;
 }
 
 export const useNavStore = create<NavState>((set, get) => ({
@@ -26,4 +28,5 @@ export const useNavStore = create<NavState>((set, get) => ({
   },
   arrived: (id) => set({ currentStation: id, targetStation: null, mode: 'station' }),
   setMode: (mode) => set({ mode }),
+  setCurrentSilently: (id) => set({ currentStation: id }),
 }));
