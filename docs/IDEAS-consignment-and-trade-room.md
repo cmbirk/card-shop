@@ -82,6 +82,22 @@ per-user storage quotas + a report button.
 **Smallest fun version:** trade Stage 1 with just friends' binders, honor-system shipping, and
 Chris's fairness comment.
 
+## Queued: persistent test admin for authenticated headless verification
+Decision 2026-08-30, not started. API-level testing already works (service-role session minting +
+throwaway users for RLS suites — keep that pattern), but headless UI verification can't render
+authenticated surfaces (admin panel/Users/Ximilar/seller panels show empty without a JWT), and API
+tests currently impersonate the real owner account.
+
+Plan when picked up (~20 min):
+- Create `chris+tlc-test@crossroadscx.com` (password auth), row in `admins`, credentials in
+  gitignored `.env.local` as `TEST_ADMIN_EMAIL` / `TEST_ADMIN_PASSWORD`; visibly named so it's
+  recognizable in the Users tab.
+- `verify.mjs` gains a `signin` action: mint a magic-link `action_link` via the service role and
+  navigate Playwright to it → real session in the page → screenshots with real data.
+- Keep throwaway users for RLS tests (fresh users prove the fences from a cold start).
+- Trade-off accepted for this stage: a standing privileged account in the prod DB. Revisit at
+  launch — delete it or move testing to a Supabase branch/local stack (`supabase/SETUP.md`).
+
 ## Other queued work
 - Ximilar "show Chris a card" (customer photographs their own card → identification → Chris talks
   about it). Requires a Ximilar Business plan; built against the documented API when green-lit.
