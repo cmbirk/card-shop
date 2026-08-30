@@ -110,6 +110,11 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   goes out on its sport shelf with a blue consignment dot on the sleeve ("that one's Maya's"), and when it sells the Stripe webhook
   writes an owed payout at their split — settled manually and marked paid in the ledger. RLS + a
   guard trigger keep sellers away from price/status/lore. Spec: `docs/SPEC-consignment.md`.
+- **Show Chris a card.** Photograph a card you own (📷 in the chat) and Chris appraises it:
+  Ximilar identifies it server-side (thresholds calibrated against real scans; JWT-gated +
+  rate-limited so anonymous visitors can't burn credits), recent-sale stats give him a hedged
+  ballpark, and every bad photo is Chris squinting in character ("hold her steady a sec"), with
+  cheap local blur/exposure gates running before a credit is ever spent.
 - **Hold pile, not a basket.** Cards you want fly to a pile on the counter — Chris holds them up
   front — with a small HUD chip; at the counter, click a pile card to put it back, then check out.
 - **Sign-in: Google or email magic link.** Both resolve to one Supabase user per email.

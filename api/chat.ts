@@ -31,7 +31,8 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const str = (v: unknown) => (typeof v === 'string' && v.length <= 64 ? v : undefined);
-  const context = body.context ? { station: str(body.context.station), holding: str(body.context.holding) } : undefined;
+  const strLong = (v: unknown) => (typeof v === 'string' && v.length <= 500 ? v : undefined);
+  const context = body.context ? { station: str(body.context.station), holding: str(body.context.holding), identified: strLong(body.context.identified) } : undefined;
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {

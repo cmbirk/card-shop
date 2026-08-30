@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useDialogueStore } from '../stores/dialogueStore';
 import { SHOP_NAME } from '@shared/launch';
 import { useAuthStore } from '../stores/authStore';
+import { ShowChrisCard } from './ShowChrisCard';
 import { useBasketStore } from '../stores/basketStore';
 import { useUIStore } from '../stores/uiStore';
 
@@ -47,6 +48,7 @@ export function ChatWindow() {
         </button>
       )}
       <div className="chat-chips">
+        <ShowChrisCard />
         {chips.map((c) => (
           <button key={c} className="chip" disabled={isStreaming} onClick={() => submit(c)}>
             {c}

@@ -129,5 +129,5 @@ export interface ChatRequest {
   messages: ChatMessage[];
   basket: string[]; // card ids
   /** Situational context (rides the user turn, never the cached system prompt). */
-  context?: { station?: string; holding?: string };
+  context?: { station?: string; holding?: string; identified?: string };
 }

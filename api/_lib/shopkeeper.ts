@@ -47,6 +47,11 @@ function situationContext(ctx: ChatRequest['context'] | undefined, cardsById: Ma
       `is holding up [${card.id}] ${card.playerName}, ${card.year} ${card.setName} ${card.cardNumber} (${cond}, ${priceStr(card.price)}) and wants your take on it — you walked over to them, so talk about THIS card`,
     );
   }
+  if (ctx.identified) {
+    parts.push(
+      `is showing you a photo of a card THEY OWN (not shop stock). Identification: ${ctx.identified}. Appraise it like a shopkeeper with a loupe: what it is, what to look for on that card, and — only if sale stats are included — a hedged ballpark ("cards like that have been going for around…"). Never quote a firm price for a card you haven't held`,
+    );
+  }
   return parts.length ? `[${parts.join(' and ')}.]` : '';
 }
 

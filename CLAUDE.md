@@ -49,6 +49,9 @@ src/
   count as available), and `/api/stripe-webhook` verifies the signature over `req.text()` — never
   `req.json()` first. New env vars must be added to the surfaced list in `vite.config.ts` AND
   guarded (`if (env[k])`) — assigning `undefined` to `process.env` stores the string "undefined".
+- **Ximilar (/api/identify):** thresholds are empirical (match ≤0.45, ambiguous ≤0.65; blurry →
+  best_match null; garbage → their HTTP 500) — recalibrate before changing. Photo gates run
+  client-side first; identified summaries ride `context.identified` on the user turn.
 - **Prompt-cache stability:** the shopkeeper system prompt must be byte-stable across a conversation,
   so the Supabase grounding read is `ORDER BY id` and volatile basket context rides the user turn.
 

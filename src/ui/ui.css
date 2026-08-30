@@ -1129,3 +1129,8 @@
   color: #4d8bff;
   font-size: 11px;
 }
+
+.chip.show-chris {
+  border-color: var(--gold);
+  color: var(--gold);
+}
