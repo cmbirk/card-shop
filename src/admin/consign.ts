@@ -113,6 +113,16 @@ export function notifyConsign(cardId: string, event: string): void {
   }).catch(() => undefined);
 }
 
+/** "You've got the keys" email for a freshly promoted admin. */
+export function notifyAdminInvited(userId: string): void {
+  const token = useAuthStore.getState().session?.access_token;
+  void fetch('/api/consign-notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify({ event: 'admin_invited', userId }),
+  }).catch(() => undefined);
+}
+
 /** Welcome email with next steps for a freshly invited seller (admin fires it after the toggle). */
 export function notifySellerInvited(userId: string): void {
   const token = useAuthStore.getState().session?.access_token;

@@ -28,6 +28,28 @@ export async function POST(req: Request): Promise<Response> {
   }
   const db = serviceClient();
 
+  // 'admin_invited' is card-less: tell a freshly promoted admin they have the keys
+  if (body.event === 'admin_invited' && body.userId) {
+    const { data: callerAdmin } = await db.from('admins').select('user_id').eq('user_id', auth.userId).maybeSingle();
+    if (!callerAdmin) return json({ ok: true, sent: false });
+    const { data: target } = await db.from('admins').select('user_id').eq('user_id', body.userId).maybeSingle();
+    if (!target) return json({ ok: true, sent: false });
+    const { data: prof } = await db.from('profiles').select('email, display_name').eq('id', body.userId).maybeSingle();
+    const email = (prof as { email: string | null } | null)?.email;
+    if (!email) return json({ ok: true, sent: false });
+    const first = String((prof as { display_name: string | null } | null)?.display_name ?? 'there').split(' ')[0];
+    const sent = await sendEmail(
+      email,
+      `You've got the keys to ${SHOP_NAME}`,
+      `Hey ${first} — Chris made you an admin at ${SHOP_NAME}.
+
+Next time you're in the shop (https://${SHOP_DOMAIN}), the STAFF ONLY door by the counter will open for you — the computer on the desk inside runs the Back Office: inventory (add/edit cards, scans, bulk import/export), consignment reviews and payouts, and the visitor list. Reload the page once if the door doesn't recognise you right away.
+
+House rule: the register's webhook owns "sold" — never mark cards sold by hand.`,
+    );
+    return json({ ok: true, sent });
+  }
+
   // 'invited' is card-less: welcome a newly toggled seller with the next steps (admin-only,
   // and only if the sellers row actually exists — a forged call can't invent an invite)
   if (body.event === 'invited' && body.userId) {

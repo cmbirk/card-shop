@@ -1105,3 +1105,11 @@
   box-sizing: border-box;
   margin-top: 4px;
 }
+
+.invite-confirm {
+  position: fixed;
+  z-index: 30; /* above the full-screen admin panel */
+}
+.invite-confirm .modal h2 {
+  font-size: 18px;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { listUsers, setAdmin, setSeller, setSellerSplit, type Visitor } from '../../admin/adminUsers';
-import { notifySellerInvited } from '../../admin/consign';
+import { notifySellerInvited, notifyAdminInvited } from '../../admin/consign';
 import { useAuthStore } from '../../stores/authStore';
 
 const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -39,19 +39,44 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
       setBusy(null);
     }
   };
-  const toggle = (u: Visitor) => run(u.id, () => setAdmin(u.id, !u.isAdmin));
-  const toggleSeller = (u: Visitor) => {
-    // display name is what Chris says out loud + what customers see — never an email local-part
-    let name: string | undefined;
-    if (!u.isSeller) {
-      const guess = (u.displayName ?? '').includes('@') ? '' : (u.displayName ?? '').split(' ')[0];
-      const answer = window.prompt('Consignor display name (what Chris calls them in the shop):', guess);
-      if (answer === null) return;
-      name = answer.trim() || undefined;
+  const [promoting, setPromoting] = useState<Visitor | null>(null);
+  const toggle = (u: Visitor) => {
+    if (u.isAdmin) {
+      void run(u.id, () => setAdmin(u.id, false)); // demotion: instant (self-demotion already refused)
+      return;
     }
+    setPromoting(u); // promotion is a big deal — confirm, and tell them it emails
+  };
+  const confirmPromote = () => {
+    const u = promoting;
+    if (!u) return;
+    setPromoting(null);
     void run(u.id, async () => {
-      await setSeller(u.id, !u.isSeller, u.splitPct ?? 85, name);
-      if (!u.isSeller) notifySellerInvited(u.id); // welcome email with next steps
+      await setAdmin(u.id, true);
+      notifyAdminInvited(u.id);
+    });
+  };
+  const toggleSeller = (u: Visitor) => {
+    if (u.isSeller) {
+      void run(u.id, () => setSeller(u.id, false)); // retiring sends nothing
+      return;
+    }
+    // inviting opens a confirm modal (it sends a welcome email)
+    const guess = (u.displayName ?? '').includes('@') ? '' : (u.displayName ?? '').split(' ')[0];
+    setInviting(u);
+    setInviteName(guess);
+    setInviteSplit(u.splitPct ?? 85);
+  };
+  const [inviting, setInviting] = useState<Visitor | null>(null);
+  const [inviteName, setInviteName] = useState('');
+  const [inviteSplit, setInviteSplit] = useState(85);
+  const confirmInvite = () => {
+    const u = inviting;
+    if (!u) return;
+    setInviting(null);
+    void run(u.id, async () => {
+      await setSeller(u.id, true, inviteSplit, inviteName.trim() || undefined);
+      notifySellerInvited(u.id); // the welcome email the modal promised
     });
   };
   const changeSplit = (u: Visitor, pct: number) => {
@@ -139,6 +164,61 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
           </tbody>
         </table>
       </div>
+
+      {promoting && (
+        <div className="modal-backdrop invite-confirm">
+          <div className="modal">
+            <h2>Make {promoting.displayName ?? promoting.email ?? 'this visitor'} an admin?</h2>
+            <p className="admin-help">
+              Admins get the whole Back Office: inventory (add/edit/delete every card, prices, cost basis), bulk import/export, consignment
+              reviews and payouts, and this Users list — including promoting others.
+            </p>
+            <p className="admin-help">
+              📬 This sends <b>{promoting.email ?? 'them'}</b> an email letting them know they have the keys.
+            </p>
+            <div className="modal-actions">
+              <button className="btn secondary" onClick={() => setPromoting(null)}>
+                Not yet
+              </button>
+              <button className="btn" onClick={confirmPromote}>
+                Make admin & send email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {inviting && (
+        <div className="modal-backdrop invite-confirm">
+          <div className="modal">
+            <h2>Invite {inviting.displayName ?? inviting.email ?? 'this visitor'} to sell?</h2>
+            <div className="admin-form" style={{ overflow: 'visible' }}>
+              <div className="grid">
+                <label>
+                  Display name <span className="admin-only">what Chris calls them</span>
+                  <input data-1p-ignore value={inviteName} autoFocus onChange={(e) => setInviteName(e.target.value)} placeholder="e.g. Maya" />
+                </label>
+                <label>
+                  Their cut %
+                  <input data-1p-ignore type="number" min={0} max={100} value={inviteSplit} onChange={(e) => setInviteSplit(Math.max(0, Math.min(100, Math.round(Number(e.target.value) || 0))))} />
+                </label>
+              </div>
+            </div>
+            <p className="admin-help" style={{ marginTop: 10 }}>
+              📬 This sends <b>{inviting.email ?? 'them'}</b> a welcome email right away — how consigning works, that they keep{' '}
+              <b>{inviteSplit}%</b> of each sale, and where to start. Make sure you're ready for their submissions.
+            </p>
+            <div className="modal-actions">
+              <button className="btn secondary" onClick={() => setInviting(null)}>
+                Not yet
+              </button>
+              <button className="btn" onClick={confirmInvite}>
+                Invite & send email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
