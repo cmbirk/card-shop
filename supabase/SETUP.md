@@ -91,6 +91,14 @@ panel's Status dropdown. The check constraint in `20260829120000_personal_status
 `whsec_localdev_…` value works for synthetic signed events. Migration `20260830100000_orders.sql`
 adds `orders`, `reserve_cards()` / `release_order()`. Test card: 4242 4242 4242 4242.
 
+## 4f. Consignment (invite-only sellers)
+Flip a visitor's **Seller** toggle in Back Office → Users. Migration
+`20260830120000_consignment.sql` adds `sellers`, consignment columns + the
+`cards_consignor_guard` trigger, `payouts`, and the `consign/{uid}/` storage policy. Emails need
+`RESEND_API_KEY`, `ADMIN_EMAIL`, `CONSIGN_SHIP_ADDRESS` (and a verified domain in Resend to mail
+sellers; until then Resend only delivers to your own account email). Test-mode sales create
+greyed "dry run" payout rows — no real obligations while SOFT_OPENING.
+
 ## 5. Seed + generate types
 ```
 ! npm run db:seed             # migrate the 120 bundled cards into the DB

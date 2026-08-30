@@ -68,6 +68,10 @@ src/
 - **Scans go through `prepareScan()`** (`src/admin/imagePrep.ts`): HEIC → JPEG (native decode, else
   `heic2any` WASM lazy-loaded — it's a 1.3 MB chunk, keep it dynamic) and ≤1600px re-encode before
   Storage. Drop zones accept Photos.app drags (`fileFromDataTransfer` checks `items` too).
+- **Consignment writes are fenced by `cards_consignor_guard`** (trigger) + seller RLS: sellers
+  only touch their own rows and never price/status/lore; the webhook is the only payout writer.
+  Consignor names ride grounding deterministically (never break byte-stability). Seller UI =
+  `ConsignPanel` (overlay), Chris's side = the admin Consign tab.
 - **`profiles` is trigger-maintained** (auth.users insert / last_sign_in_at update); the client never
   writes it. Admin membership = `admins` rows; `setAdmin` refuses self-demotion.
 - **Card art is procedural, real scans override.** `card.images.front` paints over the atlas cell;

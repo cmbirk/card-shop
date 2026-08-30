@@ -100,6 +100,12 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   cards atomically, opens hosted Stripe Checkout priced from the database, and the webhook is the
   only thing that marks cards sold; orders are snapshotted in an `orders` table for the receipt
   (stamped TEST while `test_mode`). Cancelling or letting the session expire puts the cards back.
+- **Consignment (Stage 1, invite-only).** Flip a visitor's Seller toggle in Users and they get a
+  "My consignments" panel: submit cards with scans + an asking price; Chris reviews in the Consign
+  tab (approve = set the sticker price + lore → they ship it in → mark received → List), the card
+  sits in the On Consignment case ("that one's Maya's"), and when it sells the Stripe webhook
+  writes an owed payout at their split — settled manually and marked paid in the ledger. RLS + a
+  guard trigger keep sellers away from price/status/lore. Spec: `docs/SPEC-consignment.md`.
 - **Hold pile, not a basket.** Cards you want fly to a pile on the counter — Chris holds them up
   front — with a small HUD chip; at the counter, click a pile card to put it back, then check out.
 - **Sign-in: Google or email magic link.** Both resolve to one Supabase user per email.
