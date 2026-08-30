@@ -110,6 +110,14 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   goes out on its sport shelf with a blue consignment dot on the sleeve ("that one's Maya's"), and when it sells the Stripe webhook
   writes an owed payout at their split — settled manually and marked paid in the ledger. RLS + a
   guard trigger keep sellers away from price/status/lore. Spec: `docs/SPEC-consignment.md`.
+- **Ximilar enrichment (admin).** "Check with Ximilar" on any card with a real scan: identify it
+  straight from the stored scan URL, per-field "use selected" diffs (fills the form, saving stays
+  yours), sale-stat context with a deliberate "use median as price", an alternatives picker for
+  uncertain matches, and a mismatch klaxon when Ximilar disagrees on the player (finds mislabeled
+  inventory). Bulk "🔍 Ximilar check" on selected rows with a credit estimate, pacing under the
+  rate limit, a 30-day cache (`cards.ximilar`, never public) and a mismatch report. Ximilar
+  returns no card imagery, so image adoption is out by design — a scan-quality "reshoot" nudge
+  via their grading endpoint is the someday-slice.
 - **Show Chris a card.** Photograph a card you own (📷 in the chat) and Chris appraises it:
   Ximilar identifies it server-side (thresholds calibrated against real scans; JWT-gated +
   rate-limited so anonymous visitors can't burn credits), recent-sale stats give him a hedged

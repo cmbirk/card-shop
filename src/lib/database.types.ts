@@ -101,6 +101,7 @@ export type Database = {
           team: string
           updated_at: string
           variation: string | null
+          ximilar: Json | null
           year: number
         }
         Insert: {
@@ -149,6 +150,7 @@ export type Database = {
           team?: string
           updated_at?: string
           variation?: string | null
+          ximilar?: Json | null
           year?: number
         }
         Update: {
@@ -197,6 +199,7 @@ export type Database = {
           team?: string
           updated_at?: string
           variation?: string | null
+          ximilar?: Json | null
           year?: number
         }
         Relationships: []

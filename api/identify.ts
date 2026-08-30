@@ -13,7 +13,7 @@ const hits = new Map<string, number[]>();
 
 export interface Identified {
   outcome: 'match' | 'ambiguous' | 'unidentified' | 'unclear' | 'too_far' | 'not_a_card';
-  card?: { fullName: string; name?: string; year?: number; setName?: string; cardNumber?: string; team?: string; subcategory?: string };
+  card?: { fullName: string; name?: string; year?: number; setName?: string; cardNumber?: string; team?: string; subcategory?: string; rarity?: string; company?: string; ebay?: string };
   alternatives?: string[];
   price?: { median: number; min: number; max: number; volume: number; kind: string } | null;
   distance?: number;
@@ -42,21 +42,25 @@ export async function POST(req: Request): Promise<Response> {
   mine.push(now);
   hits.set(auth.userId, mine);
 
-  let image: string;
+  let image = '';
+  let url = '';
   try {
-    const body = (await req.json()) as { image?: string };
+    const body = (await req.json()) as { image?: string; url?: string };
     image = String(body.image ?? '').replace(/^data:image\/\w+;base64,/, '');
+    url = String(body.url ?? '');
   } catch {
     return json({ error: 'bad request' }, 400);
   }
-  if (!image || image.length > 6_000_000) return json({ error: 'image missing or too large' }, 400);
+  // enrichment runs straight from a stored Supabase scan URL — no re-upload
+  if (url && !/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\//.test(url)) return json({ error: 'only shop scan urls' }, 400);
+  if (!url && (!image || image.length > 6_000_000)) return json({ error: 'image missing or too large' }, 400);
 
   let res: Response;
   try {
     res = await fetch('https://api.ximilar.com/collectibles/v2/analyze', {
       method: 'POST',
       headers: { Authorization: `Token ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records: [{ _base64: image }], price_stats: true }),
+      body: JSON.stringify({ records: [url ? { _url: url } : { _base64: image }], price_stats: true }),
     });
   } catch (e) {
     console.error('[identify]', e);
@@ -72,7 +76,7 @@ export async function POST(req: Request): Promise<Response> {
   if ((cardObj.area ?? 1) < 0.1) return json({ result: { outcome: 'too_far' } satisfies Identified });
 
   const ident = cardObj._identification;
-  const best = ident?.best_match as { full_name?: string; name?: string; year?: number | string; set_name?: string; card_number?: string; team?: string; subcategory?: string; price_stats?: { stats_type: string; value?: { median?: number; min?: number; max?: number; volume?: number } }[] } | null | undefined;
+  const best = ident?.best_match as { full_name?: string; name?: string; year?: number | string; set_name?: string; set?: string; card_number?: string; team?: string; subcategory?: string; rarity?: string; company?: string; links?: Record<string, string>; price_stats?: { stats_type: string; value?: { median?: number; min?: number; max?: number; volume?: number } }[] } | null | undefined;
   const d = ident?.distances?.[0];
   if (!best || d == null) return json({ result: { outcome: 'unidentified' } satisfies Identified });
 
@@ -83,10 +87,13 @@ export async function POST(req: Request): Promise<Response> {
     fullName: best.full_name ?? best.name ?? 'unknown card',
     name: best.name,
     year: typeof best.year === 'string' ? parseInt(best.year, 10) : best.year,
-    setName: best.set_name,
+    setName: best.set_name ?? best.set,
     cardNumber: best.card_number,
     team: best.team,
     subcategory: best.subcategory,
+    rarity: best.rarity,
+    company: best.company,
+    ebay: best.links?.['ebay.com'],
   };
   console.log(`[identify] user=${auth.userId.slice(0, 8)} d=${d.toFixed(3)} "${card.fullName}"`);
   if (d <= 0.45) return json({ result: { outcome: 'match', card, price, distance: d } satisfies Identified });

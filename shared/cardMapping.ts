@@ -40,6 +40,7 @@ export interface CardRow {
   asking_price?: number | null;
   consign_note?: string | null;
   is_consigned?: boolean; // view only
+  ximilar?: unknown; // admin base-table reads only
   consignor_display?: string | null; // view only
   image_front: string | null;
   image_back: string | null;
@@ -93,6 +94,7 @@ export function rowToCard(r: CardRow): Card {
     askingPrice: r.asking_price ?? undefined,
     consignNote: r.consign_note ?? undefined,
     isConsigned: r.is_consigned ?? !!r.consignor_id,
+    ...(r.ximilar !== undefined && r.ximilar !== null ? { ximilar: r.ximilar } : {}),
     consignorDisplay: r.consignor_display ?? undefined,
     images,
     lore: r.lore ?? { blurb: '' },

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Card, GradeCompany, RawCondition } from '@shared/types';
 import { saveCard, deleteCard, uploadCardImage, newCardId } from '../../admin/adminCards';
 import { prepareScan, fileFromDataTransfer } from '../../admin/imagePrep';
+import { XimilarPanel } from './XimilarPanel';
 import { saveConsignment, uploadConsignScan } from '../../admin/consign';
 
 const SPORTS: Card['sport'][] = ['baseball', 'basketball', 'football', 'hockey', 'tcg'];
@@ -423,6 +424,8 @@ export function CardForm({ initial, isNew, mode = 'admin', onCancel, onSaved, on
           })}
         </div>
       </fieldset>
+
+      {!seller && <XimilarPanel card={card} onPatch={(fn) => setCard(fn)} onError={onError} />}
 
       {!seller && (
       <fieldset>

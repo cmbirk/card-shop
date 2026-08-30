@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { Card } from '@shared/types';
 import { formatCents } from '../../stores/basketStore';
 import { deleteCards, blankCard, exportCsv } from '../../admin/adminCards';
+import { checkWithXimilar, cardEligible, isMismatch } from '../../admin/enrich';
 import { CardForm } from './CardForm';
 
 interface Props {
@@ -18,6 +19,7 @@ export function InventoryTab({ cards, loading, onChanged, onError }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirm, setConfirm] = useState('');
   const [busy, setBusy] = useState(false);
+  const [enrich, setEnrich] = useState<{ running: boolean; done: number; total: number; matched: number; mismatches: string[]; skipped: number } | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -52,6 +54,38 @@ export function InventoryTab({ cards, loading, onChanged, onError }: Props) {
     } finally {
       setBusy(false);
     }
+  };
+
+  // bulk "Check with Ximilar": paced under the server's 5/min limit, cache-aware, procedural/
+  // personal cards skipped. Mismatches (Ximilar disagrees on the player) surface as a report.
+  const bulkEnrich = async () => {
+    const chosen = cards.filter((c) => selected.has(c.id));
+    const eligible = chosen.filter((c) => cardEligible(c) && c.status !== 'personal');
+    const skipped = chosen.length - eligible.length;
+    if (eligible.length === 0) {
+      onError('None of the selected cards have real scans to check.');
+      return;
+    }
+    if (!window.confirm(`Check ${eligible.length} card${eligible.length === 1 ? '' : 's'} with Ximilar (≈ ${eligible.length * 10} credits, ~${Math.ceil((eligible.length * 13) / 60)} min)?${skipped ? ` ${skipped} skipped (no scan / personal).` : ''}`)) return;
+    setEnrich({ running: true, done: 0, total: eligible.length, matched: 0, mismatches: [], skipped });
+    for (let i = 0; i < eligible.length; i++) {
+      const c = eligible[i];
+      try {
+        const check = await checkWithXimilar(c);
+        setEnrich((s) => s && {
+          ...s,
+          done: i + 1,
+          matched: s.matched + (check.result.outcome === 'match' && !isMismatch(c, check) ? 1 : 0),
+          mismatches: isMismatch(c, check) ? [...s.mismatches, `${c.playerName} → Ximilar says ${check.result.card?.fullName}`] : s.mismatches,
+        });
+      } catch (e) {
+        onError((e as Error).message);
+        setEnrich((s) => s && { ...s, done: i + 1 });
+      }
+      if (i < eligible.length - 1) await new Promise((r) => setTimeout(r, 13_000)); // 5/min server limit
+    }
+    setEnrich((s) => s && { ...s, running: false });
+    await onChanged();
   };
 
   const download = () => {
@@ -105,6 +139,9 @@ export function InventoryTab({ cards, loading, onChanged, onError }: Props) {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
+          <button className="btn secondary" disabled={busy || enrich?.running} onClick={() => void bulkEnrich()} title="Identify the selected cards' scans against Ximilar">
+            🔍 Ximilar check
+          </button>
           <button className="btn danger" disabled={busy || confirm.trim() !== String(selected.size)} onClick={() => void removeSelected()}>
             Delete {selected.size}
           </button>
@@ -114,6 +151,24 @@ export function InventoryTab({ cards, loading, onChanged, onError }: Props) {
         </div>
       )}
 
+      {enrich && (
+        <div className="admin-bulk" style={{ borderColor: 'var(--gold)', background: 'rgba(255,217,122,0.08)' }}>
+          <span>
+            {enrich.running ? `Checking ${enrich.done}/${enrich.total}…` : `Done: ${enrich.done} checked`} · {enrich.matched} matched
+            {enrich.skipped > 0 && ` · ${enrich.skipped} skipped`}
+            {enrich.mismatches.length > 0 && (
+              <>
+                {' '}· <b style={{ color: 'var(--red)' }}>{enrich.mismatches.length} mismatched:</b> {enrich.mismatches.join(' · ')}
+              </>
+            )}
+          </span>
+          {!enrich.running && (
+            <button className="btn secondary" onClick={() => setEnrich(null)}>
+              ✕
+            </button>
+          )}
+        </div>
+      )}
       <div className="admin-table-wrap">
         <table className="admin-table">
           <thead>

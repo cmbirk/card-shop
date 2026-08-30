@@ -1134,3 +1134,20 @@
   border-color: var(--gold);
   color: var(--gold);
 }
+
+/* ---- ximilar enrichment ---- */
+.ximilar-panel {
+  border: 1px solid #2b4a7a !important;
+}
+.ximilar-panel legend { color: #9fc1ff !important; }
+.ximilar-mismatch {
+  background: rgba(166, 61, 64, 0.15);
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin: 8px 0;
+}
+.ximilar-diff .dim-cell { opacity: 0.55; }
+.ximilar-alts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.ximilar-alts .chip.active { background: var(--green); }

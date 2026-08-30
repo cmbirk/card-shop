@@ -68,6 +68,7 @@ export interface Card {
   askingPrice?: number; // the seller's proposed price, integer cents — never public
   consignNote?: string; // Chris's reject/return note
   isConsigned?: boolean; // from cards_public
+  ximilar?: unknown; // ADMIN-ONLY: cached Ximilar identification (cards.ximilar jsonb, never public)
   consignorDisplay?: string; // first name, from cards_public — what Chris says out loud
 
   // media
