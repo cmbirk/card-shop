@@ -45,19 +45,6 @@ export const shopLayout: ShopLayout = {
       label: "Chris's Collection — Not for Sale",
     },
     {
-      // On Consignment case: cards sold on behalf of invited sellers. Sits against the
-      // north wall east of the counter; placed BEFORE the shelves so it claims consigned
-      // cards first (overflow falls through to the sport shelves).
-      id: 'case-consign',
-      kind: 'displayCase',
-      position: [2.6, 0, -3.55],
-      rotationY: 0,
-      accepts: { consigned: true },
-      slots: { rows: 2, cols: 5, spacing: [0.28, 0.25] },
-      stationId: 'consign',
-      label: 'On Consignment',
-    },
-    {
       id: 'shelf-hockey',
       kind: 'shelf',
       position: [-4.6, 0, -1.5],
@@ -239,15 +226,7 @@ export const shopLayout: ShopLayout = {
       target: [3.2, 0.88, -2.2],
       yawRange: 1.15,
       pitchRange: 0.45,
-      neighbors: ['shelf-tcg', 'counter', 'bins', 'consign'],
-    },
-    {
-      id: 'consign',
-      position: [2.6, 1.5, -2.45],
-      target: [2.6, 0.9, -3.55],
-      yawRange: 1.0,
-      pitchRange: 0.45,
-      neighbors: ['case', 'counter', 'shelf-tcg'],
+      neighbors: ['shelf-tcg', 'counter', 'bins'],
     },
     {
       id: 'counter',
@@ -255,7 +234,7 @@ export const shopLayout: ShopLayout = {
       target: [0, 1.3, -3.6],
       yawRange: 1.1,
       pitchRange: 0.35,
-      neighbors: ['bins', 'case', 'shelf-hockey', 'collection-door', 'office-door', 'consign'],
+      neighbors: ['bins', 'case', 'shelf-hockey', 'collection-door', 'office-door'],
     },
   ],
 };

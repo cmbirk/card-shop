@@ -107,7 +107,7 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   Or flip a visitor's Seller toggle in Users and they get a
   "My consignments" panel: submit cards with scans + an asking price; Chris reviews in the Consign
   tab (approve = set the sticker price + lore → they ship it in → mark received → List), the card
-  sits in the On Consignment case ("that one's Maya's"), and when it sells the Stripe webhook
+  goes out on its sport shelf with a blue consignment dot on the sleeve ("that one's Maya's"), and when it sells the Stripe webhook
   writes an owed payout at their split — settled manually and marked paid in the ledger. RLS + a
   guard trigger keep sellers away from price/status/lore. Spec: `docs/SPEC-consignment.md`.
 - **Hold pile, not a basket.** Cards you want fly to a pile on the counter — Chris holds them up

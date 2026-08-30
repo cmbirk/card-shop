@@ -141,7 +141,7 @@ While you're in there, add your return address (bottom of the panel) so cards ca
       break;
     case 'listed':
       subject = `Your ${c.player_name} is on the shelf at ${SHOP_NAME}`;
-      text = `${name} is now in the On Consignment case at ${dollars(c.price)}.\n\nCome visit it: https://${SHOP_DOMAIN}`;
+      text = `${name} is out on the shelf at ${dollars(c.price)} — look for the little blue consignment dot on the sleeve.\n\nCome visit it: https://${SHOP_DOMAIN}`;
       break;
     case 'paid':
       subject = `${SHOP_NAME} paid out your ${c.player_name}`;

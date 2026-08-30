@@ -13,7 +13,7 @@ interface Props {
 const SECTIONS: { status: ConsignStatus; title: string; hint: string }[] = [
   { status: 'submitted', title: 'Waiting for review', hint: 'Approve sets the sticker price; the seller then ships it to you.' },
   { status: 'approved', title: 'In the mail to you', hint: 'Mark received when the card is in hand and matches the scans.' },
-  { status: 'received', title: 'In hand — not yet out', hint: 'List puts it in the On Consignment case.' },
+  { status: 'received', title: 'In hand — not yet out', hint: 'List puts it on its sport shelf, blue-dotted as a consignment.' },
   { status: 'listed', title: 'On the floor', hint: '' },
   { status: 'withdraw_requested', title: 'Return requested', hint: 'Confirm once you have shipped the card back.' },
   { status: 'rejected', title: 'Rejected', hint: '' },
@@ -184,7 +184,7 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
                     <button
                       className="btn"
                       disabled={busy === c.id || c.price <= 0}
-                      title={c.price <= 0 ? 'Set a price first (Review)' : 'Put it in the On Consignment case'}
+                      title={c.price <= 0 ? 'Set a price first (Review)' : 'Put it out on the shelf'}
                       onClick={() => void act(c.id, () => adminSetConsignStatus(c.id, 'listed'), 'listed')}
                     >
                       List it

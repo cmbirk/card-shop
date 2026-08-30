@@ -65,7 +65,6 @@ const SHELF_LABEL: Record<string, string> = {
 };
 
 function where(card: Card): string {
-  if (card.isConsigned && !card.featured) return 'the On Consignment case (north wall, east of the counter) — cards you sell on behalf of local consignors';
   if (card.status === 'personal') return `${ROOM_NAME} (through the doorway left of the hockey shelf) — Chris's PERSONAL collection, NOT FOR SALE`;
   if (card.featured) return 'the glass display case (near the counter)';
   if (card.category.startsWith('budget-box')) return 'the bargain bins (middle of the shop)';

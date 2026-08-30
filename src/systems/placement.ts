@@ -21,7 +21,8 @@ function matches(card: Card, fixture: Fixture): boolean {
   // personal (not-for-sale) cards only ever go in a fixture that asks for them
   if (a.status) return card.status === a.status;
   if (card.status === 'personal') return false;
-  // the consignment case claims consigned cards first (fixture order); overflow may land on sport shelves
+  // consigned cards mix into regular stock (marked by a sleeve dot); accepts.consigned is kept
+  // in the schema for a possible seasonal "fresh consignments" fixture later
   if (a.consigned) return !!card.isConsigned && card.status === 'available';
   // reserved (someone's at the register with it) and sold cards leave the floor
   if (card.status === 'reserved' || card.status === 'sold') return false;

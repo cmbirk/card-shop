@@ -1124,3 +1124,8 @@
   margin-bottom: 12px;
   line-height: 1.4;
 }
+
+.price-chip-consign {
+  color: #4d8bff;
+  font-size: 11px;
+}

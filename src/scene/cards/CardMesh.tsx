@@ -51,7 +51,7 @@ export function CardMesh({ card, slot, onClickOverride }: { card: Card; slot: Sl
 
   const canInteract = () => {
     const nav = useNavStore.getState();
-    return nav.mode === 'station' && !useDialogueStore.getState().isOpen;
+    return (nav.mode === 'station' || nav.mode === 'freewalk') && !useDialogueStore.getState().isOpen;
   };
 
   return (
@@ -92,6 +92,7 @@ export function CardMesh({ card, slot, onClickOverride }: { card: Card; slot: Sl
             <div className="price-chip">
               <span className="price-chip-name">{card.playerName}</span>
               <span className="price-chip-price">{formatCents(card.price)}</span>
+              {card.consignorDisplay && <span className="price-chip-consign">● {card.consignorDisplay}'s</span>}
             </div>
           </Html>
         )}
