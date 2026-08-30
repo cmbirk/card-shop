@@ -58,10 +58,14 @@ export type Database = {
         Row: {
           acquired_date: string | null
           acquired_from: string | null
+          asking_price: number | null
           autograph: string
           brand: string | null
           card_number: string
           category: string
+          consign_note: string | null
+          consign_status: string | null
+          consignor_id: string | null
           cost_basis: number | null
           created_at: string
           featured: boolean
@@ -102,10 +106,14 @@ export type Database = {
         Insert: {
           acquired_date?: string | null
           acquired_from?: string | null
+          asking_price?: number | null
           autograph?: string
           brand?: string | null
           card_number?: string
           category: string
+          consign_note?: string | null
+          consign_status?: string | null
+          consignor_id?: string | null
           cost_basis?: number | null
           created_at?: string
           featured?: boolean
@@ -146,10 +154,14 @@ export type Database = {
         Update: {
           acquired_date?: string | null
           acquired_from?: string | null
+          asking_price?: number | null
           autograph?: string
           brand?: string | null
           card_number?: string
           category?: string
+          consign_note?: string | null
+          consign_status?: string | null
+          consignor_id?: string | null
           cost_basis?: number | null
           created_at?: string
           featured?: boolean
@@ -228,6 +240,57 @@ export type Database = {
         }
         Relationships: []
       }
+      payouts: {
+        Row: {
+          amount: number
+          card_id: string
+          created_at: string
+          id: string
+          method: string | null
+          order_id: string
+          paid_at: string | null
+          reference: string | null
+          sale_price: number
+          seller_handle: string | null
+          seller_id: string | null
+          split_pct: number
+          status: string
+          test_mode: boolean
+        }
+        Insert: {
+          amount: number
+          card_id: string
+          created_at?: string
+          id?: string
+          method?: string | null
+          order_id: string
+          paid_at?: string | null
+          reference?: string | null
+          sale_price: number
+          seller_handle?: string | null
+          seller_id?: string | null
+          split_pct: number
+          status?: string
+          test_mode: boolean
+        }
+        Update: {
+          amount?: number
+          card_id?: string
+          created_at?: string
+          id?: string
+          method?: string | null
+          order_id?: string
+          paid_at?: string | null
+          reference?: string | null
+          sale_price?: number
+          seller_handle?: string | null
+          seller_id?: string | null
+          split_pct?: number
+          status?: string
+          test_mode?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -261,6 +324,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sellers: {
+        Row: {
+          created_at: string
+          invited_by: string | null
+          payout_handle: string | null
+          payout_method: string | null
+          split_pct: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          invited_by?: string | null
+          payout_handle?: string | null
+          payout_method?: string | null
+          split_pct?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          invited_by?: string | null
+          payout_handle?: string | null
+          payout_method?: string | null
+          split_pct?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       cards_public: {
@@ -269,6 +359,7 @@ export type Database = {
           brand: string | null
           card_number: string | null
           category: string | null
+          consignor_display: string | null
           created_at: string | null
           featured: boolean | null
           foil: boolean | null
@@ -278,6 +369,7 @@ export type Database = {
           image_back: string | null
           image_extra: string[] | null
           image_front: string | null
+          is_consigned: boolean | null
           is_error: boolean | null
           is_insert: boolean | null
           is_rookie: boolean | null
@@ -308,6 +400,7 @@ export type Database = {
           brand?: string | null
           card_number?: string | null
           category?: string | null
+          consignor_display?: never
           created_at?: string | null
           featured?: boolean | null
           foil?: boolean | null
@@ -317,6 +410,7 @@ export type Database = {
           image_back?: string | null
           image_extra?: string[] | null
           image_front?: string | null
+          is_consigned?: never
           is_error?: boolean | null
           is_insert?: boolean | null
           is_rookie?: boolean | null
@@ -335,7 +429,7 @@ export type Database = {
           serial_number?: number | null
           set_name?: string | null
           sport?: string | null
-          status?: string | null
+          status?: never
           subset?: string | null
           team?: string | null
           updated_at?: string | null
@@ -347,6 +441,7 @@ export type Database = {
           brand?: string | null
           card_number?: string | null
           category?: string | null
+          consignor_display?: never
           created_at?: string | null
           featured?: boolean | null
           foil?: boolean | null
@@ -356,6 +451,7 @@ export type Database = {
           image_back?: string | null
           image_extra?: string[] | null
           image_front?: string | null
+          is_consigned?: never
           is_error?: boolean | null
           is_insert?: boolean | null
           is_rookie?: boolean | null
@@ -374,7 +470,7 @@ export type Database = {
           serial_number?: number | null
           set_name?: string | null
           sport?: string | null
-          status?: string | null
+          status?: never
           subset?: string | null
           team?: string | null
           updated_at?: string | null
@@ -386,6 +482,7 @@ export type Database = {
     }
     Functions: {
       is_admin: { Args: { uid: string }; Returns: boolean }
+      is_seller: { Args: { uid: string }; Returns: boolean }
       release_order: { Args: { order_id: string }; Returns: undefined }
       reserve_cards: {
         Args: { ids: string[]; order_id: string; ttl: string }

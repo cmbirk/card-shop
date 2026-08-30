@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listUsers, setAdmin, type Visitor } from '../../admin/adminUsers';
+import { listUsers, setAdmin, setSeller, setSellerSplit, type Visitor } from '../../admin/adminUsers';
 import { useAuthStore } from '../../stores/authStore';
 
 const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -26,17 +26,23 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const toggle = async (u: Visitor) => {
-    setBusy(u.id);
+  const run = async (id: string, fn: () => Promise<void>) => {
+    setBusy(id);
     onError(null);
     try {
-      await setAdmin(u.id, !u.isAdmin);
+      await fn();
       await refresh();
     } catch (e) {
       onError((e as Error).message);
     } finally {
       setBusy(null);
     }
+  };
+  const toggle = (u: Visitor) => run(u.id, () => setAdmin(u.id, !u.isAdmin));
+  const toggleSeller = (u: Visitor) => run(u.id, () => setSeller(u.id, !u.isSeller, u.splitPct ?? 85));
+  const changeSplit = (u: Visitor, pct: number) => {
+    if (!Number.isFinite(pct) || pct < 0 || pct > 100) return;
+    void run(u.id, () => setSellerSplit(u.id, Math.round(pct)));
   };
 
   return (
@@ -58,6 +64,7 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
               <th>First visit</th>
               <th>Last visit</th>
               <th className="num">Visits</th>
+              <th>Seller</th>
               <th>Admin</th>
             </tr>
           </thead>
@@ -81,6 +88,26 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
                 <td>{when(u.lastSeen)}</td>
                 <td className="num">{u.visits}</td>
                 <td>
+                  <label className="admin-switch" title={u.isSeller ? 'Consignment seller — click to retire' : 'Invite as a consignment seller'}>
+                    <input type="checkbox" checked={u.isSeller} disabled={busy === u.id} onChange={() => void toggleSeller(u)} />
+                    <span>{u.isSeller ? 'Seller' : '—'}</span>
+                  </label>
+                  {u.isSeller && (
+                    <span className="admin-split" title="The seller's cut of each sale">
+                      keeps{' '}
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        defaultValue={u.splitPct ?? 85}
+                        disabled={busy === u.id}
+                        onBlur={(e) => changeSplit(u, Number(e.target.value))}
+                      />
+                      %
+                    </span>
+                  )}
+                </td>
+                <td>
                   <label className="admin-switch" title={u.id === me ? "You can't remove your own admin access" : u.isAdmin ? 'Remove admin' : 'Make admin'}>
                     <input type="checkbox" checked={u.isAdmin} disabled={busy === u.id || u.id === me} onChange={() => void toggle(u)} />
                     <span>{u.isAdmin ? 'Admin' : 'Customer'}</span>
@@ -90,7 +117,7 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
             ))}
             {!loading && users.length === 0 && (
               <tr>
-                <td colSpan={6} className="admin-empty">
+                <td colSpan={7} className="admin-empty">
                   Nobody has signed the guestbook yet.
                 </td>
               </tr>

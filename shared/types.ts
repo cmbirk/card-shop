@@ -5,6 +5,10 @@ export type Rarity = 'common' | 'rare' | 'premium' | 'graded';
 export type GradeCompany = 'PSA' | 'BGS' | 'TAG' | 'SGC' | 'CGC';
 export type AutographKind = 'none' | 'on-card' | 'sticker';
 export type RelicKind = 'none' | 'jersey' | 'patch' | 'multi-patch' | 'bat' | 'other';
+export type ConsignStatus =
+  | 'submitted' | 'approved' | 'rejected' | 'received' | 'listed' | 'sold' | 'paid'
+  | 'withdraw_requested' | 'withdrawn';
+
 export type CardStatus = 'available' | 'reserved' | 'sold' | 'personal'; // personal = Chris's own collection, not for sale
 export type RawCondition = 'NM-MT' | 'NM' | 'EX-MT' | 'EX' | 'VG-EX' | 'VG' | 'GOOD' | 'POOR';
 
@@ -57,6 +61,14 @@ export interface Card {
   costBasis?: number; // ADMIN-ONLY, integer cents — never selected into the public client
   acquiredDate?: string; // ADMIN-ONLY, ISO date
   acquiredFrom?: string; // ADMIN-ONLY
+
+  // consignment (Stage 1: invite-only friends; see docs/SPEC-consignment.md)
+  consignorId?: string; // auth user id of the consignor (base-table reads only)
+  consignStatus?: ConsignStatus;
+  askingPrice?: number; // the seller's proposed price, integer cents — never public
+  consignNote?: string; // Chris's reject/return note
+  isConsigned?: boolean; // from cards_public
+  consignorDisplay?: string; // first name, from cards_public — what Chris says out loud
 
   // media
   foil?: boolean;

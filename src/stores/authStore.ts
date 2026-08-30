@@ -6,6 +6,7 @@ interface AuthState {
   session: Session | null;
   user: User | null;
   isAdmin: boolean;
+  isSeller: boolean; // consignment: has a row in `sellers`
   firstVisit: boolean; // profile says visits === 1 (or no profile yet)
   ready: boolean; // initial session check finished
   magicSent: boolean; // magic-link email dispatched
@@ -28,10 +29,17 @@ async function checkAdmin(userId: string | undefined): Promise<boolean> {
   return !!data;
 }
 
+async function checkSeller(userId: string | undefined): Promise<boolean> {
+  if (!supabase || !userId) return false;
+  const { data } = await supabase.from('sellers').select('user_id').eq('user_id', userId).maybeSingle();
+  return !!data;
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   user: null,
   isAdmin: false,
+  isSeller: false,
   firstVisit: true,
   // When Supabase isn't configured (local dev before setup), treat as "ready"
   // and let the app run ungated so nothing is bricked.
@@ -43,13 +51,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (!supabase) return;
     supabase.auth.getSession().then(async ({ data }) => {
       const session = data.session;
-      set({ session, user: session?.user ?? null, isAdmin: await checkAdmin(session?.user?.id), firstVisit: await checkFirstVisit(session?.user?.id), ready: true });
+      set({ session, user: session?.user ?? null, isAdmin: await checkAdmin(session?.user?.id), isSeller: await checkSeller(session?.user?.id), firstVisit: await checkFirstVisit(session?.user?.id), ready: true });
     });
     supabase.auth.onAuthStateChange(async (_event, session) => {
       set({
         session,
         user: session?.user ?? null,
         isAdmin: await checkAdmin(session?.user?.id),
+        isSeller: await checkSeller(session?.user?.id),
         firstVisit: await checkFirstVisit(session?.user?.id),
         ready: true,
         magicSent: false,
@@ -80,7 +89,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signOut: async () => {
     await supabase?.auth.signOut();
-    set({ session: null, user: null, isAdmin: false, magicSent: false });
+    set({ session: null, user: null, isAdmin: false, isSeller: false, magicSent: false });
   },
 }));
 

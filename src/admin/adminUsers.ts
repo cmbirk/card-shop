@@ -6,6 +6,8 @@ import { useAuthStore } from '../stores/authStore';
 
 export interface Visitor {
   id: string;
+  isSeller: boolean;
+  splitPct: number | null;
   email: string | null;
   displayName: string | null;
   avatarUrl: string | null;
@@ -18,13 +20,16 @@ export interface Visitor {
 
 export async function listUsers(): Promise<Visitor[]> {
   if (!supabase) return [];
-  const [{ data: profiles, error }, { data: admins, error: aErr }] = await Promise.all([
+  const [{ data: profiles, error }, { data: admins, error: aErr }, { data: sellers, error: sErr }] = await Promise.all([
     supabase.from('profiles').select('*').order('last_seen', { ascending: false }),
     supabase.from('admins').select('user_id'),
+    supabase.from('sellers').select('user_id, split_pct'),
   ]);
   if (error) throw error;
   if (aErr) throw aErr;
+  if (sErr) throw sErr;
   const adminIds = new Set((admins ?? []).map((a) => a.user_id as string));
+  const sellerSplit = new Map((sellers ?? []).map((s) => [s.user_id as string, s.split_pct as number]));
   type Row = { id: string; email: string | null; display_name: string | null; avatar_url: string | null; provider: string | null; first_seen: string; last_seen: string; visits: number };
   return ((profiles ?? []) as Row[]).map((p) => ({
     id: p.id,
@@ -36,6 +41,8 @@ export async function listUsers(): Promise<Visitor[]> {
     lastSeen: p.last_seen,
     visits: p.visits,
     isAdmin: adminIds.has(p.id),
+    isSeller: sellerSplit.has(p.id),
+    splitPct: sellerSplit.get(p.id) ?? null,
   }));
 }
 
@@ -47,5 +54,20 @@ export async function setAdmin(userId: string, on: boolean): Promise<void> {
   const { error } = on
     ? await supabase.from('admins').insert({ user_id: userId } as never)
     : await supabase.from('admins').delete().eq('user_id', userId);
+  if (error) throw error;
+}
+
+/** Invite (or retire) a consignment seller. The split is the SELLER'S keep, in percent. */
+export async function setSeller(userId: string, on: boolean, splitPct = 85): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured');
+  const { error } = on
+    ? await supabase.from('sellers').upsert({ user_id: userId, split_pct: splitPct, invited_by: useAuthStore.getState().user?.id } as never, { onConflict: 'user_id' })
+    : await supabase.from('sellers').delete().eq('user_id', userId);
+  if (error) throw error;
+}
+
+export async function setSellerSplit(userId: string, splitPct: number): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured');
+  const { error } = await supabase.from('sellers').update({ split_pct: splitPct } as never).eq('user_id', userId);
   if (error) throw error;
 }

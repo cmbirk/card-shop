@@ -1,4 +1,4 @@
-import type { Card, Grade } from './types';
+import type { Card, ConsignStatus, Grade } from './types';
 
 // Maps between the Postgres `cards` row (snake_case) and the app `Card`
 // (camelCase). Used by the client read, the seed script, and the grounding fn.
@@ -35,6 +35,12 @@ export interface CardRow {
   acquired_from?: string | null;
   foil: boolean;
   landscape?: boolean;
+  consignor_id?: string | null;
+  consign_status?: string | null;
+  asking_price?: number | null;
+  consign_note?: string | null;
+  is_consigned?: boolean; // view only
+  consignor_display?: string | null; // view only
   image_front: string | null;
   image_back: string | null;
   image_extra: string[];
@@ -82,6 +88,12 @@ export function rowToCard(r: CardRow): Card {
     acquiredFrom: r.acquired_from ?? undefined,
     foil: r.foil,
     landscape: !!r.landscape,
+    consignorId: r.consignor_id ?? undefined,
+    consignStatus: (r.consign_status ?? undefined) as ConsignStatus | undefined,
+    askingPrice: r.asking_price ?? undefined,
+    consignNote: r.consign_note ?? undefined,
+    isConsigned: r.is_consigned ?? !!r.consignor_id,
+    consignorDisplay: r.consignor_display ?? undefined,
     images,
     lore: r.lore ?? { blurb: '' },
     featured: r.featured,
@@ -126,6 +138,11 @@ export function cardToRow(c: Card): Partial<CardRow> {
     acquired_from: c.acquiredFrom ?? null,
     foil: !!c.foil,
     landscape: !!c.landscape,
+    // consignment keys only when present — an admin upsert must not stomp them
+    ...(c.consignorId !== undefined ? { consignor_id: c.consignorId } : {}),
+    ...(c.consignStatus !== undefined ? { consign_status: c.consignStatus } : {}),
+    ...(c.askingPrice !== undefined ? { asking_price: c.askingPrice } : {}),
+    ...(c.consignNote !== undefined ? { consign_note: c.consignNote } : {}),
     image_front: c.images?.front ?? null,
     image_back: c.images?.back ?? null,
     image_extra: c.images?.extra ?? [],
