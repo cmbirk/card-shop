@@ -58,10 +58,12 @@ export async function setAdmin(userId: string, on: boolean): Promise<void> {
 }
 
 /** Invite (or retire) a consignment seller. The split is the SELLER'S keep, in percent. */
-export async function setSeller(userId: string, on: boolean, splitPct = 85): Promise<void> {
+export async function setSeller(userId: string, on: boolean, splitPct = 85, displayName?: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = on
-    ? await supabase.from('sellers').upsert({ user_id: userId, split_pct: splitPct, invited_by: useAuthStore.getState().user?.id } as never, { onConflict: 'user_id' })
+    ? await supabase
+        .from('sellers')
+        .upsert({ user_id: userId, split_pct: splitPct, invited_by: useAuthStore.getState().user?.id, display_name: displayName ?? null } as never, { onConflict: 'user_id' })
     : await supabase.from('sellers').delete().eq('user_id', userId);
   if (error) throw error;
 }

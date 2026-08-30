@@ -66,7 +66,10 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
     const method = window.prompt('Paid how? (venmo / zelle / cash…)', 'venmo');
     if (method === null) return;
     const reference = window.prompt('Reference (txn id, note — optional)', '') ?? '';
-    void act(p.card_id, () => adminMarkPaid(p, method, reference), 'paid');
+    void act(p.card_id, async () => {
+      const changed = await adminMarkPaid(p, method, reference);
+      if (changed) notifyConsign(p.card_id, 'paid');
+    });
   };
 
   if (reviewing) {

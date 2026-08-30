@@ -41,8 +41,8 @@ export async function getInventory(): Promise<{ cards: Card[]; cardsById: Map<st
         // consignor first names, attached deterministically (rows stay ORDER BY id → byte-stable prompt)
         const consignorIds = [...new Set(rows.map((r) => r.consignor_id).filter((x): x is string => !!x))].sort();
         if (consignorIds.length) {
-          const { data: profs } = await supa.from('profiles').select('id, display_name').in('id', consignorIds);
-          const names = new Map((profs ?? []).map((p) => [p.id as string, String(p.display_name ?? '').split(' ')[0]]));
+          const { data: sellerRows } = await supa.from('sellers').select('user_id, display_name').in('user_id', consignorIds);
+          const names = new Map((sellerRows ?? []).map((p) => [p.user_id as string, String(p.display_name ?? '').trim()]));
           rows = rows.map((r) => (r.consignor_id ? { ...r, consignor_display: names.get(r.consignor_id) || 'a local collector' } : r));
         }
         cards = rows.map((r) => rowToCard(r.status === 'reserved' ? { ...r, status: 'available' } : r));
@@ -65,7 +65,7 @@ const SHELF_LABEL: Record<string, string> = {
 };
 
 function where(card: Card): string {
-  if (card.isConsigned) return 'the On Consignment case (north wall, east of the counter) — cards you sell on behalf of local consignors';
+  if (card.isConsigned && !card.featured) return 'the On Consignment case (north wall, east of the counter) — cards you sell on behalf of local consignors';
   if (card.status === 'personal') return `${ROOM_NAME} (through the doorway left of the hockey shelf) — Chris's PERSONAL collection, NOT FOR SALE`;
   if (card.featured) return 'the glass display case (near the counter)';
   if (card.category.startsWith('budget-box')) return 'the bargain bins (middle of the shop)';

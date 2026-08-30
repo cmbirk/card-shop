@@ -118,6 +118,14 @@ export function notifyConsign(cardId: string, event: string): void {
 /** Admin: move a consignment along its lifecycle (approve/reject/receive/list/withdraw…). */
 export async function adminSetConsignStatus(id: string, status: ConsignStatus, note?: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
+  if (status === 'withdrawn') {
+    // never hand a card back on paper while a buyer holds or bought it
+    const { data } = await supabase.from('cards').select('status, reserved_until').eq('id', id).maybeSingle();
+    const c = data as { status: string; reserved_until: string | null } | null;
+    if (c && (c.status === 'sold' || (c.status === 'reserved' && c.reserved_until && new Date(c.reserved_until) > new Date()))) {
+      throw new Error(c.status === 'sold' ? 'That card sold — settle the payout instead.' : 'A buyer is checking out with it right now; try again in a few minutes.');
+    }
+  }
   const patch: Record<string, unknown> = { consign_status: status };
   if (note !== undefined) patch.consign_note = note;
   const { error } = await supabase.from('cards').update(patch as never).eq('id', id);
@@ -137,13 +145,17 @@ export async function adminListPayouts(): Promise<AdminPayoutRow[]> {
 }
 
 /** Admin: record a payout as paid (method + reference) and flip the card to `paid`. */
-export async function adminMarkPaid(payout: AdminPayoutRow, method: string, reference: string): Promise<void> {
+/** @returns false when the payout was already settled (double-click, second tab) — nothing changed. */
+export async function adminMarkPaid(payout: AdminPayoutRow, method: string, reference: string): Promise<boolean> {
   if (!supabase) throw new Error('Supabase not configured');
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('payouts')
     .update({ status: 'paid', method, reference, paid_at: new Date().toISOString() } as never)
     .eq('id', payout.id)
-    .eq('status', 'owed');
+    .eq('status', 'owed')
+    .select('id');
   if (error) throw error;
+  if (!data || data.length === 0) return false;
   await adminSetConsignStatus(payout.card_id, 'paid');
+  return true;
 }

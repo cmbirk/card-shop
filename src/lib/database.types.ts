@@ -327,6 +327,7 @@ export type Database = {
       sellers: {
         Row: {
           created_at: string
+          display_name: string | null
           invited_by: string | null
           payout_handle: string | null
           payout_method: string | null
@@ -335,6 +336,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          display_name?: string | null
           invited_by?: string | null
           payout_handle?: string | null
           payout_method?: string | null
@@ -343,6 +345,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          display_name?: string | null
           invited_by?: string | null
           payout_handle?: string | null
           payout_method?: string | null

@@ -24,7 +24,14 @@ export async function listAllCards(): Promise<Card[]> {
 
 export async function saveCard(card: Card): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
-  const { error } = await supabase.from('cards').upsert(cardToRow(card) as never, { onConflict: 'id' });
+  // consignment lifecycle moves ONLY through adminSetConsignStatus — a stale form snapshot
+  // must never regress consign_status (e.g. back to 'listed' after the webhook sold it)
+  const row = cardToRow(card) as Record<string, unknown>;
+  delete row.consignor_id;
+  delete row.consign_status;
+  delete row.asking_price;
+  delete row.consign_note;
+  const { error } = await supabase.from('cards').upsert(row as never, { onConflict: 'id' });
   if (error) throw error;
 }
 

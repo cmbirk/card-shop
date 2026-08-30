@@ -41,7 +41,7 @@ export async function POST(req: Request): Promise<Response> {
   // caller must be an admin, or (for `submitted`) the consignor themself
   const { data: adminRow } = await db.from('admins').select('user_id').eq('user_id', auth.userId).maybeSingle();
   const isAdmin = !!adminRow;
-  if (!isAdmin && !(body.event === 'submitted' && auth.userId === c.consignor_id)) return json({ error: 'not allowed' }, 403);
+  if (!isAdmin && !(body.event === 'submitted' && auth.userId === c.consignor_id)) return json({ ok: true, sent: false });
 
   const name = `${c.year} ${c.player_name} ${c.set_name} ${c.card_number}`.trim();
   const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;

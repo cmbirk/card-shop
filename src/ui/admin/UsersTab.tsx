@@ -39,7 +39,17 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
     }
   };
   const toggle = (u: Visitor) => run(u.id, () => setAdmin(u.id, !u.isAdmin));
-  const toggleSeller = (u: Visitor) => run(u.id, () => setSeller(u.id, !u.isSeller, u.splitPct ?? 85));
+  const toggleSeller = (u: Visitor) => {
+    // display name is what Chris says out loud + what customers see — never an email local-part
+    let name: string | undefined;
+    if (!u.isSeller) {
+      const guess = (u.displayName ?? '').includes('@') ? '' : (u.displayName ?? '').split(' ')[0];
+      const answer = window.prompt('Consignor display name (what Chris calls them in the shop):', guess);
+      if (answer === null) return;
+      name = answer.trim() || undefined;
+    }
+    void run(u.id, () => setSeller(u.id, !u.isSeller, u.splitPct ?? 85, name));
+  };
   const changeSplit = (u: Visitor, pct: number) => {
     if (!Number.isFinite(pct) || pct < 0 || pct > 100) return;
     void run(u.id, () => setSellerSplit(u.id, Math.round(pct)));

@@ -22,7 +22,7 @@ function matches(card: Card, fixture: Fixture): boolean {
   if (a.status) return card.status === a.status;
   if (card.status === 'personal') return false;
   // the consignment case claims consigned cards first (fixture order); overflow may land on sport shelves
-  if (a.consigned) return !!card.isConsigned;
+  if (a.consigned) return !!card.isConsigned && card.status === 'available';
   // reserved (someone's at the register with it) and sold cards leave the floor
   if (card.status === 'reserved' || card.status === 'sold') return false;
   if (a.featured) return !!card.featured;

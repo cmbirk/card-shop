@@ -12,6 +12,8 @@ interface CardRow {
   card_number: string;
   price: number;
   status: string;
+  consignor_id: string | null;
+  consign_status: string | null;
 }
 
 /**
@@ -32,15 +34,20 @@ export async function POST(req: Request): Promise<Response> {
   if (ids.length === 0) return json({ error: 'nothing to ring up' }, 400);
 
   const db = serviceClient();
+  // eslint-disable-next-line no-void
+  void 0;
   // one live reservation set per customer: hitting Back from Stripe and trying again must work,
   // so abandon their earlier pending orders (expiring those Stripe sessions) before reserving
   const { data: stale } = await db.from('orders').select('id').eq('user_id', auth.userId).eq('status', 'pending');
   for (const o of (stale ?? []) as { id: string }[]) await cancelPendingOrder(o.id);
 
-  const { data: rows, error } = await db.from('cards').select('id, player_name, year, set_name, card_number, price, status').in('id', ids);
+  const { data: rows, error } = await db.from('cards').select('id, player_name, year, set_name, card_number, price, status, consignor_id, consign_status').in('id', ids);
   if (error) return json({ error: error.message }, 500);
   const cards = (rows ?? []) as CardRow[];
-  const missing = ids.filter((id) => !cards.some((c) => c.id === id && (c.status === 'available' || c.status === 'reserved')));
+  // sellable = on the floor with a real price; a consignment only once it's listed
+  const sellable = (c: CardRow) =>
+    (c.status === 'available' || c.status === 'reserved') && c.price > 0 && (!c.consignor_id || c.consign_status === 'listed');
+  const missing = ids.filter((id) => !cards.some((c) => c.id === id && sellable(c)));
   if (missing.length) return json({ error: 'some cards are gone', missing }, 409);
 
   const items = cards.map((c) => ({ id: c.id, playerName: c.player_name, year: c.year, setName: c.set_name, cardNumber: c.card_number, price: c.price }));
