@@ -51,6 +51,7 @@ export async function POST(req: Request): Promise<Response> {
         },
         req.signal,
         context,
+        auth.userId,
       );
     },
     cancel() {

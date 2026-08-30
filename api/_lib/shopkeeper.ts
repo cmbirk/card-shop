@@ -16,6 +16,7 @@ Character rules:
 - Some cards are ON CONSIGNMENT: you sell them on behalf of a local consignor (their first name is in the inventory). Credit the owner naturally ("that one's Maya's — she's picky, it's clean"), but NEVER reveal asking prices, splits, payouts, or full names, and the sticker price is yours to quote like any other card.
 - "The Collection" (through the doorway left of the hockey shelf) is your personal collection — Indianapolis Colts is your team, so that's what's in it today. Talk about those cards and the memorabilia with real affection and their stories, but they are NEVER for sale: never quote a price, and turn down offers warmly ("not for all the wax in Indiana").
 - SOFT OPENING: the shop is not taking real payments yet — the register is in TEST MODE (Stripe test cards like 4242 4242 4242 4242 work; nothing is charged, nothing ships). Customers are welcome to try it: it holds their picks, walks them through checkout, and hands them a test receipt. Say so warmly if asked about paying or shipping. Never claim a real sale happened.
+- CONSIGNMENT SELLERS: some customers also sell through you. If a seller asks how it works or gets stuck, walk them through it patiently, in your voice: (1) the "📦 My consignments" button at the top right opens their panel; (2) "+ Consign a card" — fill in the card, drop in photos (front and back), set an ASKING price (you set the final sticker); (3) you review it — they'll get an email when you approve, with your shipping address; (4) they mail you the card, you check it over and list it in the On Consignment case; (5) when it sells, their cut shows in their panel's earnings ledger and you pay them out. They can edit or remove a card before you approve it, resubmit after a pass, and request a return any time from the same panel (plus set their return address there). If someone who ISN'T a seller yet asks about selling through the shop, be welcoming: it's invite-only while you're getting started — ask them to leave their name (sign the guestbook) and you'll reach out.
 - Cards the customer picks get held up front on the counter for them (their "hold pile"). If it has items, you can comment on their picks. When they seem done, gently invite them to check out with the "Check out" button.
 
 Below is your complete current inventory, grouped by where it sits in the shop. Prices are what's on the sticker.
@@ -55,12 +56,45 @@ export interface ShopkeeperEvents {
   onError: (message: string) => void;
 }
 
+const SUPA_URL2 = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const SUPA_SR = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+/** If the caller is a consignment seller, an authoritative one-line status of their cards (DB truth, rides the user turn). */
+async function sellerContext(userId: string | null | undefined): Promise<string> {
+  if (!userId || !SUPA_URL2 || !SUPA_SR) return '';
+  try {
+    const H = { apikey: SUPA_SR, Authorization: `Bearer ${SUPA_SR}` };
+    const seller = await (await fetch(`${SUPA_URL2}/rest/v1/sellers?user_id=eq.${userId}&select=user_id`, { headers: H })).json();
+    if (!Array.isArray(seller) || seller.length === 0) return '';
+    const rows = (await (await fetch(`${SUPA_URL2}/rest/v1/cards?consignor_id=eq.${userId}&select=consign_status`, { headers: H })).json()) as { consign_status: string }[];
+    if (!Array.isArray(rows)) return '';
+    const counts = new Map<string, number>();
+    for (const r of rows) counts.set(r.consign_status, (counts.get(r.consign_status) ?? 0) + 1);
+    const LABEL: Record<string, string> = {
+      submitted: 'waiting for your review',
+      approved: 'approved and awaiting their shipment to you',
+      rejected: 'passed on',
+      received: 'in your hands, not yet listed',
+      listed: 'on the floor',
+      sold: 'sold (payout owed)',
+      paid: 'sold and paid out',
+      withdraw_requested: 'asking to be returned',
+      withdrawn: 'returned',
+    };
+    const parts = [...counts.entries()].sort().map(([k, n]) => `${n} ${LABEL[k] ?? k}`);
+    return `[This customer is one of your consignment sellers.${parts.length ? ` Their cards with you: ${parts.join('; ')}.` : ' They have no cards with you yet.'} Help them with the process if they seem stuck.]`;
+  } catch {
+    return '';
+  }
+}
+
 export async function runShopkeeper(
   messages: ChatMessage[],
   basket: string[],
   events: ShopkeeperEvents,
   signal?: AbortSignal,
   context?: ChatRequest['context'],
+  userId?: string | null,
 ): Promise<void> {
   // identity-linked API keys must name the workspace they act in; harmless when unset
   const client = new Anthropic({
@@ -73,11 +107,12 @@ export async function runShopkeeper(
   const { cards, cardsById } = await getInventory();
   const systemPrompt = PERSONA + buildInventoryContext(cards);
 
-  // volatile basket + situation context rides on the last user turn — never in the cached system prompt
+  // volatile basket + situation + seller context rides on the last user turn — never in the cached system prompt
   const situation = situationContext(context, cardsById);
+  const sellerLine = await sellerContext(userId);
   const apiMessages = messages.map((m, i) =>
     i === messages.length - 1 && m.role === 'user'
-      ? { role: m.role, content: `${basketContext(basket, cardsById)}${situation ? `\n${situation}` : ''}\n\n${m.content}` }
+      ? { role: m.role, content: `${basketContext(basket, cardsById)}${situation ? `\n${situation}` : ''}${sellerLine ? `\n${sellerLine}` : ''}\n\n${m.content}` }
       : { role: m.role, content: m.content },
   );
 

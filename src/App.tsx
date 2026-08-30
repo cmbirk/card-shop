@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { useProgress } from '@react-three/drei';
 import { AdaptiveDpr } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import { Shop } from './scene/Shop';
@@ -12,7 +13,6 @@ import { UIOverlay } from './ui/UIOverlay';
 import { loadInventory } from './systems/inventory';
 import { useAuthStore } from './stores/authStore';
 import { ErrorBoundary } from './ui/ErrorBoundary';
-import { SHOP_NAME } from '@shared/launch';
 import { resumeCheckout } from './systems/checkoutReturn';
 
 export default function App() {
@@ -25,26 +25,26 @@ export default function App() {
     });
   }, []);
 
-  if (!ready) {
-    return (
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          display: 'grid',
-          placeItems: 'center',
-          background: '#1a120b',
-          color: '#ffd97a',
-          fontFamily: 'Georgia, serif',
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 40, letterSpacing: 4 }}>{SHOP_NAME}</div>
-          <div style={{ fontSize: 13, opacity: 0.7, marginTop: 8 }}>opening up the shop…</div>
-        </div>
-      </div>
+  // the inline #boot screen in index.html covers everything until the scene is genuinely
+  // ready: inventory loaded AND the asset loaders (GLBs, HDRI, textures) have gone quiet
+  const { active: assetsLoading } = useProgress();
+  useEffect(() => {
+    if (!ready || assetsLoading) return;
+    const boot = document.getElementById('boot');
+    if (!boot) return;
+    // two frames so the first real render is on screen beneath the fade
+    let raf = 0;
+    raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        clearInterval((window as unknown as { __bootQuip?: number }).__bootQuip);
+        boot.classList.add('done');
+        setTimeout(() => boot.remove(), 600);
+      }),
     );
-  }
+    return () => cancelAnimationFrame(raf);
+  }, [ready, assetsLoading]);
+
+  if (!ready) return null; // #boot is showing
 
   return (
     <ErrorBoundary>

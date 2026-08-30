@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDialogueStore } from '../stores/dialogueStore';
 import { SHOP_NAME } from '@shared/launch';
+import { useAuthStore } from '../stores/authStore';
 import { useBasketStore } from '../stores/basketStore';
 import { useUIStore } from '../stores/uiStore';
 
@@ -8,6 +9,8 @@ const CHIPS = ["What's the best thing in the shop?", 'Got any rookie cards?', 'W
 
 export function ChatWindow() {
   const { messages, streamingText, isStreaming, isOpen } = useDialogueStore();
+  const isSeller = useAuthStore((s) => s.isSeller);
+  const chips = isSeller ? ['How does consigning work?', 'What are my cards doing?', ...CHIPS.slice(0, 1)] : CHIPS;
   const basketCount = useBasketStore((s) => s.items.length);
   const phase = useUIStore((s) => s.checkoutPhase);
   const [input, setInput] = useState('');
@@ -44,7 +47,7 @@ export function ChatWindow() {
         </button>
       )}
       <div className="chat-chips">
-        {CHIPS.map((c) => (
+        {chips.map((c) => (
           <button key={c} className="chip" disabled={isStreaming} onClick={() => submit(c)}>
             {c}
           </button>

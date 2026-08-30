@@ -7,9 +7,91 @@
     <style>
       html, body, #root { margin: 0; height: 100%; overflow: hidden; background: #1a120b; }
       * { box-sizing: border-box; }
+
+      /* ---- boot screen: pure inline CSS so it paints before the JS bundle arrives ---- */
+      #boot {
+        position: fixed; inset: 0; z-index: 9999;
+        display: grid; place-items: center;
+        background: #1a120b; color: #f2e8d5;
+        font-family: Georgia, 'Times New Roman', serif;
+        transition: opacity 0.45s ease;
+      }
+      #boot.done { opacity: 0; pointer-events: none; }
+      .boot-inner { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+      .boot-title { font-size: 34px; letter-spacing: 6px; color: #ffd97a; }
+      .boot-sub { font-size: 12px; letter-spacing: 3px; opacity: 0.6; margin-top: -18px; text-transform: uppercase; }
+      .boot-quip { font-size: 13px; opacity: 0.75; font-style: italic; min-height: 18px; }
+
+      /* a card sliding into a toploader, forever */
+      .boot-loader { position: relative; width: 84px; height: 122px; }
+      .boot-sleeve {
+        position: absolute; inset: 0;
+        border: 2px solid rgba(242, 232, 213, 0.35);
+        border-radius: 6px;
+        background: linear-gradient(115deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.14) 40%, rgba(255,255,255,0.03) 60%);
+        z-index: 2;
+      }
+      .boot-sleeve::after { /* the open mouth of the toploader */
+        content: ''; position: absolute; top: -2px; left: 14%; right: 14%; height: 4px; background: #1a120b;
+      }
+      .boot-card {
+        position: absolute; left: 10px; top: 10px; width: 64px; height: 92px;
+        border-radius: 4px; background: #2e5e4e; border: 3px solid #f2e8d5;
+        overflow: hidden; z-index: 1;
+        animation: boot-slide 2.6s cubic-bezier(0.5, 0, 0.3, 1) infinite;
+      }
+      .boot-card::before { /* little player silhouette-ish blob + name bar, echoing the procedural art */
+        content: ''; position: absolute; left: 18%; top: 16%; width: 64%; height: 46%;
+        border-radius: 50% 50% 42% 42%; background: rgba(26, 18, 11, 0.55);
+      }
+      .boot-card::after {
+        content: ''; position: absolute; left: 10%; right: 10%; bottom: 12%; height: 12%;
+        background: #ffd97a; border-radius: 2px;
+      }
+      @keyframes boot-slide {
+        0%   { transform: translateY(-105px); }
+        45%  { transform: translateY(0); }
+        62%  { transform: translateY(-6px); } /* the little settle-tap every collector does */
+        70%  { transform: translateY(0); }
+        88%  { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(0); opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) { .boot-card { animation: none; } }
     </style>
   </head>
   <body>
+    <div id="boot">
+      <div class="boot-inner">
+        <div class="boot-loader">
+          <div class="boot-card"></div>
+          <div class="boot-sleeve"></div>
+        </div>
+        <div class="boot-title">TLC</div>
+        <div class="boot-sub">Toploader Cards</div>
+        <div class="boot-quip" id="boot-quip">Rolling up the shutters…</div>
+      </div>
+    </div>
+    <script>
+      // rotating shop quips — inline so they run while the app bundle is still downloading
+      (function () {
+        var quips = [
+          'Rolling up the shutters…',
+          'Sleeving the rookies…',
+          'Alphabetizing the bargain bin (again)…',
+          'Straightening the pennants…',
+          'Chris is unlocking the case…',
+          'Fanning out the wax packs…',
+          'Checking the pop report…',
+          'Warming up the register…',
+        ];
+        var i = 0;
+        var el = document.getElementById('boot-quip');
+        window.__bootQuip = setInterval(function () {
+          i = (i + 1) % quips.length;
+          if (el) el.textContent = quips[i];
+        }, 1700);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
