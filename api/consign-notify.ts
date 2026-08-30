@@ -20,16 +20,45 @@ const EVENTS: Record<Event, { expect: string[]; toSeller: boolean }> = {
 export async function POST(req: Request): Promise<Response> {
   const auth = await requireUser(req);
   if (!auth.ok || !auth.userId) return json({ error: 'sign in' }, 401);
-  let body: { cardId?: string; event?: string };
+  let body: { cardId?: string; event?: string; userId?: string };
   try {
     body = (await req.json()) as typeof body;
   } catch {
     return json({ error: 'bad request' }, 400);
   }
+  const db = serviceClient();
+
+  // 'invited' is card-less: welcome a newly toggled seller with the next steps (admin-only,
+  // and only if the sellers row actually exists — a forged call can't invent an invite)
+  if (body.event === 'invited' && body.userId) {
+    const { data: adminRow } = await db.from('admins').select('user_id').eq('user_id', auth.userId).maybeSingle();
+    if (!adminRow) return json({ ok: true, sent: false });
+    const { data: sellerRow } = await db.from('sellers').select('user_id, split_pct, display_name').eq('user_id', body.userId).maybeSingle();
+    if (!sellerRow) return json({ ok: true, sent: false });
+    const { data: prof } = await db.from('profiles').select('email').eq('id', body.userId).maybeSingle();
+    const email = (prof as { email: string | null } | null)?.email;
+    if (!email) return json({ ok: true, sent: false });
+    const split = (sellerRow as { split_pct: number }).split_pct;
+    const first = (sellerRow as { display_name: string | null }).display_name ?? 'there';
+    const sent = await sendEmail(
+      email,
+      `You can now sell cards through ${SHOP_NAME}`,
+      `Hey ${first} — Chris set you up as a consignment seller at ${SHOP_NAME}.
+
+How it works:
+1. Sign in at https://${SHOP_DOMAIN} and hit the "📦 My consignments" button (top right).
+2. "+ Consign a card": fill in the card, add front/back photos, and set your asking price (Chris sets the final sticker).
+3. Chris reviews it — you'll get an email when he approves, with the address to ship it to.
+4. Once it arrives and checks out, it goes in the On Consignment case. When it sells, your cut (${split}% of the sale) shows in your earnings ledger and Chris pays you out.
+
+While you're in there, add your return address (bottom of the panel) so cards can find their way back to you if needed. Questions? Just ask Chris in the shop — he knows the whole routine.`,
+    );
+    return json({ ok: true, sent });
+  }
+
   const spec = EVENTS[body.event as Event];
   if (!spec || !body.cardId) return json({ error: 'bad request' }, 400);
 
-  const db = serviceClient();
   const { data: card } = await db
     .from('cards')
     .select('id, player_name, year, set_name, card_number, price, asking_price, consign_note, consignor_id, consign_status')

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { listUsers, setAdmin, setSeller, setSellerSplit, type Visitor } from '../../admin/adminUsers';
+import { notifySellerInvited } from '../../admin/consign';
 import { useAuthStore } from '../../stores/authStore';
 
 const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -48,7 +49,10 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
       if (answer === null) return;
       name = answer.trim() || undefined;
     }
-    void run(u.id, () => setSeller(u.id, !u.isSeller, u.splitPct ?? 85, name));
+    void run(u.id, async () => {
+      await setSeller(u.id, !u.isSeller, u.splitPct ?? 85, name);
+      if (!u.isSeller) notifySellerInvited(u.id); // welcome email with next steps
+    });
   };
   const changeSplit = (u: Visitor, pct: number) => {
     if (!Number.isFinite(pct) || pct < 0 || pct > 100) return;

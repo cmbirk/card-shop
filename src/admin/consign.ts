@@ -113,6 +113,16 @@ export function notifyConsign(cardId: string, event: string): void {
   }).catch(() => undefined);
 }
 
+/** Welcome email with next steps for a freshly invited seller (admin fires it after the toggle). */
+export function notifySellerInvited(userId: string): void {
+  const token = useAuthStore.getState().session?.access_token;
+  void fetch('/api/consign-notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify({ event: 'invited', userId }),
+  }).catch(() => undefined);
+}
+
 // ─── Chris's side (admin) ───────────────────────────────────────────────────
 
 /** Admin: move a consignment along its lifecycle (approve/reject/receive/list/withdraw…). */
