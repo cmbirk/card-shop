@@ -75,8 +75,6 @@ export default defineConfig(({ mode }) => {
     'STRIPE_WEBHOOK_SECRET',
     'PUBLIC_ORIGIN',
     'RESEND_API_KEY',
-    'ADMIN_EMAIL',
-    'CONSIGN_SHIP_ADDRESS',
     'EMAIL_FROM',
   ]) {
     if (env[k]) process.env[k] ??= env[k]; // never assign undefined — process.env would store "undefined"

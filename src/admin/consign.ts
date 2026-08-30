@@ -159,3 +159,24 @@ export async function adminMarkPaid(payout: AdminPayoutRow, method: string, refe
   await adminSetConsignStatus(payout.card_id, 'paid');
   return true;
 }
+
+/** The caller's shipping address (returns null when unset). */
+export async function myShipAddress(): Promise<string | null> {
+  if (!supabase || !useAuthStore.getState().user?.id) return null; // signed out (or headless): no address, no throw
+  const { data } = await supabase.from('profiles').select('ship_address').eq('id', uid()).maybeSingle();
+  return ((data as { ship_address: string | null } | null)?.ship_address ?? null) as string | null;
+}
+
+/** Update the caller's shipping address (the only profiles column clients may write). */
+export async function setMyShipAddress(address: string): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured');
+  const { error } = await supabase.from('profiles').update({ ship_address: address.trim() || null } as never).eq('id', uid());
+  if (error) throw error;
+}
+
+/** Admin: shipping addresses for a set of users (returning withdrawn cards). */
+export async function adminShipAddresses(userIds: string[]): Promise<Map<string, string>> {
+  if (!supabase || userIds.length === 0) return new Map();
+  const { data } = await supabase.from('profiles').select('id, ship_address').in('id', userIds);
+  return new Map(((data ?? []) as { id: string; ship_address: string | null }[]).filter((r) => r.ship_address).map((r) => [r.id, r.ship_address!]));
+}

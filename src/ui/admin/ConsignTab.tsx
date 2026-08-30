@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Card, ConsignStatus } from '@shared/types';
 import { formatCents } from '../../stores/basketStore';
-import { adminSetConsignStatus, adminListPayouts, adminMarkPaid, notifyConsign, type AdminPayoutRow } from '../../admin/consign';
+import { adminSetConsignStatus, adminListPayouts, adminMarkPaid, notifyConsign, myShipAddress, setMyShipAddress, adminShipAddresses, type AdminPayoutRow } from '../../admin/consign';
 import { CardForm } from './CardForm';
 
 interface Props {
@@ -24,6 +24,9 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
   const [reviewing, setReviewing] = useState<Card | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [payouts, setPayouts] = useState<AdminPayoutRow[]>([]);
+  const [intake, setIntake] = useState('');
+  const [intakeSaved, setIntakeSaved] = useState(true);
+  const [returnAddrs, setReturnAddrs] = useState<Map<string, string>>(new Map());
 
   const consigned = useMemo(() => cards.filter((c) => c.consignorId || c.consignStatus), [cards]);
   const by = (s: ConsignStatus) => consigned.filter((c) => c.consignStatus === s);
@@ -38,8 +41,13 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
   };
   useEffect(() => {
     void refreshPayouts();
+    void myShipAddress().then((a) => setIntake(a ?? ''));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    const ids = [...new Set(consigned.filter((c) => c.consignStatus === 'withdraw_requested').map((c) => c.consignorId).filter((x): x is string => !!x))];
+    if (ids.length) void adminShipAddresses(ids).then(setReturnAddrs);
+  }, [consigned]);
 
   const act = async (id: string, fn: () => Promise<void>, event?: string) => {
     setBusy(id);
@@ -101,6 +109,33 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
 
   return (
     <div className="consign-list">
+      <div className="consign-address">
+        <label className="admin-help" style={{ flex: 1 }}>
+          Intake address — goes in every "approved, ship it to…" email:
+          <textarea
+            data-1p-ignore
+            rows={2}
+            placeholder={'TLC — Chris\nStreet, City ST ZIP'}
+            value={intake}
+            onChange={(e) => {
+              setIntake(e.target.value);
+              setIntakeSaved(false);
+            }}
+          />
+        </label>
+        <button
+          className="btn secondary"
+          disabled={intakeSaved}
+          onClick={() =>
+            void act('intake', async () => {
+              await setMyShipAddress(intake);
+              setIntakeSaved(true);
+            })
+          }
+        >
+          {intakeSaved ? 'Saved ✓' : 'Save'}
+        </button>
+      </div>
       {consigned.length === 0 && <p className="admin-help">No consignments yet. Invite a seller from the Users tab; their submissions land here.</p>}
       {SECTIONS.map(({ status, title, hint }) => {
         const rows = by(status);
@@ -161,9 +196,14 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
                     </button>
                   )}
                   {status === 'withdraw_requested' && (
-                    <button className="btn secondary" disabled={busy === c.id} onClick={() => void act(c.id, () => adminSetConsignStatus(c.id, 'withdrawn'))}>
-                      Confirm returned
-                    </button>
+                    <>
+                      <span className="admin-card-sub" style={{ maxWidth: 220, whiteSpace: 'pre-line' }}>
+                        {c.consignorId && returnAddrs.get(c.consignorId) ? `↩ ${returnAddrs.get(c.consignorId)}` : '↩ no address on file — ask them'}
+                      </span>
+                      <button className="btn secondary" disabled={busy === c.id} onClick={() => void act(c.id, () => adminSetConsignStatus(c.id, 'withdrawn'))}>
+                        Confirm returned
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

@@ -45,13 +45,32 @@ export async function POST(req: Request): Promise<Response> {
 
   const name = `${c.year} ${c.player_name} ${c.set_name} ${c.card_number}`.trim();
   const dollars = (cents: number) => `$${(cents / 100).toFixed(2)}`;
-  let to = process.env.ADMIN_EMAIL ?? '';
+  let to: string[] = [];
   let subject = '';
   let text = '';
   if (spec.toSeller) {
-    const { data: prof } = await db.from('profiles').select('email, display_name').eq('id', c.consignor_id).maybeSingle();
-    to = (prof as { email: string | null } | null)?.email ?? '';
+    const { data: prof } = await db.from('profiles').select('email').eq('id', c.consignor_id).maybeSingle();
+    const email = (prof as { email: string | null } | null)?.email;
+    if (email) to = [email];
+  } else {
+    // → every admin, from the DB (no ADMIN_EMAIL env)
+    const { data: adminRows } = await db.from('admins').select('user_id');
+    const adminIds = (adminRows ?? []).map((a) => a.user_id as string);
+    const { data: adminProfs } = await db.from('profiles').select('email').in('id', adminIds);
+    to = (adminProfs ?? []).map((p) => (p as { email: string | null }).email).filter((e): e is string => !!e);
   }
+
+  /** Where the seller ships an approved card: the approving admin's address, else any admin's. */
+  const intakeAddress = async (): Promise<string> => {
+    const { data: mine } = await db.from('profiles').select('ship_address').eq('id', auth.userId!).maybeSingle();
+    const own = (mine as { ship_address: string | null } | null)?.ship_address;
+    if (own?.trim()) return own;
+    const { data: adminRows } = await db.from('admins').select('user_id').order('user_id');
+    const adminIds = (adminRows ?? []).map((a) => a.user_id as string);
+    const { data: profs } = await db.from('profiles').select('id, ship_address').in('id', adminIds).order('id');
+    const any = (profs ?? []).map((p) => (p as { ship_address: string | null }).ship_address).find((a) => a?.trim());
+    return any ?? 'Ask Chris for the shipping address.';
+  };
   switch (body.event as Event) {
     case 'submitted':
       subject = `New consignment to review: ${name}`;
@@ -59,7 +78,7 @@ export async function POST(req: Request): Promise<Response> {
       break;
     case 'approved':
       subject = `${SHOP_NAME} approved your ${c.player_name} — time to ship it`;
-      text = `Good news — Chris approved your ${name} and it's listed at ${dollars(c.price)} once it arrives.\n\nShip it to:\n${process.env.CONSIGN_SHIP_ADDRESS ?? 'Ask Chris for the shipping address.'}\n\nPack it in a sleeve + toploader (naturally) inside a bubble mailer.`;
+      text = `Good news — Chris approved your ${name} and it's listed at ${dollars(c.price)} once it arrives.\n\nShip it to:\n${await intakeAddress()}\n\nPack it in a sleeve + toploader (naturally) inside a bubble mailer.`;
       break;
     case 'rejected':
       subject = `About your ${c.player_name} consignment`;
@@ -78,6 +97,7 @@ export async function POST(req: Request): Promise<Response> {
       text = `Your cut for ${name} has been sent — check My Consignments for the details. Pleasure doing business!`;
       break;
   }
-  const sent = await sendEmail(to, subject, text);
+  let sent = false;
+  for (const addr of to) sent = (await sendEmail(addr, subject, text)) || sent;
   return json({ ok: true, sent });
 }

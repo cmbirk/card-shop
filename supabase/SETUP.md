@@ -94,9 +94,11 @@ adds `orders`, `reserve_cards()` / `release_order()`. Test card: 4242 4242 4242 
 ## 4f. Consignment (invite-only sellers)
 Flip a visitor's **Seller** toggle in Back Office → Users. Migration
 `20260830120000_consignment.sql` adds `sellers`, consignment columns + the
-`cards_consignor_guard` trigger, `payouts`, and the `consign/{uid}/` storage policy. Emails need
-`RESEND_API_KEY`, `ADMIN_EMAIL`, `CONSIGN_SHIP_ADDRESS` (and a verified domain in Resend to mail
-sellers; until then Resend only delivers to your own account email). Test-mode sales create
+`cards_consignor_guard` trigger, `payouts`, and the `consign/{uid}/` storage policy. Emails need `RESEND_API_KEY`
+(and a verified domain in Resend to mail sellers; until then Resend only delivers to your own
+account email). Submitted-alerts go to every admin's profile email; the ship-to address in the
+approval email is the approving admin's `profiles.ship_address` (set it in the Consign tab), and
+sellers set their return address in My Consignments. Test-mode sales create
 greyed "dry run" payout rows — no real obligations while SOFT_OPENING.
 
 ## 5. Seed + generate types

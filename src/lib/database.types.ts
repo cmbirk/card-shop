@@ -300,6 +300,7 @@ export type Database = {
           id: string
           last_seen: string
           provider: string | null
+          ship_address: string | null
           visits: number
         }
         Insert: {
@@ -310,6 +311,7 @@ export type Database = {
           id: string
           last_seen?: string
           provider?: string | null
+          ship_address?: string | null
           visits?: number
         }
         Update: {
@@ -320,6 +322,7 @@ export type Database = {
           id?: string
           last_seen?: string
           provider?: string | null
+          ship_address?: string | null
           visits?: number
         }
         Relationships: []

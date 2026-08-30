@@ -7,6 +7,8 @@ import { blankCard } from '../admin/adminCards';
 import {
   myConsignments,
   myPayouts,
+  myShipAddress,
+  setMyShipAddress,
   deleteConsignment,
   requestWithdraw,
   resubmit,
@@ -30,13 +32,16 @@ export function ConsignPanel() {
   const [editing, setEditing] = useState<Card | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [address, setAddress] = useState('');
+  const [addressSaved, setAddressSaved] = useState(false);
 
   const refresh = async () => {
     setError(null);
     try {
-      const [c, p] = await Promise.all([myConsignments(), myPayouts()]);
+      const [c, p, a] = await Promise.all([myConsignments(), myPayouts(), myShipAddress()]);
       setCards(c);
       setPayouts(p);
+      setAddress(a ?? '');
     } catch (e) {
       setError((e as Error).message);
     }
@@ -160,6 +165,33 @@ export function ConsignPanel() {
                 </div>
               </div>
             ))}
+
+            <div className="consign-ledger-head">Your return address</div>
+            <p className="admin-help">Where Chris ships cards back to you (returns, or if a consignment doesn't work out).</p>
+            <div className="consign-address">
+              <textarea
+                data-1p-ignore
+                rows={2}
+                placeholder={'Name\nStreet, City ST ZIP'}
+                value={address}
+                onChange={(e) => {
+                  setAddress(e.target.value);
+                  setAddressSaved(false);
+                }}
+              />
+              <button
+                className="btn secondary"
+                disabled={busy === 'addr'}
+                onClick={() =>
+                  void act('addr', async () => {
+                    await setMyShipAddress(address);
+                    setAddressSaved(true);
+                  })
+                }
+              >
+                {addressSaved ? 'Saved ✓' : 'Save'}
+              </button>
+            </div>
 
             {payouts.length > 0 && (
               <>

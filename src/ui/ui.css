@@ -1085,3 +1085,23 @@
   font-size: 10px;
   padding: 0 4px;
 }
+
+.consign-address {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.consign-address textarea {
+  flex: 1;
+  background: rgba(242, 232, 213, 0.08);
+  border: 1px solid var(--wood);
+  border-radius: 8px;
+  color: var(--cream);
+  padding: 8px 10px;
+  font-size: 12px;
+  resize: vertical;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+}
