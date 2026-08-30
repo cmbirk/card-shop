@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
 import CameraControlsImpl from 'camera-controls';
 import * as THREE from 'three';
@@ -7,6 +7,8 @@ import { shopLayout, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared
 import type { Station, Vec3 } from '@shared/types';
 import { useNavStore } from '../stores/navStore';
 import { useShopkeeperStore } from '../stores/shopkeeperStore';
+import { useInspectStore } from '../stores/inspectStore';
+import { binUnderPointer } from './fixtures/Bin';
 import { FEEL } from '../feel';
 import { sfx } from '../systems/sfx';
 
@@ -62,7 +64,33 @@ export function StationController() {
     c.minPolarAngle = Math.max(0.05, _sph.phi - st.pitchRange);
     c.maxPolarAngle = Math.min(Math.PI - 0.05, _sph.phi + st.pitchRange);
     c.minDistance = _sph.radius;
-    c.maxDistance = _sph.radius;
+    // lean-back room: scroll dollies out along the view axis, but never through a wall/ceiling
+    c.maxDistance = Math.max(_sph.radius, Math.min(_sph.radius + FEEL.zoomOutRange, backOffLimit(st)));
+  };
+
+  /** How far behind `st.position` the camera can go (from the target, along the view axis) before leaving the station's room. */
+  const backOffLimit = (st: Station): number => {
+    const room = roomOf(st.position);
+    const b =
+      room === 'annex'
+        ? { x0: ANNEX.xMin, x1: ANNEX.xMax, z0: ANNEX.zMin, z1: ANNEX.zMax }
+        : room === 'office'
+          ? { x0: OFFICE.xMin, x1: OFFICE.xMax, z0: OFFICE.zMin, z1: OFFICE.zMax }
+          : { x0: -5, x1: 5, z0: -4, z1: st.id === 'outside' ? 99 : 4 }; // outside has no back wall
+    const m = 0.3; // wall margin
+    const dir = _off.clone().normalize(); // target → camera
+    let t = Infinity;
+    const axes: [number, number, number, number][] = [
+      [dir.x, st.target[0], b.x0 + m, b.x1 - m],
+      [dir.z, st.target[2], b.z0 + m, b.z1 - m],
+      [dir.y, st.target[1], 0.3, 2.8],
+    ];
+    for (const [d, o, lo, hi] of axes) {
+      if (Math.abs(d) < 1e-6) continue;
+      const lim = d > 0 ? (hi - o) / d : (lo - o) / d;
+      t = Math.min(t, lim);
+    }
+    return t;
   };
 
   const releaseBounds = () => {
@@ -141,6 +169,24 @@ export function StationController() {
       });
     }
   }, [keeperPose]);
+
+  // scroll = lean back for a wider look. Defers to the wheel's other owners: the held card
+  // (inspect zoom) and the bins (riffle when the pointer is over one).
+  const { gl } = useThree();
+  useEffect(() => {
+    const el = gl.domElement;
+    const onWheel = (e: WheelEvent) => {
+      const nav = useNavStore.getState();
+      if (nav.mode !== 'station' || nav.currentStation === 'outside') return;
+      if (useInspectStore.getState().mode !== 'idle') return; // CardInHand owns the wheel
+      if (binUnderPointer()) return; // the riffle owns it there
+      if (useShopkeeperStore.getState().pose === 'visiting') return; // camera is looking at Chris
+      e.preventDefault();
+      ref.current?.dolly(-e.deltaY * FEEL.zoomOutSpeed, true);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [gl]);
 
   // user look-around only while parked at a station
   useFrame(() => {

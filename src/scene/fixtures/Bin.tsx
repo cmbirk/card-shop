@@ -18,7 +18,8 @@ const _hits: THREE.Intersection[] = [];
 const _scale = new THREE.Vector3();
 // every mounted bin's hit test, so a key press resolves to exactly one bin
 const hitTests = new Map<string, () => boolean>();
-const binUnderPointer = () => [...hitTests].find(([, over]) => over())?.[0] ?? null;
+/** Which bin (if any) is under the pointer right now — the riffle owns the wheel there. */
+export const binUnderPointer = () => [...hitTests].find(([, over]) => over())?.[0] ?? null;
 const REST = { position: [0, 0, 0] as [number, number, number], rotation: [0, 0, 0] as [number, number, number] };
 
 /** Can the customer thumb through bins right now? (parked at the bins, nothing in hand) */

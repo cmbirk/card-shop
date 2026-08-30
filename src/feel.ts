@@ -2,6 +2,8 @@
 
 export const FEEL = {
   // camera
+  zoomOutRange: 3.5, // how far you can lean back from a station, metres (wall-clamped)
+  zoomOutSpeed: 0.0028, // dolly metres per wheel px
   glideSmoothTime: 0.55, // camera-controls damp, ~1s felt time cross-shop
   hopSmoothTime: 0.4, // midpoint hop segments
 
