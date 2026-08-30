@@ -99,7 +99,7 @@ export interface Fixture {
   kind: FixtureKind;
   position: Vec3;
   rotationY: number; // radians
-  accepts: { sport?: Sport; category?: string; featured?: boolean; status?: CardStatus };
+  accepts: { sport?: Sport; category?: string; featured?: boolean; status?: CardStatus; consigned?: boolean };
   slots: { rows: number; cols: number; spacing: [number, number] };
   stationId: string;
   label: string;

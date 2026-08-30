@@ -470,7 +470,7 @@ export function Shop() {
           {f.kind === 'displayCase' && (
             <DisplayCase
               cards={placed.get(f.id) ?? []}
-              title={f.id === 'case-collection' ? "Chris's Collection" : undefined}
+              title={f.id === 'case-collection' ? "Chris's Collection" : f.id === 'case-consign' ? 'On Consignment' : undefined}
               glow={f.id === 'case-collection' ? '#cfe0ff' : undefined}
             />
           )}

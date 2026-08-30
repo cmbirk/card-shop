@@ -33,9 +33,19 @@ export async function getInventory(): Promise<{ cards: Card[]; cardsById: Map<st
       if (error) throw error;
       if (data && data.length) {
         const now = Date.now();
-        cards = (data as (CardRow & { reserved_until?: string | null })[])
+        type Row = CardRow & { reserved_until?: string | null };
+        let rows = (data as Row[])
           .filter((r) => r.status !== 'reserved' || (r.reserved_until != null && new Date(r.reserved_until).getTime() < now))
-          .map((r) => rowToCard(r.status === 'reserved' ? { ...r, status: 'available' } : r));
+          // consigned cards ground only once they're on the floor (withdrawn/pending stay invisible)
+          .filter((r) => !r.consignor_id || ['listed', 'sold', 'paid'].includes(r.consign_status ?? ''));
+        // consignor first names, attached deterministically (rows stay ORDER BY id → byte-stable prompt)
+        const consignorIds = [...new Set(rows.map((r) => r.consignor_id).filter((x): x is string => !!x))].sort();
+        if (consignorIds.length) {
+          const { data: profs } = await supa.from('profiles').select('id, display_name').in('id', consignorIds);
+          const names = new Map((profs ?? []).map((p) => [p.id as string, String(p.display_name ?? '').split(' ')[0]]));
+          rows = rows.map((r) => (r.consignor_id ? { ...r, consignor_display: names.get(r.consignor_id) || 'a local collector' } : r));
+        }
+        cards = rows.map((r) => rowToCard(r.status === 'reserved' ? { ...r, status: 'available' } : r));
       }
     } catch (err) {
       console.warn('[grounding] Supabase read failed, using bundled data:', (err as Error).message);
@@ -55,6 +65,7 @@ const SHELF_LABEL: Record<string, string> = {
 };
 
 function where(card: Card): string {
+  if (card.isConsigned) return 'the On Consignment case (north wall, east of the counter) — cards you sell on behalf of local consignors';
   if (card.status === 'personal') return `${ROOM_NAME} (through the doorway left of the hockey shelf) — Chris's PERSONAL collection, NOT FOR SALE`;
   if (card.featured) return 'the glass display case (near the counter)';
   if (card.category.startsWith('budget-box')) return 'the bargain bins (middle of the shop)';
@@ -70,8 +81,9 @@ function cardLine(c: Card): string {
   const grade = c.grade ? `, ${c.grade.label}${cert}` : c.foil ? ', foil' : '';
   const note = c.lore.investmentNote ? ` (${c.lore.investmentNote})` : '';
   const fact = c.lore.funFact ? ` ${c.lore.funFact}` : '';
+  const consign = c.consignorDisplay ? ` On consignment from ${c.consignorDisplay}.` : '';
   if (c.status === 'personal') return `- [${c.id}] ${c.playerName}, ${c.year} ${c.setName} ${c.cardNumber}, ${c.team}${grade} — not for sale. ${c.lore.blurb}${fact}`;
-  return `- [${c.id}] ${c.playerName}, ${c.year} ${c.setName} ${c.cardNumber}, ${c.team}${grade} — ${priceStr(c.price)}${note}. ${c.lore.blurb}`;
+  return `- [${c.id}] ${c.playerName}, ${c.year} ${c.setName} ${c.cardNumber}, ${c.team}${grade} — ${priceStr(c.price)}${note}. ${c.lore.blurb}${consign}`;
 }
 
 /** Full inventory grounding text, grouped by physical location in the shop. */

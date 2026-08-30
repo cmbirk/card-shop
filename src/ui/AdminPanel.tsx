@@ -7,12 +7,13 @@ import { listAllCards } from '../admin/adminCards';
 import { InventoryTab } from './admin/InventoryTab';
 import { ImportTab } from './admin/ImportTab';
 import { UsersTab } from './admin/UsersTab';
+import { ConsignTab } from './admin/ConsignTab';
 
 // The back office. Admin-only: inventory CRUD (every column, incl. sold/reserved/personal and
 // cost basis), bulk import/delete, and the visitors list with admin promotion. Writes go straight
 // to Supabase under the admin JWT; RLS is the real gate — this UI just hides itself from non-admins.
 
-type Tab = 'inventory' | 'import' | 'users';
+type Tab = 'inventory' | 'import' | 'consign' | 'users';
 
 export function AdminPanel() {
   const open = useUIStore((s) => s.adminOpen);
@@ -67,11 +68,15 @@ export function AdminPanel() {
             </div>
           </div>
           <div className="admin-tabs">
-            {(['inventory', 'import', 'users'] as Tab[]).map((t) => (
-              <button key={t} className={`admin-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
-                {t === 'inventory' ? 'Inventory' : t === 'import' ? 'Import' : 'Users'}
-              </button>
-            ))}
+            {(['inventory', 'import', 'consign', 'users'] as Tab[]).map((t) => {
+              const badge = t === 'consign' ? cards.filter((c) => c.consignStatus === 'submitted' || c.consignStatus === 'withdraw_requested').length : 0;
+              return (
+                <button key={t} className={`admin-tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
+                  {t === 'inventory' ? 'Inventory' : t === 'import' ? 'Import' : t === 'consign' ? 'Consign' : 'Users'}
+                  {badge > 0 && <span className="admin-badge">{badge}</span>}
+                </button>
+              );
+            })}
           </div>
           <div className="admin-head-actions">
             <button className="btn secondary" onClick={() => void refresh()} disabled={loading} title="Reload">
@@ -90,6 +95,7 @@ export function AdminPanel() {
 
         {tab === 'inventory' && <InventoryTab cards={cards} loading={loading} onChanged={afterWrite} onError={setError} />}
         {tab === 'import' && <ImportTab existing={cards} onImported={afterWrite} onError={setError} />}
+        {tab === 'consign' && <ConsignTab cards={cards} onChanged={afterWrite} onError={setError} />}
         {tab === 'users' && <UsersTab onError={setError} />}
       </div>
     </div>

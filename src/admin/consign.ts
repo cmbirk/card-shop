@@ -112,3 +112,38 @@ export function notifyConsign(cardId: string, event: string): void {
     body: JSON.stringify({ cardId, event }),
   }).catch(() => undefined);
 }
+
+// ─── Chris's side (admin) ───────────────────────────────────────────────────
+
+/** Admin: move a consignment along its lifecycle (approve/reject/receive/list/withdraw…). */
+export async function adminSetConsignStatus(id: string, status: ConsignStatus, note?: string): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured');
+  const patch: Record<string, unknown> = { consign_status: status };
+  if (note !== undefined) patch.consign_note = note;
+  const { error } = await supabase.from('cards').update(patch as never).eq('id', id);
+  if (error) throw error;
+}
+
+export interface AdminPayoutRow extends PayoutRow {
+  seller_id: string | null;
+  seller_handle: string | null;
+}
+
+export async function adminListPayouts(): Promise<AdminPayoutRow[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase.from('payouts').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  return data as AdminPayoutRow[];
+}
+
+/** Admin: record a payout as paid (method + reference) and flip the card to `paid`. */
+export async function adminMarkPaid(payout: AdminPayoutRow, method: string, reference: string): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured');
+  const { error } = await supabase
+    .from('payouts')
+    .update({ status: 'paid', method, reference, paid_at: new Date().toISOString() } as never)
+    .eq('id', payout.id)
+    .eq('status', 'owed');
+  if (error) throw error;
+  await adminSetConsignStatus(payout.card_id, 'paid');
+}

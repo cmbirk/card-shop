@@ -11,7 +11,15 @@ export async function listAllCards(): Promise<Card[]> {
   if (!supabase) return [];
   const { data, error } = await supabase.from('cards').select('*').order('updated_at', { ascending: false });
   if (error) throw error;
-  return (data as CardRow[]).map(rowToCard);
+  const rows = data as CardRow[];
+  // attach consignor first names (admin may read all profiles) so the Consign tab shows people, not uuids
+  const ids = [...new Set(rows.map((r) => r.consignor_id).filter((x): x is string => !!x))];
+  if (ids.length) {
+    const { data: profs } = await supabase.from('profiles').select('id, display_name').in('id', ids);
+    const names = new Map((profs ?? []).map((p) => [p.id as string, String(p.display_name ?? '').split(' ')[0]]));
+    for (const r of rows) if (r.consignor_id) r.consignor_display = names.get(r.consignor_id) ?? null;
+  }
+  return rows.map(rowToCard);
 }
 
 export async function saveCard(card: Card): Promise<void> {

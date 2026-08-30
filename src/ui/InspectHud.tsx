@@ -38,6 +38,7 @@ export function InspectHud() {
         {card.foil ? ' · Foil' : ''}
       </div>
       <p className="blurb">{card.lore.blurb}</p>
+      {card.consignorDisplay && <div className="consign-tag">On consignment from {card.consignorDisplay}</div>}
       {personal ? <div className="price personal">From Chris's own collection · not for sale</div> : <div className="price">{formatCents(card.price)}</div>}
       <div className="inspect-actions">
         <button className="btn secondary" onClick={() => useInspectStore.getState().flip()}>

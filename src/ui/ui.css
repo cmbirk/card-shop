@@ -1065,3 +1065,23 @@
   color: var(--gold);
   margin-top: 10px;
 }
+
+.inspect-hud .consign-tag {
+  font-size: 11px;
+  color: #9fc1ff;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.admin-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  padding: 0 4px;
+}
