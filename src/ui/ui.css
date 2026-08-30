@@ -1000,3 +1000,68 @@
   padding: 2px 4px;
   font-size: 11px;
 }
+
+/* ---- consignment ---- */
+.consign-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(24, 16, 8, 0.85);
+}
+.back-office-btn ~ * .consign-btn,
+.consign-btn.with-office {
+  top: 64px;
+}
+.modal.admin.consign {
+  width: min(760px, 100vw);
+  height: auto;
+  max-height: 92vh;
+  border-radius: 14px;
+  border: 1px solid var(--wood);
+}
+.consign-list {
+  overflow: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.consign-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(92, 64, 51, 0.6);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.consign-card {
+  flex: 1;
+  min-width: 0;
+}
+.consign-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--wood);
+  white-space: nowrap;
+}
+.consign-chip.s-approved, .consign-chip.s-received { background: #1c4a7a; }
+.consign-chip.s-listed { background: var(--green); }
+.consign-chip.s-sold, .consign-chip.s-paid { background: #7a5a1c; }
+.consign-chip.s-rejected, .consign-chip.s-withdraw_requested { background: var(--red); }
+.consign-actions {
+  display: flex;
+  gap: 6px;
+}
+.consign-note {
+  font-size: 12px;
+  color: #ff9a9c;
+  margin-top: 4px;
+}
+.consign-note.ok { color: #9fc1ff; }
+.consign-ledger-head {
+  font-family: Georgia, serif;
+  color: var(--gold);
+  margin-top: 10px;
+}

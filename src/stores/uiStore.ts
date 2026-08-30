@@ -20,6 +20,7 @@ interface UIState {
   tantrumCount: number; // increments when the customer storms out; the hold pile gets swept off the counter
   signInOpen: boolean; // guestbook sign-in panel
   adminOpen: boolean; // back-office admin panel
+  consignOpen: boolean; // seller's My Consignments overlay
   setPhase: (p: CheckoutPhase) => void;
   /** Show the receipt for a paid order (or a dry-run one) and mark its cards gone for the session. */
   completePurchase: (receipt: Receipt) => void;
@@ -27,6 +28,7 @@ interface UIState {
   tantrum: () => void;
   setSignInOpen: (v: boolean) => void;
   setAdminOpen: (v: boolean) => void;
+  setConsignOpen: (v: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
@@ -36,8 +38,10 @@ export const useUIStore = create<UIState>((set, get) => ({
   tantrumCount: 0,
   signInOpen: false,
   adminOpen: false,
+  consignOpen: false,
   setSignInOpen: (v) => set({ signInOpen: v }),
   setAdminOpen: (v) => set({ adminOpen: v }),
+  setConsignOpen: (v) => set({ consignOpen: v }),
   setPhase: (p) => {
     if (p === 'reviewing') useDialogueStore.getState().gesture$('nod'); // Chris nods you toward the register
     set({ checkoutPhase: p });

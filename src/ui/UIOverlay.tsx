@@ -11,6 +11,7 @@ import { ChatWindow } from './ChatWindow';
 import { CheckoutModal } from './CheckoutModal';
 import { SignInPanel } from './SignInPanel';
 import { AdminPanel } from './AdminPanel';
+import { ConsignPanel } from './ConsignPanel';
 import { useAuthStore } from '../stores/authStore';
 import { useBasketStore } from '../stores/basketStore';
 import { SOFT_OPENING, SHOP_NAME } from '@shared/launch';
@@ -78,6 +79,7 @@ export function UIOverlay() {
   const mode = useNavStore((s) => s.mode);
   const showStepBack = mode === 'station' && station !== 'outside' && station !== 'center' && station !== 'entry';
   const isAdmin = useAuthStore((s) => s.isAdmin);
+  const isSeller = useAuthStore((s) => s.isSeller);
   const holding = useBasketStore((s) => s.items.length > 0);
   return (
     <div className="overlay">
@@ -95,6 +97,11 @@ export function UIOverlay() {
         </p>
       </div>
       {SOFT_OPENING && <div className="soft-open-ribbon">Opening soon · browse away, nothing's for sale yet</div>}
+      {isSeller && (
+        <button className={`btn secondary consign-btn${isAdmin ? ' with-office' : ''}`} onClick={() => useUIStore.getState().setConsignOpen(true)}>
+          📦 My consignments
+        </button>
+      )}
       {isAdmin && (
         <button className="btn secondary back-office-btn" onClick={() => useUIStore.getState().setAdminOpen(true)}>
           🗝 Back office
@@ -111,6 +118,7 @@ export function UIOverlay() {
       <CheckoutModal />
       <SignInPanel />
       <AdminPanel />
+      <ConsignPanel />
     </div>
   );
 }

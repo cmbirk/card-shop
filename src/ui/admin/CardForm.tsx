@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Card, GradeCompany, RawCondition } from '@shared/types';
 import { saveCard, deleteCard, uploadCardImage, newCardId } from '../../admin/adminCards';
 import { prepareScan, fileFromDataTransfer } from '../../admin/imagePrep';
+import { saveConsignment, uploadConsignScan } from '../../admin/consign';
 
 const SPORTS: Card['sport'][] = ['baseball', 'basketball', 'football', 'hockey', 'tcg'];
 const CATEGORIES = ['rookies', 'vintage', 'stars', 'graded-slabs', 'budget-box', 'budget-box-b', 'collection'];
@@ -56,13 +57,16 @@ function MoneyInput({ cents, onCents, required, placeholder }: { cents: number |
 interface FormProps {
   initial: Card;
   isNew: boolean;
+  /** 'seller': consignment submission — no price/status/lore/shelf; asking price instead. */
+  mode?: 'admin' | 'seller';
   onCancel: () => void;
   onSaved: () => Promise<void>;
   onDeleted: () => Promise<void>;
   onError: (msg: string | null) => void;
 }
 
-export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError }: FormProps) {
+export function CardForm({ initial, isNew, mode = 'admin', onCancel, onSaved, onDeleted, onError }: FormProps) {
+  const seller = mode === 'seller';
   const [card, setCard] = useState<Card>(initial);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -88,7 +92,8 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
     if (!card.playerName.trim()) return onError('Player name is required.');
     setBusy(true);
     try {
-      await saveCard({ ...card, id, graded: !!card.grade });
+      if (seller) await saveConsignment({ ...card, id, graded: !!card.grade });
+      else await saveCard({ ...card, id, graded: !!card.grade });
       await onSaved();
     } catch (err) {
       onError((err as Error).message);
@@ -121,7 +126,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
     try {
       const prepared = await prepareScan(file, setStage); // HEIC → JPEG, downscale
       setStage('uploading…');
-      const url = await uploadCardImage(prepared.file, id, side);
+      const url = seller ? await uploadConsignScan(prepared.file, id, side) : await uploadCardImage(prepared.file, id, side);
       setCard((c) => ({
         ...c,
         id,
@@ -163,7 +168,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
       onDrop={onFormDrop}
     >
       <div className="admin-form-title">
-        {isNew ? 'New card' : `Editing ${card.id}`}
+        {seller ? (isNew ? 'Consign a card' : `Editing ${card.id}`) : isNew ? 'New card' : `Editing ${card.id}`}
         {!isNew && card.updatedAt && <span className="admin-card-sub"> · updated {new Date(card.updatedAt).toLocaleString()}</span>}
       </div>
 
@@ -189,6 +194,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
               ))}
             </select>
           </label>
+          {!seller && (
           <label>
             Shelf
             <select value={card.category} onChange={(e) => patch({ category: e.target.value })}>
@@ -197,6 +203,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
               ))}
             </select>
           </label>
+          )}
           <label className="wide">
             Player
             <input data-1p-ignore value={card.playerName} onChange={(e) => patch({ playerName: e.target.value })} required />
@@ -279,9 +286,11 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
             <label title="Set automatically from the front scan; override if needed">
               <input data-1p-ignore type="checkbox" checked={!!card.landscape} onChange={(e) => patch({ landscape: e.target.checked })} /> Horizontal card
             </label>
-            <label>
-              <input data-1p-ignore type="checkbox" checked={!!card.featured} onChange={(e) => patch({ featured: e.target.checked })} /> Featured (display case)
-            </label>
+            {!seller && (
+              <label>
+                <input data-1p-ignore type="checkbox" checked={!!card.featured} onChange={(e) => patch({ featured: e.target.checked })} /> Featured (display case)
+              </label>
+            )}
           </div>
         </div>
       </fieldset>
@@ -342,7 +351,15 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
       </fieldset>
 
       <fieldset>
-        <legend>Commerce</legend>
+        <legend>{seller ? 'Your ask' : 'Commerce'}</legend>
+        {seller ? (
+          <div className="grid">
+            <label title="What you'd like it listed at — Chris sets the final sticker price">
+              Asking price $
+              <MoneyInput cents={card.askingPrice} onCents={(c) => patch({ askingPrice: c })} required />
+            </label>
+          </div>
+        ) : (
         <div className="grid">
           <label>
             Price $
@@ -373,6 +390,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
             <input data-1p-ignore value={card.acquiredFrom ?? ''} placeholder="eBay, show, trade…" onChange={(e) => patch({ acquiredFrom: e.target.value || undefined })} />
           </label>
         </div>
+        )}
       </fieldset>
 
       <fieldset>
@@ -406,6 +424,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
         </div>
       </fieldset>
 
+      {!seller && (
       <fieldset>
         <legend>Lore (what Chris knows)</legend>
         <div className="grid">
@@ -423,6 +442,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           </label>
         </div>
       </fieldset>
+      )}
 
       <div className="modal-actions admin-actions">
         {!isNew &&
@@ -446,7 +466,7 @@ export function CardForm({ initial, isNew, onCancel, onSaved, onDeleted, onError
           Cancel
         </button>
         <button type="submit" className="btn" disabled={busy || !!uploading}>
-          {busy ? 'Saving…' : 'Save card'}
+          {busy ? 'Saving…' : seller ? (isNew ? 'Submit to Chris' : 'Save changes') : 'Save card'}
         </button>
       </div>
     </form>

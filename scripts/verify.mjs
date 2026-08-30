@@ -53,6 +53,7 @@ for (const step of script.split(';').map((s) => s.trim()).filter(Boolean)) {
   else if (cmd === 'key') await page.keyboard.press(a[0]);
   else if (cmd === 'clickText') await page.getByText(a.join(','), { exact: false }).first().click();
   else if (cmd === 'basket') await page.evaluate((ids) => ids.forEach((id) => window.__basket?.getState().add(id)), a);
+  else if (cmd === 'sellerFlag') await page.evaluate(() => window.__auth?.setState({ isSeller: true }));
   else if (cmd === 'adminFlag') await page.evaluate(() => window.__auth?.setState({ isAdmin: true }));
   else if (cmd === 'admin') await page.evaluate(() => { window.__auth?.setState({ isAdmin: true }); window.__ui?.getState().setAdminOpen(true); });
   else if (cmd === 'ask') await page.evaluate((id) => { window.__inspect?.getState().pickUp(id); const t = setInterval(() => { if (window.__inspect?.getState().mode === 'inspecting') { clearInterval(t); window.__dialogue?.getState().askAbout(id); } }, 100); }, a[0]);
