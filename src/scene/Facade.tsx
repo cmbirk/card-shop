@@ -28,6 +28,13 @@ function SignInSheet() {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
   const signedIn = useAuthStore((s) => !!s.session);
+  // an invited seller arrives with their line already in the book
+  const invited = useUIStore((s) => s.invitedArrival);
+  const firstName = useAuthStore((s) => {
+    const meta = s.user?.user_metadata as { full_name?: string; name?: string } | undefined;
+    return (meta?.full_name ?? meta?.name ?? '').split(' ')[0] || null;
+  });
+  const savedSpot = invited && signedIn;
   return (
     <group
       position={[1.05, 1.25, 0.06]}
@@ -53,11 +60,14 @@ function SignInSheet() {
         <boxGeometry args={[0.12, 0.05, 0.03]} />
       </mesh>
       <mesh
-        material={makeLabelMaterial(signedIn ? 'Signed in ✓' : 'Sign in here', {
-          bg: '#efe6c8',
-          fg: signedIn ? '#2e5e4e' : '#a63d40',
-          size: 44,
-        })}
+        material={makeLabelMaterial(
+          savedSpot ? `${firstName ?? 'You'} — we saved you a spot` : signedIn ? 'Signed in ✓' : 'Sign in here',
+          {
+            bg: '#efe6c8',
+            fg: savedSpot || signedIn ? '#2e5e4e' : '#a63d40',
+            size: savedSpot ? 30 : 44,
+          },
+        )}
         position={[0, 0.02, 0.014]}
       >
         <planeGeometry args={[0.25, 0.09]} />

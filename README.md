@@ -100,7 +100,11 @@ scripts/verify.mjs  headless screenshot/console verify (see the verify-app skill
   cards atomically, opens hosted Stripe Checkout priced from the database, and the webhook is the
   only thing that marks cards sold; orders are snapshotted in an `orders` table for the receipt
   (stamped TEST while `test_mode`). Cancelling or letting the session expire puts the cards back.
-- **Consignment (Stage 1, invite-only).** Flip a visitor's Seller toggle in Users and they get a
+- **Consignment (Stage 1, invite-only).** Invite by email from Users → "+ Invite someone" (creates
+  the account up front; the email carries a walk-right-in link — they arrive signed in, their line
+  pre-written in the guestbook, and Chris greets them with "been expecting you"; stale links fall
+  back to a friendly re-sign-in, and if mail can't deliver the modal hands you the link to text).
+  Or flip a visitor's Seller toggle in Users and they get a
   "My consignments" panel: submit cards with scans + an asking price; Chris reviews in the Consign
   tab (approve = set the sticker price + lore → they ship it in → mark received → List), the card
   sits in the On Consignment case ("that one's Maya's"), and when it sells the Stripe webhook

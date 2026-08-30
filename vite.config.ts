@@ -18,6 +18,7 @@ function apiDev(): Plugin {
       server.middlewares.use('/api/stripe-webhook', (req, res) => void handle(server, '/api/stripe-webhook.ts', req, res));
       server.middlewares.use('/api/orders', (req, res) => void handle(server, '/api/orders.ts', req, res));
       server.middlewares.use('/api/consign-notify', (req, res) => void handle(server, '/api/consign-notify.ts', req, res));
+      server.middlewares.use('/api/invite', (req, res) => void handle(server, '/api/invite.ts', req, res));
     },
   };
 }

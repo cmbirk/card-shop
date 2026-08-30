@@ -21,12 +21,14 @@ export function SignInPanel() {
   const magicSent = useAuthStore((s) => s.magicSent);
   const authError = useAuthStore((s) => s.authError);
   const [email, setEmail] = useState('');
+  const notice = useUIStore((s) => s.signInNotice);
 
   if (!open) return null;
 
   return (
     <div className="modal-backdrop">
       <div className="modal signin">
+        {notice && <div className="signin-note">{notice}</div>}
         <div className="signin-sheet-head">
           <div className="signin-title">The {SHOP_NAME} Guestbook</div>
           <div className="signin-sub">Sign in to come on in — welcome to the shop.</div>

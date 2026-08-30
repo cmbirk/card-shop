@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { listUsers, setAdmin, setSeller, setSellerSplit, type Visitor } from '../../admin/adminUsers';
 import { notifySellerInvited, notifyAdminInvited } from '../../admin/consign';
+import { useAuthStore as auth } from '../../stores/authStore';
 import { useAuthStore } from '../../stores/authStore';
 
 const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
@@ -68,6 +69,45 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
     setInviteSplit(u.splitPct ?? 85);
   };
   const [inviting, setInviting] = useState<Visitor | null>(null);
+  const [cold, setCold] = useState(false); // the "+ Invite someone" (never-visited) modal
+  const [coldEmail, setColdEmail] = useState('');
+  const [coldName, setColdName] = useState('');
+  const [coldSplit, setColdSplit] = useState(85);
+  const [coldBusy, setColdBusy] = useState(false);
+  const [coldResult, setColdResult] = useState<{ sent: boolean; link: string | null; existing: boolean } | null>(null);
+
+  const sendInvite = async (email: string, name: string, split: number) => {
+    const token = auth.getState().session?.access_token;
+    const res = await fetch('/api/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ email, displayName: name, splitPct: split }),
+    });
+    const body = (await res.json()) as { ok?: boolean; sent?: boolean; link?: string | null; existing?: boolean; error?: string };
+    if (!res.ok || !body.ok) throw new Error(body.error ?? `invite failed (${res.status})`);
+    return { sent: !!body.sent, link: body.link ?? null, existing: !!body.existing };
+  };
+
+  const submitCold = async () => {
+    const email = coldEmail.trim().toLowerCase();
+    if (!email) return;
+    const already = users.find((u) => u.email?.toLowerCase() === email);
+    if (already) {
+      onError(`${email} has already visited — use the Seller toggle on their row instead.`);
+      setCold(false);
+      return;
+    }
+    setColdBusy(true);
+    onError(null);
+    try {
+      setColdResult(await sendInvite(email, coldName, coldSplit));
+      await refresh();
+    } catch (e) {
+      onError((e as Error).message);
+    } finally {
+      setColdBusy(false);
+    }
+  };
   const [inviteName, setInviteName] = useState('');
   const [inviteSplit, setInviteSplit] = useState(85);
   const confirmInvite = () => {
@@ -87,6 +127,9 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
   return (
     <>
       <div className="admin-toolbar">
+        <button className="btn" onClick={() => { setCold(true); setColdResult(null); setColdEmail(''); setColdName(''); setColdSplit(85); }}>
+          + Invite someone
+        </button>
         <span className="admin-help">
           {users.length} visitor{users.length === 1 ? '' : 's'} · {users.filter((u) => u.isAdmin).length} admin{users.filter((u) => u.isAdmin).length === 1 ? '' : 's'}
         </span>
@@ -117,6 +160,7 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
                       <div className="admin-card-name">
                         {u.displayName ?? '—'}
                         {u.id === me && <span className="tag">you</span>}
+                        {u.invitedAt && u.visits <= 1 && <span className="tag warn">invited · hasn't visited</span>}
                       </div>
                       <div className="admin-card-sub">{u.email ?? ''}</div>
                     </div>
@@ -131,6 +175,17 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
                     <input type="checkbox" checked={u.isSeller} disabled={busy === u.id} onChange={() => void toggleSeller(u)} />
                     <span>{u.isSeller ? 'Seller' : '—'}</span>
                   </label>
+                  {u.isSeller && u.invitedAt && u.visits <= 1 && u.email && (
+                    <button
+                      className="btn secondary"
+                      style={{ marginLeft: 6 }}
+                      disabled={busy === u.id}
+                      title="Send them a fresh walk-right-in link"
+                      onClick={() => void run(u.id, async () => void (await sendInvite(u.email!, u.displayName ?? 'there', u.splitPct ?? 85)))}
+                    >
+                      ↻ re-invite
+                    </button>
+                  )}
                   {u.isSeller && (
                     <span className="admin-split" title="The seller's cut of each sale">
                       keeps{' '}
@@ -164,6 +219,69 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
           </tbody>
         </table>
       </div>
+
+      {cold && (
+        <div className="modal-backdrop invite-confirm">
+          <div className="modal">
+            <h2>Invite someone to sell</h2>
+            {coldResult ? (
+              <>
+                <p className="admin-help">
+                  {coldResult.existing
+                    ? 'They already had an account — seller access attached, and they got the welcome email.'
+                    : coldResult.sent
+                      ? `Done — ${coldEmail.trim()} has an invite in their inbox with a walk-right-in link.`
+                      : 'Account created, but the email did not go out (domain not verified in Resend yet). Copy the link below and text it to them — it signs them straight in.'}
+                </p>
+                {coldResult.link && !coldResult.sent && (
+                  <div className="admin-toolbar">
+                    <input data-1p-ignore className="admin-search" readOnly value={coldResult.link} onFocus={(e) => e.target.select()} />
+                    <button className="btn secondary" onClick={() => void navigator.clipboard?.writeText(coldResult.link!)}>
+                      Copy
+                    </button>
+                  </div>
+                )}
+                <div className="modal-actions">
+                  <button className="btn" onClick={() => setCold(false)}>
+                    Done
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="admin-form" style={{ overflow: 'visible' }}>
+                  <div className="grid">
+                    <label className="wide">
+                      Email
+                      <input data-1p-ignore autoFocus type="email" value={coldEmail} onChange={(e) => setColdEmail(e.target.value)} placeholder="friend@example.com" />
+                    </label>
+                    <label>
+                      Display name <span className="admin-only">what Chris calls them</span>
+                      <input data-1p-ignore value={coldName} onChange={(e) => setColdName(e.target.value)} placeholder="e.g. Maya" />
+                    </label>
+                    <label>
+                      Their cut %
+                      <input data-1p-ignore type="number" min={0} max={100} value={coldSplit} onChange={(e) => setColdSplit(Math.max(0, Math.min(100, Math.round(Number(e.target.value) || 0))))} />
+                    </label>
+                  </div>
+                </div>
+                <p className="admin-help" style={{ marginTop: 10 }}>
+                  📬 This creates their account and emails an invite in your voice with a sign-in link. They keep <b>{coldSplit}%</b> of each
+                  sale. Sellers only — admins get promoted after they've actually visited.
+                </p>
+                <div className="modal-actions">
+                  <button className="btn secondary" onClick={() => setCold(false)}>
+                    Cancel
+                  </button>
+                  <button className="btn" disabled={coldBusy || !coldEmail.trim() || !coldName.trim()} onClick={() => void submitCold()}>
+                    {coldBusy ? 'Inviting…' : 'Invite & send email'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {promoting && (
         <div className="modal-backdrop invite-confirm">

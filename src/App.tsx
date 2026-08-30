@@ -14,6 +14,7 @@ import { loadInventory } from './systems/inventory';
 import { useAuthStore } from './stores/authStore';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import { resumeCheckout } from './systems/checkoutReturn';
+import { handleArrival } from './systems/arrival';
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -22,6 +23,7 @@ export default function App() {
     loadInventory().then(() => {
       setReady(true);
       void resumeCheckout(); // ?checkout=success|cancel after Stripe
+      handleArrival(); // ?invited=1 / stale invite links
     });
   }, []);
 

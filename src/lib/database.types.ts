@@ -298,6 +298,7 @@ export type Database = {
           email: string | null
           first_seen: string
           id: string
+          invited_at: string | null
           last_seen: string
           provider: string | null
           ship_address: string | null
@@ -309,6 +310,7 @@ export type Database = {
           email?: string | null
           first_seen?: string
           id: string
+          invited_at?: string | null
           last_seen?: string
           provider?: string | null
           ship_address?: string | null
@@ -320,6 +322,7 @@ export type Database = {
           email?: string | null
           first_seen?: string
           id?: string
+          invited_at?: string | null
           last_seen?: string
           provider?: string | null
           ship_address?: string | null

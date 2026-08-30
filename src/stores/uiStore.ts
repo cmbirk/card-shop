@@ -21,6 +21,8 @@ interface UIState {
   signInOpen: boolean; // guestbook sign-in panel
   adminOpen: boolean; // back-office admin panel
   consignOpen: boolean; // seller's My Consignments overlay
+  invitedArrival: boolean; // came in via an invite email's walk-right-in link
+  signInNotice: string | null; // friendly line atop the sign-in panel (e.g. stale invite link)
   setPhase: (p: CheckoutPhase) => void;
   /** Show the receipt for a paid order (or a dry-run one) and mark its cards gone for the session. */
   completePurchase: (receipt: Receipt) => void;
@@ -29,6 +31,8 @@ interface UIState {
   setSignInOpen: (v: boolean) => void;
   setAdminOpen: (v: boolean) => void;
   setConsignOpen: (v: boolean) => void;
+  setInvitedArrival: (v: boolean) => void;
+  setSignInNotice: (v: string | null) => void;
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
@@ -39,9 +43,13 @@ export const useUIStore = create<UIState>((set, get) => ({
   signInOpen: false,
   adminOpen: false,
   consignOpen: false,
+  invitedArrival: false,
+  signInNotice: null,
   setSignInOpen: (v) => set({ signInOpen: v }),
   setAdminOpen: (v) => set({ adminOpen: v }),
   setConsignOpen: (v) => set({ consignOpen: v }),
+  setInvitedArrival: (v) => set({ invitedArrival: v }),
+  setSignInNotice: (v) => set({ signInNotice: v }),
   setPhase: (p) => {
     if (p === 'reviewing') useDialogueStore.getState().gesture$('nod'); // Chris nods you toward the register
     set({ checkoutPhase: p });

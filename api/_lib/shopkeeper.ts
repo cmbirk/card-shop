@@ -66,6 +66,8 @@ async function sellerContext(userId: string | null | undefined): Promise<string>
     const H = { apikey: SUPA_SR, Authorization: `Bearer ${SUPA_SR}` };
     const seller = await (await fetch(`${SUPA_URL2}/rest/v1/sellers?user_id=eq.${userId}&select=user_id`, { headers: H })).json();
     if (!Array.isArray(seller) || seller.length === 0) return '';
+    const prof = (await (await fetch(`${SUPA_URL2}/rest/v1/profiles?id=eq.${userId}&select=invited_at,visits`, { headers: H })).json()) as { invited_at: string | null; visits: number }[];
+    const firstInvitedVisit = Array.isArray(prof) && prof[0]?.invited_at != null && (prof[0]?.visits ?? 0) <= 1;
     const rows = (await (await fetch(`${SUPA_URL2}/rest/v1/cards?consignor_id=eq.${userId}&select=consign_status`, { headers: H })).json()) as { consign_status: string }[];
     if (!Array.isArray(rows)) return '';
     const counts = new Map<string, number>();
@@ -82,7 +84,7 @@ async function sellerContext(userId: string | null | undefined): Promise<string>
       withdrawn: 'returned',
     };
     const parts = [...counts.entries()].sort().map(([k, n]) => `${n} ${LABEL[k] ?? k}`);
-    return `[This customer is one of your consignment sellers.${parts.length ? ` Their cards with you: ${parts.join('; ')}.` : ' They have no cards with you yet.'} Help them with the process if they seem stuck.]`;
+    return `[This customer is one of your consignment sellers.${parts.length ? ` Their cards with you: ${parts.join('; ')}.` : ' They have no cards with you yet.'}${firstInvitedVisit ? ' This is their FIRST visit and you invited them personally — make them feel at home and offer to walk them through consigning their first card.' : ''} Help them with the process if they seem stuck.]`;
   } catch {
     return '';
   }

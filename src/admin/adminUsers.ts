@@ -8,6 +8,7 @@ export interface Visitor {
   id: string;
   isSeller: boolean;
   splitPct: number | null;
+  invitedAt: string | null;
   email: string | null;
   displayName: string | null;
   avatarUrl: string | null;
@@ -43,6 +44,7 @@ export async function listUsers(): Promise<Visitor[]> {
     isAdmin: adminIds.has(p.id),
     isSeller: sellerSplit.has(p.id),
     splitPct: sellerSplit.get(p.id) ?? null,
+    invitedAt: (p as { invited_at?: string | null }).invited_at ?? null,
   }));
 }
 
