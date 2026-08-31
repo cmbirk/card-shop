@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { logEvent } from '../systems/analytics';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase, supabaseConfigured } from '../lib/supabase';
 
@@ -35,7 +36,7 @@ async function checkSeller(userId: string | undefined): Promise<boolean> {
   return !!data;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   user: null,
   isAdmin: false,
@@ -53,7 +54,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       const session = data.session;
       set({ session, user: session?.user ?? null, isAdmin: await checkAdmin(session?.user?.id), isSeller: await checkSeller(session?.user?.id), firstVisit: await checkFirstVisit(session?.user?.id), ready: true });
     });
-    supabase.auth.onAuthStateChange(async (_event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session && !get().session) {
+        const provider = session.user.app_metadata?.provider;
+        logEvent('sign_in', { method: provider === 'google' ? 'google' : 'magic' });
+      }
       set({
         session,
         user: session?.user ?? null,

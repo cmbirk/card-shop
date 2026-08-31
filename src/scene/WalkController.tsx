@@ -8,6 +8,7 @@ import { useInspectStore } from '../stores/inspectStore';
 import { useUIStore } from '../stores/uiStore';
 import { useDialogueStore } from '../stores/dialogueStore';
 import { FEEL } from '../feel';
+import { logEvent } from '../systems/analytics';
 
 // First-person walking, the low-key way: press WASD/arrows anywhere inside and you detach
 // from the station rig into freewalk (drag to look, keys to move, eye height locked).
@@ -89,6 +90,7 @@ export function WalkController() {
         look.current.yaw = e2.y;
         look.current.pitch = e2.x;
         nav.setMode('freewalk');
+        logEvent('freewalk');
       }
     };
     const up = (e: KeyboardEvent) => keys.current.delete(e.code);

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { logEvent } from '../systems/analytics';
 import { shopLayout } from '@shared/data/shopLayout';
 import { useAuthStore } from './authStore';
 
@@ -26,7 +27,16 @@ export const useNavStore = create<NavState>((set, get) => ({
     if (id === 'office' && !useAuthStore.getState().isAdmin) return; // staff only — the door gate
     set({ targetStation: id, mode: 'transit' });
   },
-  arrived: (id) => set({ currentStation: id, targetStation: null, mode: 'station' }),
+  arrived: (id) => {
+    if (id !== 'outside') {
+      if (get().currentStation === 'outside') logEvent('enter_shop');
+      logEvent('visit_station', { station: id, via: 'glide' });
+    }
+    set({ currentStation: id, targetStation: null, mode: 'station' });
+  },
   setMode: (mode) => set({ mode }),
-  setCurrentSilently: (id) => set({ currentStation: id }),
+  setCurrentSilently: (id) => {
+    logEvent('visit_station', { station: id, via: 'walk' });
+    set({ currentStation: id });
+  },
 }));

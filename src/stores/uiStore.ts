@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { logEvent, basketSummary } from '../systems/analytics';
 import { useNavStore } from './navStore';
 import { useBasketStore } from './basketStore';
 import { useDialogueStore } from './dialogueStore';
@@ -52,10 +53,12 @@ export const useUIStore = create<UIState>((set, get) => ({
   setSignInNotice: (v) => set({ signInNotice: v }),
   setPhase: (p) => {
     if (p === 'reviewing') useDialogueStore.getState().gesture$('nod'); // Chris nods you toward the register
+    if (p !== 'browsing' && p !== 'receipt' && p !== get().checkoutPhase) logEvent('checkout', { step: p, ...basketSummary(useBasketStore.getState().items) });
     set({ checkoutPhase: p });
   },
   completePurchase: (receipt) => {
     useDialogueStore.getState().gesture$('checkout'); // rings it up
+    logEvent('checkout', { step: 'receipt', items: receipt.items.length, cents: receipt.total });
     set((s) => ({
       soldIds: [...s.soldIds, ...receipt.items.map((i) => i.id)],
       lastReceipt: receipt,

@@ -33,7 +33,10 @@ used constantly during development.
 
 ## Notes that save time
 
-- **Dev hooks (`window.__nav / __inspect / __basket / __ui / __auth`) exist only in `dev`.** `admin` opens the
+- **Dev hooks (`window.__nav / __inspect / __basket / __ui / __auth / __inventory / __events`) exist only in `dev`.**
+  `__inventory` is the live `inventoryById` map — `eval,[...window.__inventory.keys()][0]` finds a real card id (bundled ids may
+  not exist in Supabase). `__events` is the list of analytics events fired so far (`src/systems/analytics.ts`) — dump it
+  with `eval,JSON.stringify(window.__events)` to assert a flow was tracked. `eval` expressions can't contain `;` (the action separator). `admin` opens the
   back-office panel as a fake admin; `adminFlag` only sets `isAdmin` (e.g. to click the STAFF ONLY door). Prefer
   `goto,<station>` and `pickup,<id>` over pixel clicks — headless SwiftShader renders at ~5-10fps, so
   camera glides are slow (the script polls ~13s for arrival) and precise clicks during transit are

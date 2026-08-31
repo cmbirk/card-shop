@@ -96,7 +96,7 @@ src/
 - `npm run dev` — Vite + dev-mounted `/api`. `.env.local` (gitignored) holds
   Anthropic + Supabase keys. `npm run build` = tsc + vite build. `npm test` = vitest.
 - **Verify visually with the `verify-app` skill** (headless Playwright screenshot + console capture).
-  Dev hooks in dev mode: `window.__nav / __inspect / __basket / __ui / __auth / __dialogue / __keeper / __maya`.
+  Dev hooks in dev mode: `window.__nav / __inspect / __basket / __ui / __auth / __dialogue / __keeper / __maya / __inventory` (live `inventoryById`) and `__events` (every analytics event fired this page — assert on it).
   Camera glide is slow headless — poll `__nav.getState()` for arrival before asserting. `verify.mjs`
   actions `admin` / `adminFlag` fake admin status; `ask,<id>` runs the hold-up-a-card → Chris walks
   over flow (headless has no JWT, so the fallback line shows — the walk still exercises fully);

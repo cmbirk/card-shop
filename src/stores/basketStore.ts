@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { logEvent, cardProps } from '../systems/analytics';
 import { inventoryById } from '../systems/inventory';
 
 interface BasketState {
@@ -10,7 +11,12 @@ interface BasketState {
 
 export const useBasketStore = create<BasketState>((set) => ({
   items: [],
-  add: (id) => set((s) => (s.items.includes(id) ? s : { items: [...s.items, id] })),
+  add: (id) =>
+    set((s) => {
+      if (s.items.includes(id)) return s;
+      logEvent('basket_add', cardProps(id));
+      return { items: [...s.items, id] };
+    }),
   remove: (id) => set((s) => ({ items: s.items.filter((i) => i !== id) })),
   clear: () => set({ items: [] }),
 }));

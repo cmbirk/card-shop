@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { logEvent, cardProps } from '../systems/analytics';
 import { useNavStore } from './navStore';
 import { inventoryById } from '../systems/inventory';
 
@@ -26,6 +27,7 @@ export const useInspectStore = create<InspectState>((set, get) => ({
     if (!inventoryById.has(id)) return; // stale id (card removed since load) — don't crash the scene
     nav.setMode('inspect-locked');
     set({ heldCardId: id, mode: 'pickingUp' });
+    logEvent('pickup_card', cardProps(id));
   },
   transitionDone: () => {
     const { mode } = get();

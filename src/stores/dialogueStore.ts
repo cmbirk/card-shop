@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { logEvent } from '../systems/analytics';
 import type { ChatMessage, ChatRequest } from '@shared/types';
 import { shopLayout, ROOM, ANNEX, OFFICE } from '@shared/data/shopLayout';
 import { streamChat } from '../api/chat';
@@ -199,6 +200,7 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
     if (!trimmed || get().isStreaming) return;
     const messages: ChatMessage[] = [...get().messages, { role: 'user' as const, content: trimmed }].slice(-HISTORY_CAP);
     set({ messages, isStreaming: true, streamingText: '' });
+    logEvent('chat', { via: context?.identified ? 'photo' : context?.holding ? 'card' : 'typed' });
     abort = new AbortController();
     try {
       const final = await streamChat(
