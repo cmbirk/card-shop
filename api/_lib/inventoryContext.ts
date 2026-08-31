@@ -57,15 +57,15 @@ export async function getInventory(): Promise<{ cards: Card[]; cardsById: Map<st
 }
 
 const SHELF_LABEL: Record<string, string> = {
-  baseball: 'the Baseball shelf (right wall, near the entrance)',
-  basketball: 'the Basketball shelf (left wall, near the entrance)',
-  football: 'the Football shelf (left wall, middle)',
-  hockey: 'the Hockey shelf (left wall, toward the counter)',
-  tcg: 'the Trading Card Games shelf (right wall, middle)',
+  baseball: 'the Baseball shelf (right wall, toward the counter)',
+  basketball: 'the Basketball shelf (left wall, middle)',
+  football: 'the Football shelf (left wall, toward the counter)',
+  hockey: 'the Hockey shelf (left wall, nearest the entrance)',
+  tcg: 'the Trading Card Games shelf (right wall, nearest the entrance)',
 };
 
 function where(card: Card): string {
-  if (card.status === 'personal') return `${ROOM_NAME} (through the doorway left of the hockey shelf) — Chris's PERSONAL collection, NOT FOR SALE`;
+  if (card.status === 'personal') return `${ROOM_NAME} (through the doorway beside the football shelf) — Chris's PERSONAL collection, NOT FOR SALE`;
   if (card.featured) return 'the glass display case (near the counter)';
   if (card.category.startsWith('budget-box')) return 'the bargain bins (middle of the shop)';
   return SHELF_LABEL[card.sport];

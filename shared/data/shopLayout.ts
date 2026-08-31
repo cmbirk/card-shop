@@ -7,7 +7,7 @@ const D90 = Math.PI / 2;
 export const ROOM = { width: 10, depth: 8, height: 3 } as const;
 
 // The Collection: a small annex off the west wall (Chris's personal collection + memorabilia).
-// Reached through an open doorway beside the hockey shelf, next to the back-office door.
+// Reached through an open doorway beside the football shelf, next to the back-office door.
 export const ANNEX = { xMin: -9, xMax: -5, zMin: -5.2, zMax: -1.2, height: 3 } as const;
 export const ANNEX_DOOR = { z: -3.2, width: 1.0, height: 2.2 } as const; // on the west wall (x = -5)
 
@@ -47,7 +47,7 @@ export const shopLayout: ShopLayout = {
     {
       id: 'shelf-hockey',
       kind: 'shelf',
-      position: [-4.6, 0, -1.5],
+      position: [-4.6, 0, 2.9],
       rotationY: D90,
       accepts: { sport: 'hockey' },
       slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
@@ -57,7 +57,7 @@ export const shopLayout: ShopLayout = {
     {
       id: 'shelf-football',
       kind: 'shelf',
-      position: [-4.6, 0, 0.8],
+      position: [-4.6, 0, -1.5],
       rotationY: D90,
       accepts: { sport: 'football' },
       slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
@@ -67,7 +67,7 @@ export const shopLayout: ShopLayout = {
     {
       id: 'shelf-basketball',
       kind: 'shelf',
-      position: [-4.6, 0, 2.9],
+      position: [-4.6, 0, 0.8],
       rotationY: D90,
       accepts: { sport: 'basketball' },
       slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
@@ -77,7 +77,7 @@ export const shopLayout: ShopLayout = {
     {
       id: 'shelf-tcg',
       kind: 'shelf',
-      position: [4.6, 0, 0.8],
+      position: [4.6, 0, 2.9],
       rotationY: -D90,
       accepts: { sport: 'tcg' },
       slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
@@ -87,7 +87,7 @@ export const shopLayout: ShopLayout = {
     {
       id: 'shelf-baseball',
       kind: 'shelf',
-      position: [4.6, 0, 2.9],
+      position: [4.6, 0, 0.8],
       rotationY: -D90,
       accepts: { sport: 'baseball' },
       slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
@@ -130,15 +130,15 @@ export const shopLayout: ShopLayout = {
       target: [0, 1.4, -1],
       yawRange: 1.1,
       pitchRange: 0.4,
-      neighbors: ['shelf-basketball', 'shelf-baseball', 'bins'],
+      neighbors: ['shelf-hockey', 'shelf-tcg', 'bins'],
     },
     {
       id: 'shelf-hockey',
-      position: [-3.1, 1.5, -1.5],
-      target: [-4.6, 1.35, -1.5],
+      position: [-3.1, 1.5, 2.9],
+      target: [-4.6, 1.35, 2.9],
       yawRange: 1.15,
       pitchRange: 0.4,
-      neighbors: ['shelf-football', 'bins', 'counter', 'collection-door'],
+      neighbors: ['shelf-basketball', 'entry', 'bins'],
     },
     {
       id: 'office-door',
@@ -146,7 +146,7 @@ export const shopLayout: ShopLayout = {
       target: [-3, 1.4, -5],
       yawRange: 0.8,
       pitchRange: 0.35,
-      neighbors: ['counter', 'shelf-hockey', 'collection-door', 'office'],
+      neighbors: ['counter', 'shelf-football', 'collection-door', 'office'],
     },
     {
       id: 'office',
@@ -162,7 +162,7 @@ export const shopLayout: ShopLayout = {
       target: [-7, 1.4, -3.2],
       yawRange: 0.9,
       pitchRange: 0.35,
-      neighbors: ['shelf-hockey', 'counter', 'collection-case'],
+      neighbors: ['shelf-football', 'counter', 'collection-case'],
     },
     {
       id: 'collection-case',
@@ -174,35 +174,35 @@ export const shopLayout: ShopLayout = {
     },
     {
       id: 'shelf-football',
+      position: [-3.1, 1.5, -1.5],
+      target: [-4.6, 1.35, -1.5],
+      yawRange: 1.15,
+      pitchRange: 0.4,
+      neighbors: ['shelf-basketball', 'bins', 'counter', 'collection-door'],
+    },
+    {
+      id: 'shelf-basketball',
       position: [-3.1, 1.5, 0.8],
       target: [-4.6, 1.35, 0.8],
       yawRange: 1.15,
       pitchRange: 0.4,
-      neighbors: ['shelf-hockey', 'shelf-basketball', 'bins'],
-    },
-    {
-      id: 'shelf-basketball',
-      position: [-3.1, 1.5, 2.9],
-      target: [-4.6, 1.35, 2.9],
-      yawRange: 1.15,
-      pitchRange: 0.4,
-      neighbors: ['shelf-football', 'entry', 'bins'],
+      neighbors: ['shelf-football', 'shelf-hockey', 'bins'],
     },
     {
       id: 'shelf-tcg',
-      position: [3.1, 1.5, 0.8],
-      target: [4.6, 1.35, 0.8],
-      yawRange: 1.15,
-      pitchRange: 0.4,
-      neighbors: ['shelf-baseball', 'case', 'bins'],
-    },
-    {
-      id: 'shelf-baseball',
       position: [3.1, 1.5, 2.9],
       target: [4.6, 1.35, 2.9],
       yawRange: 1.15,
       pitchRange: 0.4,
-      neighbors: ['shelf-tcg', 'entry', 'bins'],
+      neighbors: ['shelf-baseball', 'entry', 'bins'],
+    },
+    {
+      id: 'shelf-baseball',
+      position: [3.1, 1.5, 0.8],
+      target: [4.6, 1.35, 0.8],
+      yawRange: 1.15,
+      pitchRange: 0.4,
+      neighbors: ['shelf-tcg', 'case', 'bins'],
     },
     {
       id: 'center',
@@ -218,7 +218,7 @@ export const shopLayout: ShopLayout = {
       target: [0.05, 0.85, -0.55],
       yawRange: 1.35,
       pitchRange: 0.45,
-      neighbors: ['entry', 'counter', 'case', 'shelf-hockey', 'shelf-tcg'],
+      neighbors: ['entry', 'counter', 'case', 'shelf-football', 'shelf-baseball'],
     },
     {
       id: 'case',
@@ -234,7 +234,7 @@ export const shopLayout: ShopLayout = {
       target: [0, 1.3, -3.6],
       yawRange: 1.1,
       pitchRange: 0.35,
-      neighbors: ['bins', 'case', 'shelf-hockey', 'collection-door', 'office-door'],
+      neighbors: ['bins', 'case', 'shelf-football', 'collection-door', 'office-door'],
     },
   ],
 };
