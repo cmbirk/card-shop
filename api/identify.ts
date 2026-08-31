@@ -17,18 +17,26 @@ export interface Identified {
   alternatives?: string[];
   price?: { median: number; min: number; max: number; volume: number; kind: string } | null;
   distance?: number;
+  /** 'slab' = read straight off the grading label (authoritative); 'image' = visual match */
+  source?: 'image' | 'slab';
+  slab?: { company?: string; grade?: string; cert?: string; beckett?: string };
+  detectedSport?: string; // from Ximilar's Subcategory tag on the card object
 }
 
 interface XObject {
   name: string;
   prob: number;
   area?: number;
+  _tags?: Record<string, { name: string; prob: number }[]>;
   _identification?: {
     best_match?: Record<string, unknown> | null;
     alternatives?: { full_name?: string; name?: string }[];
     distances?: number[];
   };
 }
+
+const titleCase = (s: string) => s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+const SPORT_TAG: Record<string, string> = { Football: 'football', Baseball: 'baseball', Basketball: 'basketball', Hockey: 'hockey', Soccer: 'football' };
 
 export async function POST(req: Request): Promise<Response> {
   const auth = await requireUser(req);
@@ -44,10 +52,12 @@ export async function POST(req: Request): Promise<Response> {
 
   let image = '';
   let url = '';
+  let slab = false;
   try {
-    const body = (await req.json()) as { image?: string; url?: string };
+    const body = (await req.json()) as { image?: string; url?: string; slab?: boolean };
     image = String(body.image ?? '').replace(/^data:image\/\w+;base64,/, '');
     url = String(body.url ?? '');
+    slab = !!body.slab;
   } catch {
     return json({ error: 'bad request' }, 400);
   }
@@ -60,7 +70,7 @@ export async function POST(req: Request): Promise<Response> {
     res = await fetch('https://api.ximilar.com/collectibles/v2/analyze', {
       method: 'POST',
       headers: { Authorization: `Token ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records: [url ? { _url: url } : { _base64: image }], price_stats: true }),
+      body: JSON.stringify({ records: [url ? { _url: url } : { _base64: image }], price_stats: true, ...(slab ? { slab_id: true } : {}) }),
     });
   } catch (e) {
     console.error('[identify]', e);
@@ -75,10 +85,41 @@ export async function POST(req: Request): Promise<Response> {
   if (cardObj.prob < 0.6) return json({ result: { outcome: 'unclear' } satisfies Identified });
   if ((cardObj.area ?? 1) < 0.1) return json({ result: { outcome: 'too_far' } satisfies Identified });
 
+  const detectedSport = SPORT_TAG[cardObj._tags?.Subcategory?.[0]?.name ?? ''];
+
+  // graded cards: the slab label read is authoritative (player/set/year/number/grade/cert)
+  const slabObj = objects.find((o) => /slab label/i.test(o.name));
+  const slabBest = slabObj?._identification?.best_match as { name?: string; brand?: string; set?: string; year?: string | number; card_no?: string; grade?: string; verbal_grade?: string; certificate_number?: string; links?: Record<string, string> } | null | undefined;
+  if (slab && slabBest?.name) {
+    const year = typeof slabBest.year === 'string' ? parseInt(slabBest.year, 10) : slabBest.year;
+    const name = titleCase(slabBest.name);
+    const setName = slabBest.set ? titleCase(slabBest.set) : undefined;
+    const cardNumber = slabBest.card_no?.replace(/^#/, '');
+    const company = slabObj?._tags?.Company?.[0]?.name;
+    console.log(`[identify] user=${auth.userId.slice(0, 8)} slab-label "${name}" cert=${slabBest.certificate_number ?? '?'}`);
+    return json({
+      result: {
+        outcome: 'match',
+        source: 'slab',
+        card: { fullName: `${year ?? ''} ${name} ${setName ?? ''} ${cardNumber ? `#${cardNumber}` : ''}`.replace(/\s+/g, ' ').trim(), name, year, setName, cardNumber, company: slabBest.brand ? titleCase(slabBest.brand) : undefined },
+        slab: { company, grade: slabBest.grade, cert: slabBest.certificate_number, beckett: slabBest.links?.['beckett.com'] },
+        detectedSport,
+      } satisfies Identified,
+    });
+  }
+
   const ident = cardObj._identification;
   const best = ident?.best_match as { full_name?: string; name?: string; year?: number | string; set_name?: string; set?: string; card_number?: string; team?: string; subcategory?: string; rarity?: string; company?: string; links?: Record<string, string>; price_stats?: { stats_type: string; value?: { median?: number; min?: number; max?: number; volume?: number } }[] } | null | undefined;
   const d = ident?.distances?.[0];
-  if (!best || d == null) return json({ result: { outcome: 'unidentified' } satisfies Identified });
+  // Ximilar sometimes returns best_match null WITH plausible alternatives (seen on slabs):
+  // that's an ambiguous result, not a dead end
+  if (!best || d == null) {
+    const alts = (ident?.alternatives ?? []).map((a) => a.full_name ?? a.name ?? '').filter(Boolean).slice(0, 3);
+    if (alts.length && d != null && d <= 0.65) {
+      return json({ result: { outcome: 'ambiguous', card: { fullName: alts[0] }, alternatives: alts, distance: d, source: 'image', detectedSport } satisfies Identified });
+    }
+    return json({ result: { outcome: 'unidentified', detectedSport } satisfies Identified });
+  }
 
   const alternatives = (ident?.alternatives ?? []).map((a) => a.full_name ?? a.name ?? '').filter(Boolean).slice(0, 3);
   const ps = (best.price_stats ?? []).find((p) => p.value?.median != null);
@@ -96,7 +137,7 @@ export async function POST(req: Request): Promise<Response> {
     ebay: best.links?.['ebay.com'],
   };
   console.log(`[identify] user=${auth.userId.slice(0, 8)} d=${d.toFixed(3)} "${card.fullName}"`);
-  if (d <= 0.45) return json({ result: { outcome: 'match', card, price, distance: d } satisfies Identified });
-  if (d <= 0.65) return json({ result: { outcome: 'ambiguous', card, alternatives, distance: d } satisfies Identified });
-  return json({ result: { outcome: 'unidentified' } satisfies Identified });
+  if (d <= 0.45) return json({ result: { outcome: 'match', card, price, distance: d, source: 'image', detectedSport } satisfies Identified });
+  if (d <= 0.65) return json({ result: { outcome: 'ambiguous', card, alternatives, distance: d, source: 'image', detectedSport } satisfies Identified });
+  return json({ result: { outcome: 'unidentified', detectedSport } satisfies Identified });
 }

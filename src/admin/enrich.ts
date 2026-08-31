@@ -36,7 +36,7 @@ export async function checkWithXimilar(card: Card, force = false): Promise<Ximil
   const res = await fetch('/api/identify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: JSON.stringify({ url: card.images!.front }),
+    body: JSON.stringify({ url: card.images!.front, slab: !!card.grade }),
   });
   const body = (await res.json().catch(() => ({}))) as { result?: Identified; error?: string };
   if (!res.ok || !body.result) throw new Error(body.error ?? `check failed (${res.status})`);
@@ -70,7 +70,7 @@ export function isMismatch(card: Card, check: XimilarCheck): boolean {
 }
 
 export interface FieldSuggestion {
-  field: 'playerName' | 'year' | 'setName' | 'cardNumber' | 'team';
+  field: 'playerName' | 'year' | 'setName' | 'cardNumber' | 'team' | 'sport';
   label: string;
   ours: string;
   theirs: string;
@@ -90,5 +90,7 @@ export function suggestionsFor(card: Card, check: XimilarCheck): FieldSuggestion
   push('setName', 'Set', card.setName, m.setName, (c) => ({ ...c, setName: m.setName! }));
   push('cardNumber', 'Card #', card.cardNumber, m.cardNumber, (c) => ({ ...c, cardNumber: m.cardNumber! }));
   push('team', 'Team', card.team, m.team, (c) => ({ ...c, team: m.team! }));
+  const sport = check.result.detectedSport;
+  if (sport && sport !== card.sport) out.push({ field: 'sport', label: 'Sport', ours: card.sport, theirs: sport, apply: (c) => ({ ...c, sport: sport as Card['sport'] }) });
   return out;
 }

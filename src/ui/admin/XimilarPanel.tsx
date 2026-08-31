@@ -54,7 +54,10 @@ export function XimilarPanel({ card, onPatch, onError }: Props) {
             <span className="admin-help">
               {r?.outcome === 'match' && (
                 <>
-                  Matched <b>{r.card?.fullName}</b> (d={r.distance?.toFixed(2)}) · checked {new Date(check.checkedAt).toLocaleDateString()}
+                  {r.source === 'slab' ? 'Read off the grading label: ' : 'Matched '}
+                  <b>{r.card?.fullName}</b>
+                  {r.source === 'slab' && r.slab ? <> · {r.slab.company} {r.slab.grade}{r.slab.cert ? ` · cert ${r.slab.cert}` : ''}{r.slab.beckett && <> · <a className="linkish" href={r.slab.beckett} target="_blank" rel="noreferrer">Beckett↗</a></>}</> : ` (d=${r.distance?.toFixed(2)})`}
+                  {' '}· checked {new Date(check.checkedAt).toLocaleDateString()}
                 </>
               )}
               {r?.outcome === 'ambiguous' && <>Not sure — could be one of the below.</>}
