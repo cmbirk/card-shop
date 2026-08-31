@@ -6,7 +6,7 @@ export const ROOM_NAME = 'The Collection';
 
 export interface ShowcaseItem {
   id: string;
-  kind: 'jersey' | 'pennant' | 'football' | 'tickets' | 'seat' | 'photo';
+  kind: 'jersey' | 'pennant' | 'trophy' | 'tickets' | 'seat' | 'photo';
   name: string;
   blurb: string; // what Chris says about it
   position: [number, number, number];
@@ -53,10 +53,10 @@ export const showcase: ShowcaseItem[] = [
     detail: 'INDIANAPOLIS',
   },
   {
-    id: 'ball-signed',
-    kind: 'football',
-    name: 'Signed game ball',
-    blurb: "A game ball on a walnut stand, signed along the panel. Chris won't say who signed it unless you ask nicely.",
+    id: 'trophy-lombardi',
+    kind: 'trophy',
+    name: 'Lombardi-style trophy replica',
+    blurb: "A silver football-on-a-stand trophy replica on the walnut pedestal — a Super Bowl XLI keepsake. Chris polishes it more often than the counter and will absolutely let you hoist it (in spirit).",
     position: [-8.5, 0.9, -4.75],
     rotationY: 0.6,
   },

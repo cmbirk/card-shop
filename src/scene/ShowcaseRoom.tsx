@@ -118,36 +118,40 @@ function ticketsMaterial(lines: string[]): THREE.MeshStandardMaterial {
   });
 }
 
-function SignedBall({ item }: { item: ShowcaseItem }) {
-  const leather = useMemo(() => new THREE.MeshStandardMaterial({ color: '#6b3f22', roughness: 0.9 }), []);
+/** A Lombardi-style trophy: a silver football standing on its tip, on a tapered three-sided stand. */
+function Trophy({ item }: { item: ShowcaseItem }) {
+  const silver = useMemo(() => new THREE.MeshStandardMaterial({ color: '#e2e4e8', metalness: 0.95, roughness: 0.18 }), []);
   return (
     <group position={item.position} rotation-y={item.rotationY}>
-      {/* plinth + walnut stand */}
+      {/* walnut pedestal (top face is item.position) */}
       <mesh material={MAT.walnut} position={[0, -item.position[1] / 2 - 0.04, 0]} castShadow>
         <boxGeometry args={[0.24, item.position[1] - 0.08, 0.24]} />
       </mesh>
       <mesh material={MAT.walnut} position={[0, -0.06, 0]}>
-        <cylinderGeometry args={[0.07, 0.09, 0.03, 24]} />
+        <boxGeometry args={[0.2, 0.04, 0.2]} />
       </mesh>
-      <mesh material={MAT.walnut} position={[0, -0.02, 0]}>
-        <torusGeometry args={[0.05, 0.008, 8, 24]} />
+      {/* three-sided base plate + tapering stand, one flat face to the front */}
+      <mesh material={silver} position={[0, 0.008, 0]} rotation-y={Math.PI / 6} castShadow>
+        <cylinderGeometry args={[0.078, 0.086, 0.016, 3]} />
       </mesh>
-      {/* ball: a stretched sphere reads as a football */}
-      <mesh material={leather} position={[0, 0.06, 0]} scale={[0.145, 0.085, 0.085]} castShadow>
-        <sphereGeometry args={[1, 24, 16]} />
+      <mesh material={silver} position={[0, 0.136, 0]} rotation-y={Math.PI / 6} castShadow>
+        <cylinderGeometry args={[0.018, 0.072, 0.24, 3]} />
       </mesh>
-      {/* laces */}
-      {[-0.03, -0.015, 0, 0.015, 0.03].map((x) => (
-        <mesh key={x} position={[x, 0.145, 0]}>
-          <boxGeometry args={[0.006, 0.006, 0.022]} />
-          <meshStandardMaterial color={WHITE} roughness={0.8} />
+      {/* the ball, on its tip in kicking position with a slight lean back */}
+      <group position={[0, 0.25, 0]} rotation-x={0.14}>
+        <mesh material={silver} position={[0, 0.104, 0]} scale={[0.062, 0.11, 0.062]} castShadow>
+          <sphereGeometry args={[1, 32, 24]} />
         </mesh>
-      ))}
-      {/* the signature — a silver scrawl on the panel */}
-      <mesh position={[0, 0.09, 0.075]} rotation-x={-0.4}>
-        <planeGeometry args={[0.07, 0.02]} />
-        <meshStandardMaterial color="#c9ccd1" roughness={0.4} metalness={0.3} />
-      </mesh>
+        {/* laces on the front panel */}
+        {[-0.03, -0.015, 0, 0.015, 0.03].map((y) => (
+          <mesh key={y} material={silver} position={[0, 0.104 + y, 0.059 - Math.abs(y) * 0.18]}>
+            <boxGeometry args={[0.02, 0.005, 0.006]} />
+          </mesh>
+        ))}
+        <mesh material={silver} position={[0, 0.104, 0.06]}>
+          <boxGeometry args={[0.005, 0.075, 0.006]} />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -214,8 +218,8 @@ export function ShowcaseRoom() {
             );
           case 'tickets':
             return <Framed key={item.id} material={mats.tickets} position={item.position} rotationY={item.rotationY} w={0.64} h={0.4} />;
-          case 'football':
-            return <SignedBall key={item.id} item={item} />;
+          case 'trophy':
+            return <Trophy key={item.id} item={item} />;
           case 'seat':
             return <StadiumSeat key={item.id} item={item} />;
           default:
