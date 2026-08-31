@@ -7,7 +7,7 @@ import { useAuthStore } from '../../stores/authStore';
 const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 /** Everyone who's signed the guestbook, with an Admin toggle. */
-export function UsersTab({ onError }: { onError: (msg: string | null) => void }) {
+export function UsersTab({ onError, onViewConsignments }: { onError: (msg: string | null) => void; onViewConsignments?: (userId: string) => void }) {
   const [users, setUsers] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
@@ -175,6 +175,11 @@ export function UsersTab({ onError }: { onError: (msg: string | null) => void })
                     <input type="checkbox" checked={u.isSeller} disabled={busy === u.id} onChange={() => void toggleSeller(u)} />
                     <span>{u.isSeller ? 'Seller' : '—'}</span>
                   </label>
+                  {u.isSeller && onViewConsignments && (
+                    <button className="btn secondary" style={{ marginLeft: 6 }} title="See everything they've consigned" onClick={() => onViewConsignments(u.id)}>
+                      📦 view
+                    </button>
+                  )}
                   {u.isSeller && u.invitedAt && u.visits <= 1 && u.email && (
                     <button
                       className="btn secondary"

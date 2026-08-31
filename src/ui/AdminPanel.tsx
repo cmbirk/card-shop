@@ -19,6 +19,7 @@ export function AdminPanel() {
   const open = useUIStore((s) => s.adminOpen);
   const isAdmin = useAuthStore((s) => s.isAdmin);
   const [tab, setTab] = useState<Tab>('inventory');
+  const [consignFilter, setConsignFilter] = useState<string | null>(null); // consignor user id
   const [cards, setCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,8 +96,16 @@ export function AdminPanel() {
 
         {tab === 'inventory' && <InventoryTab cards={cards} loading={loading} onChanged={afterWrite} onError={setError} />}
         {tab === 'import' && <ImportTab existing={cards} onImported={afterWrite} onError={setError} />}
-        {tab === 'consign' && <ConsignTab cards={cards} onChanged={afterWrite} onError={setError} />}
-        {tab === 'users' && <UsersTab onError={setError} />}
+        {tab === 'consign' && <ConsignTab cards={cards} onChanged={afterWrite} onError={setError} filter={consignFilter} onFilter={setConsignFilter} />}
+        {tab === 'users' && (
+          <UsersTab
+            onError={setError}
+            onViewConsignments={(userId) => {
+              setConsignFilter(userId);
+              setTab('consign');
+            }}
+          />
+        )}
       </div>
     </div>
   );

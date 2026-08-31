@@ -8,6 +8,9 @@ interface Props {
   cards: Card[];
   onChanged: () => Promise<void>;
   onError: (msg: string | null) => void;
+  /** show only this consignor's cards (user id) */
+  filter?: string | null;
+  onFilter?: (userId: string | null) => void;
 }
 
 const SECTIONS: { status: ConsignStatus; title: string; hint: string }[] = [
@@ -20,7 +23,7 @@ const SECTIONS: { status: ConsignStatus; title: string; hint: string }[] = [
 ];
 
 /** Chris's consignment desk: review queue by stage + the payout ledger. */
-export function ConsignTab({ cards, onChanged, onError }: Props) {
+export function ConsignTab({ cards, onChanged, onError, filter = null, onFilter }: Props) {
   const [reviewing, setReviewing] = useState<Card | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [payouts, setPayouts] = useState<AdminPayoutRow[]>([]);
@@ -28,9 +31,21 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
   const [intakeSaved, setIntakeSaved] = useState(true);
   const [returnAddrs, setReturnAddrs] = useState<Map<string, string>>(new Map());
 
-  const consigned = useMemo(() => cards.filter((c) => c.consignorId || c.consignStatus), [cards]);
+  const allConsigned = useMemo(() => cards.filter((c) => c.consignorId || c.consignStatus), [cards]);
+  const consigners = useMemo(() => {
+    const m = new Map<string, { name: string; count: number }>();
+    for (const c of allConsigned) {
+      if (!c.consignorId) continue;
+      const e = m.get(c.consignorId) ?? { name: c.consignorDisplay ?? c.consignorId.slice(0, 8), count: 0 };
+      e.count++;
+      m.set(c.consignorId, e);
+    }
+    return [...m.entries()].sort((a, b) => a[1].name.localeCompare(b[1].name));
+  }, [allConsigned]);
+  const consigned = useMemo(() => (filter ? allConsigned.filter((c) => c.consignorId === filter) : allConsigned), [allConsigned, filter]);
   const by = (s: ConsignStatus) => consigned.filter((c) => c.consignStatus === s);
-  const owed = payouts.filter((p) => p.status === 'owed' && !p.test_mode);
+  const visiblePayouts = filter ? payouts.filter((p) => p.seller_id === filter) : payouts;
+  const owed = visiblePayouts.filter((p) => p.status === 'owed' && !p.test_mode);
 
   const refreshPayouts = async () => {
     try {
@@ -109,6 +124,19 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
 
   return (
     <div className="consign-list">
+      {consigners.length > 1 && (
+        <div className="ximilar-alts">
+          <button type="button" className={`chip${filter === null ? ' active' : ''}`} onClick={() => onFilter?.(null)}>
+            Everyone ({allConsigned.length})
+          </button>
+          {consigners.map(([id, c]) => (
+            <button key={id} type="button" className={`chip${filter === id ? ' active' : ''}`} onClick={() => onFilter?.(filter === id ? null : id)}>
+              {c.name} ({c.count})
+            </button>
+          ))}
+        </div>
+      )}
+      {filter && consigned.length === 0 && <p className="admin-help">Nothing from this consigner yet.</p>}
       <div className="consign-address">
         <label className="admin-help" style={{ flex: 1 }}>
           Intake address — goes in every "approved, ship it to…" email:
@@ -159,7 +187,11 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
                     {c.images?.front && <span className="tag">📷</span>}
                   </div>
                   <div className="admin-card-sub">
-                    {[c.setName, c.cardNumber].filter(Boolean).join(' ')} · from <b>{c.consignorDisplay ?? c.consignorId?.slice(0, 8) ?? '?'}</b> · asked{' '}
+                    {[c.setName, c.cardNumber].filter(Boolean).join(' ')} · from{' '}
+                    <b className="linkish" style={{ cursor: 'pointer' }} onClick={() => c.consignorId && onFilter?.(c.consignorId)}>
+                      {c.consignorDisplay ?? c.consignorId?.slice(0, 8) ?? '?'}
+                    </b>{' '}
+                    · asked{' '}
                     {c.askingPrice != null ? formatCents(c.askingPrice) : '—'}
                     {c.price > 0 && ` · sticker ${formatCents(c.price)}`}
                   </div>
@@ -213,7 +245,7 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
       })}
 
       <div className="consign-ledger-head">Payouts{owed.length > 0 && ` — ${formatCents(owed.reduce((s, p) => s + p.amount, 0))} owed`}</div>
-      {payouts.length === 0 ? (
+      {visiblePayouts.length === 0 ? (
         <p className="admin-help">Nothing owed yet — payout rows appear here when a consigned card sells.</p>
       ) : (
         <table className="admin-table">
@@ -228,7 +260,7 @@ export function ConsignTab({ cards, onChanged, onError }: Props) {
             </tr>
           </thead>
           <tbody>
-            {payouts.map((p) => (
+            {visiblePayouts.map((p) => (
               <tr key={p.id} className={p.test_mode ? 'dim' : ''}>
                 <td className="mono">{p.card_id}</td>
                 <td>{p.seller_handle ?? p.seller_id?.slice(0, 8) ?? '—'}</td>
