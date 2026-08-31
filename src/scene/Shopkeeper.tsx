@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, useAnimations, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useDialogueStore, type MelGesture } from '../stores/dialogueStore';
 import { useShopkeeperStore, SHOPKEEPER_HOME } from '../stores/shopkeeperStore';
-import { FEEL, bubbleHoldSeconds } from '../feel';
+import { useSpeechStore } from '../stores/speechStore';
+import { FEEL } from '../feel';
 
 const MODEL_URL = '/models/shopkeeper.glb';
 
@@ -39,13 +40,10 @@ export function Shopkeeper() {
   const { scene, animations } = useGLTF(MODEL_URL);
   const { actions, mixer } = useAnimations(animations, group);
   const isStreaming = useDialogueStore((s) => s.isStreaming);
-  const messages = useDialogueStore((s) => s.messages);
-  const isOpen = useDialogueStore((s) => s.isOpen);
   const gesture = useDialogueStore((s) => s.gesture);
   const gestureId = useDialogueStore((s) => s.gestureId);
-  const streamingText = useDialogueStore((s) => s.streamingText);
+  const speaking = useSpeechStore((s) => s.current?.speaker === 'chris'); // '…' dots anchor the voice to the body
   const pose = useShopkeeperStore((s) => s.pose);
-  const [bubble, setBubble] = useState<string | null>(null);
   const walk = useRef({ legId: 0, idx: 0 }); // waypoint cursor for the store's current leg
   const yaw = useRef(0);
   const current = useRef<THREE.AnimationAction | null>(null);
@@ -154,26 +152,6 @@ export function Shopkeeper() {
     return () => mixer.removeEventListener('finished', onFinished);
   }, [gesture, gestureId, play, mixer]);
 
-  // in-world speech bubble while the chat panel is closed: streams live as Chris talks
-  // (e.g. answering about a held card out on the floor), then holds for reading time
-  useEffect(() => {
-    if (isOpen) {
-      setBubble(null);
-      return;
-    }
-    if (isStreaming) {
-      setBubble(streamingText || '…');
-      return;
-    }
-    const last = messages[messages.length - 1];
-    if (last?.role === 'assistant') {
-      setBubble(last.content);
-      const t = setTimeout(() => setBubble(null), bubbleHoldSeconds(last.content) * 1000);
-      return () => clearTimeout(t);
-    }
-    setBubble(null);
-  }, [messages, isOpen, isStreaming, streamingText]);
-
   // locomotion: walk the planned waypoints, face the way we're going; at the spot, face the customer
   useFrame((_, dt) => {
     const r = root.current;
@@ -247,12 +225,7 @@ export function Shopkeeper() {
 
   return (
     <group ref={root} position={[SHOPKEEPER_HOME[0], 0, SHOPKEEPER_HOME[1]]}>
-      {bubble && (
-        <Html position={[0, 2.1, 0]} center style={{ pointerEvents: 'none' }}>
-          <div className="mel-bubble">{bubble}</div>
-        </Html>
-      )}
-      {isStreaming && (
+      {speaking && (
         <Html position={[0, 1.95, 0]} center distanceFactor={2.5} style={{ pointerEvents: 'none' }}>
           <div className="speech-dots">
             <span />

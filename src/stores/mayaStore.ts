@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useSpeechStore } from './speechStore';
 
 // Maya's scripted lines (no API). <Maya/> shows the bubble + talk pose.
 interface MayaState {
@@ -13,6 +14,9 @@ export const useMayaStore = create<MayaState>((set) => ({
   line: null,
   lineId: 0,
   spoken: false,
-  say: (text) => set((s) => ({ line: text, lineId: s.lineId + 1, spoken: true })),
+  say: (text) => {
+    useSpeechStore.getState().say('maya', text); // the pinned card carries the words
+    set((s) => ({ line: text, lineId: s.lineId + 1, spoken: true }));
+  },
   clear: () => set({ line: null }),
 }));

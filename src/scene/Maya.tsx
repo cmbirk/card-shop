@@ -111,9 +111,13 @@ export function Maya() {
   return (
     <group position={[MAYA.x, 0, MAYA.z]} rotation-y={MAYA.faceY}>
       {line && (
-        // the case station looks down at the slabs, so her bubble sits at chest height to stay in frame
-        <Html position={[0, 1.35, 0]} center style={{ pointerEvents: 'none' }}>
-          <div className="staff-bubble">{line}</div>
+        // her words live in the pinned speech card; the dots just say "that's me talking"
+        <Html position={[0, 1.9, 0]} center distanceFactor={2.5} style={{ pointerEvents: 'none' }}>
+          <div className="speech-dots">
+            <span />
+            <span />
+            <span />
+          </div>
         </Html>
       )}
       <group ref={group}>

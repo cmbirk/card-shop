@@ -1179,3 +1179,70 @@
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
   }
 }
+
+/* ---- pinned speech card (the collapsed ChatWindow; all character lines land here) ---- */
+.speech-card {
+  position: absolute;
+  top: 64px; /* below the top-right admin/seller buttons */
+  right: 16px;
+  width: min(360px, 88vw);
+  background: rgba(255, 252, 242, 0.92);
+  color: #2b2118;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 14px;
+  padding: 10px 12px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  box-shadow: 0 8px 28px rgba(20, 12, 5, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  animation: speech-in 0.25s ease;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .speech-card {
+    background: rgba(255, 252, 242, 0.55);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+    backdrop-filter: blur(14px) saturate(1.5);
+  }
+}
+@keyframes speech-in {
+  from { opacity: 0; transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .speech-card { animation: none; }
+}
+.speech-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.speech-card-name {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+.speech-card-x {
+  border: 0;
+  background: none;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+}
+.speech-card-x:hover { opacity: 1; }
+.speaker-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  vertical-align: middle;
+}
+.speaker-chip.chris { background: #a06a1f; }
+.speaker-chip.maya { background: #2e6e5e; }
+.chat-header .speaker-chip { margin-right: 6px; }
