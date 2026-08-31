@@ -24,8 +24,9 @@ async function ringItUp(items: string[]) {
       dlg.gesture$('shrug');
       dlg.say(`Ah — ${names} just got snapped up by somebody else. Sorry about that; the rest are still yours.`);
     } else {
+      console.warn('[checkout]', e); // technical detail stays out of Chris's mouth
       dlg.gesture$('shrug');
-      dlg.say(`The register's being fussy (${(e as Error).message}). Give me a second and try again.`);
+      dlg.say("The register's being fussy — give me a second and try that again for me.");
     }
     ui.setPhase('atCounter');
   }

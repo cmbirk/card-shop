@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useDialogueStore } from '../stores/dialogueStore';
 import { useAuthStore } from '../stores/authStore';
-import { prepareScan } from '../admin/imagePrep';
+import { prepareScan, fileToBase64 } from '../admin/imagePrep';
 import { checkPhoto, type GateResult } from '../systems/photoGates';
 import type { Identified } from '../../api/identify';
 import { sfx } from '../systems/sfx';
@@ -45,16 +45,25 @@ export function ShowChrisCard() {
         return;
       }
       dlg.say('Lemme grab my loupe…');
-      const b64 = btoa(String.fromCharCode(...new Uint8Array(await prepared.file.arrayBuffer())));
+      const b64 = await fileToBase64(prepared.file);
       const token = useAuthStore.getState().session?.access_token;
       const res = await fetch('/api/identify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ image: b64 }),
       });
-      const body = (await res.json()) as { result?: Identified; error?: string };
+      const body = (await res.json().catch(() => ({}))) as { result?: Identified; error?: string };
       if (!res.ok || !body.result) {
-        dlg.say(body.error ?? "The loupe's fogged up — give me a minute and try again.");
+        console.warn('[showChris]', res.status, body.error); // the technical detail stays in the console
+        dlg.say(
+          res.status === 503
+            ? "Ah — my card scanner's in the shop this week, of all things. Ask me about the card the old-fashioned way, or try again another day."
+            : res.status === 429
+              ? 'One at a time, friend — give me a breather between photos.'
+              : res.status === 401
+                ? 'Sign the guestbook first and I\'ll take a look.'
+                : "The loupe's fogged up — give me a minute and try again.",
+        );
         return;
       }
       const r = body.result;
@@ -76,7 +85,8 @@ export function ShowChrisCard() {
         }
       }
     } catch (e) {
-      dlg.say(`Huh — ${(e as Error).message}. Try another shot?`);
+      console.warn('[showChris]', e); // never show raw errors in Chris's mouth
+      dlg.say("Hm, that photo didn't come through right — try taking it once more?");
     } finally {
       setBusy(false);
       if (input.current) input.current.value = '';

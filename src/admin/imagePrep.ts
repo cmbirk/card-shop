@@ -79,6 +79,16 @@ export async function prepareScan(file: File, onStage?: (s: string) => void): Pr
   return { file: new File([blob], `${base}.jpg`, { type: 'image/jpeg' }), width: w, height: h, landscape: w > h * 1.05 };
 }
 
+/** File → bare base64 via FileReader — safe for any size (never spread bytes into fromCharCode). */
+export function fileToBase64(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error('could not read the photo'));
+    r.onload = () => resolve(String(r.result).replace(/^data:[^,]*,/, ''));
+    r.readAsDataURL(file);
+  });
+}
+
 /** Pull the first image file out of a drop/paste, incl. Photos.app drags (which arrive as items). */
 export function fileFromDataTransfer(dt: DataTransfer | null): File | undefined {
   if (!dt) return undefined;
