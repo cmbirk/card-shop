@@ -462,6 +462,7 @@ export function Shop() {
               cards={placed.get(f.id) ?? []}
               title={f.id === 'case-collection' ? "Chris's Collection" : f.id === 'case-consign' ? 'On Consignment' : undefined}
               glow={f.id === 'case-collection' ? '#cfe0ff' : undefined}
+              glassTop={f.id === 'case-premium'}
             />
           )}
           {f.kind === 'bin' && <Bin fixtureId={f.id} cards={placed.get(f.id) ?? []} />}
