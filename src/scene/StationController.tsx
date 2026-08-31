@@ -188,11 +188,17 @@ export function StationController() {
     return () => el.removeEventListener('wheel', onWheel);
   }, [gl]);
 
-  // user look-around only while parked at a station
+  // user look-around only while parked at a station. Entering freewalk drops the station's
+  // clamps so WalkController's setLookAt poses aren't bent back into the station's cone
+  // (clampToStation runs again on the next glide arrival).
+  const lastMode = useRef<string>('station');
   useFrame(() => {
     const c = ref.current;
     if (!c) return;
-    c.enabled = useNavStore.getState().mode === 'station';
+    const mode = useNavStore.getState().mode;
+    c.enabled = mode === 'station';
+    if (mode === 'freewalk' && lastMode.current !== 'freewalk') releaseBounds();
+    lastMode.current = mode;
   });
 
   return <CameraControls ref={ref} makeDefault />;

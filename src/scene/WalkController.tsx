@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import type CameraControlsImpl from 'camera-controls';
 import * as THREE from 'three';
 import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
 import { useNavStore } from '../stores/navStore';
@@ -13,6 +14,11 @@ import { FEEL } from '../feel';
 // Clicking a glowing waypoint glides you back into station mode; Esc snaps to the nearest
 // station. No pointer lock, no head-bob. Collision is 2D boxes: rooms with doorway gaps,
 // plus fixture footprints — clamped with wall sliding.
+//
+// The pose is written THROUGH CameraControls (setLookAt, no transition), never straight to
+// the camera: drei calls controls.update() every frame even while `enabled` is false, and
+// update() rewrites camera.position from the controls' own state — writing the camera
+// directly gets undone each frame (the walker crawled ~5cm and drifted back).
 
 const KEYS: Record<string, [number, number]> = {
   KeyW: [0, -1], ArrowUp: [0, -1],
@@ -47,7 +53,7 @@ const OBSTACLES: Box[] = shopLayout.fixtures
   .concat([
     { x0: -3.8, x1: -2.2, z0: OFFICE.zMin, z1: OFFICE.zMin + 1.0 }, // office desk + chair
     { x0: OFFICE.xMin, x1: OFFICE.xMin + 0.65, z0: OFFICE.zMin, z1: OFFICE.zMin + 0.75 }, // filing cabinet
-    { x0: -8.85, x1: -8.15, z0: -5.1, z1: -4.4 }, // signed-ball plinth (annex)
+    { x0: -8.85, x1: -8.15, z0: -5.1, z1: -4.4 }, // trophy plinth (annex)
   ]);
 
 const walkable = (x: number, z: number) =>
@@ -58,8 +64,11 @@ export const walkPose = { x: 0, z: 0, yaw: 0, active: false };
 
 const typing = (t: EventTarget | null) => !!(t as HTMLElement | null)?.closest?.('input, textarea, select, [contenteditable]');
 
+const _fwd = new THREE.Vector3();
+
 export function WalkController() {
   const { camera, gl } = useThree();
+  const controls = useThree((s) => s.controls) as CameraControlsImpl | null;
   const keys = useRef(new Set<string>());
   const vel = useRef(new THREE.Vector2());
   const look = useRef({ yaw: 0, pitch: 0, dragging: false });
@@ -156,15 +165,23 @@ export function WalkController() {
     vel.current.y = THREE.MathUtils.damp(vel.current.y, ix || iz ? tz : 0, FEEL.walkAccelLambda, dt);
 
     // move with wall sliding (try each axis on its own)
-    const nx = camera.position.x + vel.current.x * dt;
-    const nz = camera.position.z + vel.current.y * dt;
-    if (walkable(nx, camera.position.z)) camera.position.x = nx;
-    if (walkable(camera.position.x, nz)) camera.position.z = nz;
-    camera.position.y = FEEL.walkEyeHeight;
-    camera.quaternion.setFromEuler(new THREE.Euler(l.pitch, l.yaw, 0, 'YXZ'));
+    let px = camera.position.x;
+    let pz = camera.position.z;
+    const nx = px + vel.current.x * dt;
+    const nz = pz + vel.current.y * dt;
+    if (walkable(nx, pz)) px = nx;
+    if (walkable(px, nz)) pz = nz;
+    const py = FEEL.walkEyeHeight;
+    // look direction from yaw/pitch (camera forward is -Z): the controls' target sits 1m ahead
+    _fwd.set(-Math.sin(l.yaw) * Math.cos(l.pitch), Math.sin(l.pitch), -Math.cos(l.yaw) * Math.cos(l.pitch));
+    if (controls) void controls.setLookAt(px, py, pz, px + _fwd.x, py + _fwd.y, pz + _fwd.z, false);
+    else {
+      camera.position.set(px, py, pz);
+      camera.quaternion.setFromEuler(new THREE.Euler(l.pitch, l.yaw, 0, 'YXZ'));
+    }
 
-    walkPose.x = camera.position.x;
-    walkPose.z = camera.position.z;
+    walkPose.x = px;
+    walkPose.z = pz;
     walkPose.yaw = l.yaw;
 
     // keep currentStation honest (nearest, throttled) so context/doors stay sensible
