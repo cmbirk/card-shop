@@ -30,6 +30,7 @@ export function SignInPanel() {
       <div className="modal signin">
         {notice && <div className="signin-note">{notice}</div>}
         <div className="signin-sheet-head">
+          <img className="signin-logo" src="/tlc-icon-dark.svg" alt="" width={200} height={200} />
           <div className="signin-title">The {SHOP_NAME} Guestbook</div>
           <div className="signin-sub">Sign in to come on in — welcome to the shop.</div>
         </div>

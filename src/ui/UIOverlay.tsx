@@ -14,7 +14,7 @@ import { AdminPanel } from './AdminPanel';
 import { ConsignPanel } from './ConsignPanel';
 import { useAuthStore } from '../stores/authStore';
 import { useBasketStore } from '../stores/basketStore';
-import { SOFT_OPENING, SHOP_NAME } from '@shared/launch';
+import { SOFT_OPENING, SHOP_NAME, SHOP_FULL_NAME } from '@shared/launch';
 
 /** Maya's one canned line about the top slab in the case — no API, once per session. */
 function mayaCaseLine(): string | null {
@@ -85,7 +85,9 @@ export function UIOverlay() {
     <div className="overlay">
       <NavEffects />
       <div className="hud">
-        <h1>{SHOP_NAME}</h1>
+        <h1>
+          <img className="hud-logo" src="/tlc-logo-full-dark.svg" alt={`${SHOP_NAME} — ${SHOP_FULL_NAME}`} width={500} height={210} />
+        </h1>
         <p>
           {outside
             ? 'Click the front door to step inside'

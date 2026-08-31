@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { ROOM } from '@shared/data/shopLayout';
-import { MAT, makeLabelMaterial } from './materials';
+import { MAT, makeImageMaterial, makeLabelMaterial } from './materials';
 import { PBR } from './pbr';
 import { useNavStore } from '../stores/navStore';
 import { useAuthStore } from '../stores/authStore';
-import { SHOP_NAME } from '@shared/launch';
 import { useUIStore } from '../stores/uiStore';
 import { supabaseConfigured } from '../lib/supabase';
 
@@ -102,12 +101,9 @@ export function Facade() {
       <mesh material={MAT.walnut} position={[0, ROOM.height + 0.55, 0.05]}>
         <boxGeometry args={[ROOM.width + 0.8, 0.16, 0.2]} />
       </mesh>
-      {/* GEM sign */}
-      <mesh material={makeLabelMaterial(SHOP_NAME, { bg: '#1f3d33', fg: '#ffd97a', size: 92 })} position={[0, 2.72, 0.06]}>
-        <planeGeometry args={[2.6, 0.65]} />
-      </mesh>
-      <mesh material={makeLabelMaterial('Cards · Collectibles', { bg: '#1f3d33', fg: '#f2e8d5', size: 34 })} position={[0, 2.28, 0.06]}>
-        <planeGeometry args={[2.2, 0.28]} />
+      {/* shop sign — the TLC logo on a cream board (public/tlc-logo-full-light.svg) */}
+      <mesh material={makeImageMaterial('/tlc-logo-full-light.svg', { width: 1500, height: 600, bg: '#f2e8d5', pad: 48 })} position={[0, 2.85, 0.06]}>
+        <planeGeometry args={[2.6, 1.04]} />
       </mesh>
 
       {/* windows with warm glow + marketing posters */}

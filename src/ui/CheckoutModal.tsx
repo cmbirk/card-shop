@@ -129,8 +129,9 @@ export function CheckoutModal() {
           <h2>Thanks for stopping by!</h2>
           <div className="receipt">
             {receipt.testMode && <div className="r-stamp">TEST · NOT A SALE</div>}
-            <div className="r-center">★ {SHOP_NAME} ★</div>
-            <div className="r-center">{SHOP_FULL_NAME.toUpperCase()}</div>
+            <div className="r-center">
+              <img className="r-logo" src="/tlc-logo-full-light.svg" alt={`${SHOP_NAME} — ${SHOP_FULL_NAME}`} width={500} height={210} />
+            </div>
             <div className="r-center" style={{ marginBottom: 8 }}>CARDS · COLLECTIBLES</div>
             {receipt.items.map((i) => (
               <div className="r-row" key={i.id}>

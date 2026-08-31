@@ -55,3 +55,48 @@ export function makeLabelMaterial(text: string, opts?: { bg?: string; fg?: strin
   labelCache.set(key, mat);
   return mat;
 }
+
+const imageCache = new Map<string, THREE.MeshBasicMaterial>();
+
+/**
+ * Sign painted from an image URL (SVG welcome — it's rasterised onto the canvas at the requested
+ * pixel size, so it stays crisp on a big storefront board). The board colour paints immediately;
+ * the artwork lands when the image loads.
+ */
+export function makeImageMaterial(
+  url: string,
+  opts: { width: number; height: number; bg?: string; pad?: number },
+): THREE.MeshBasicMaterial {
+  const key = `${url}|${opts.width}x${opts.height}|${opts.bg}|${opts.pad}`;
+  const cached = imageCache.get(key);
+  if (cached) return cached;
+  const c = document.createElement('canvas');
+  c.width = opts.width;
+  c.height = opts.height;
+  const ctx = c.getContext('2d')!;
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const paint = (img?: HTMLImageElement) => {
+    ctx.fillStyle = opts.bg ?? '#f2e8d5';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.strokeStyle = '#00000033';
+    ctx.lineWidth = 12;
+    ctx.strokeRect(6, 6, c.width - 12, c.height - 12);
+    if (img) {
+      const pad = opts.pad ?? 0;
+      const s = Math.min((c.width - pad * 2) / img.width, (c.height - pad * 2) / img.height);
+      const dw = img.width * s;
+      const dh = img.height * s;
+      ctx.drawImage(img, (c.width - dw) / 2, (c.height - dh) / 2, dw, dh);
+    }
+    tex.needsUpdate = true;
+  };
+  paint();
+  const img = new Image();
+  img.onload = () => paint(img);
+  img.src = url;
+  const mat = new THREE.MeshBasicMaterial({ map: tex });
+  imageCache.set(key, mat);
+  return mat;
+}

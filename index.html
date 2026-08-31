@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TLC — Toploader Cards</title>
+    <meta name="theme-color" content="#1a120b" />
+    <link rel="icon" type="image/svg+xml" href="/tlc-icon-light.svg" />
+    <link rel="icon" type="image/svg+xml" href="/tlc-icon-dark.svg" media="(prefers-color-scheme: dark)" />
     <style>
       html, body, #root { margin: 0; height: 100%; overflow: hidden; background: #1a120b; }
       * { box-sizing: border-box; }
@@ -18,8 +21,7 @@
       }
       #boot.done { opacity: 0; pointer-events: none; }
       .boot-inner { display: flex; flex-direction: column; align-items: center; gap: 26px; }
-      .boot-title { font-size: 34px; letter-spacing: 6px; color: #ffd97a; }
-      .boot-sub { font-size: 12px; letter-spacing: 3px; opacity: 0.6; margin-top: -18px; text-transform: uppercase; }
+      .boot-logo { width: 250px; height: auto; display: block; filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.45)); }
       .boot-quip { font-size: 13px; opacity: 0.75; font-style: italic; min-height: 18px; }
 
       /* a card sliding into a toploader, forever */
@@ -66,8 +68,7 @@
           <div class="boot-card"></div>
           <div class="boot-sleeve"></div>
         </div>
-        <div class="boot-title">TLC</div>
-        <div class="boot-sub">Toploader Cards</div>
+        <img class="boot-logo" src="/tlc-logo-full-dark.svg" alt="TLC — Toploader Cards" width="500" height="210" />
         <div class="boot-quip" id="boot-quip">Rolling up the shutters…</div>
       </div>
     </div>
