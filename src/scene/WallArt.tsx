@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { MAT } from './materials';
+import { MAT, makeImageMaterial } from './materials';
 import { SHOP_NAME } from '@shared/launch';
 
 const texLoader = new THREE.TextureLoader();
@@ -88,10 +88,14 @@ const D90 = Math.PI / 2;
 export function WallArt() {
   const art = useMemo(
     () => ({
-      dunlop: scanMaterial('/cards/football/mayo-dunlop-f.jpg'),
-      brewer: scanMaterial('/cards/football/mayo-brewer-f.jpg'),
-      murphy: scanMaterial('/cards/football/mayo-murphy-f.jpg'),
-      stillman: scanMaterial('/cards/football/mayo-stillman-f.jpg'),
+      // Colts photos — CC BY-SA from Wikimedia Commons, attribution in public/wallart/CREDITS.md
+      manning: scanMaterial('/wallart/peyton-manning.jpg'),
+      harrison: scanMaterial('/wallart/marvin-harrison.jpg'),
+      sanders: scanMaterial('/wallart/bob-sanders.jpg'),
+      wayne: scanMaterial('/wallart/reggie-wayne.jpg'),
+      freeney: scanMaterial('/wallart/dwight-freeney.jpg'),
+      mathis: scanMaterial('/wallart/robert-mathis.jpg'),
+      banner: makeImageMaterial('/tlc-logo-full-light.svg', { width: 1500, height: 600, bg: '#f2e8d5', pad: 48 }),
       grail: posterMaterial('CHASE THE GRAIL', 'every pack is a chance', 275),
       trade: posterMaterial('TRADE NIGHT FRIDAYS', 'bring your binder', 20),
     }),
@@ -101,14 +105,18 @@ export function WallArt() {
   return (
     <group>
       {/* left wall, above the shelves */}
-      <Framed material={art.dunlop} position={[-4.97, 2.45, -0.35]} rotationY={D90} w={0.42} h={0.6} />
+      <Framed material={art.sanders} position={[-4.97, 2.45, -0.35]} rotationY={D90} w={0.5} h={0.67} />
       <Framed material={art.grail} position={[-4.97, 2.45, 1.85]} rotationY={D90} w={0.5} h={0.66} />
       {/* right wall */}
-      <Framed material={art.brewer} position={[4.97, 2.45, 1.85]} rotationY={-D90} w={0.42} h={0.6} />
+      <Framed material={art.wayne} position={[4.97, 2.45, 1.85]} rotationY={-D90} w={0.56} h={0.56} />
       <Framed material={art.trade} position={[4.97, 2.45, -0.2]} rotationY={-D90} w={0.5} h={0.66} />
-      {/* back wall, flanking the counter */}
-      <Framed material={art.murphy} position={[-1.6, 2.35, -3.97]} rotationY={0} w={0.42} h={0.6} />
-      <Framed material={art.stillman} position={[1.6, 2.35, -3.97]} rotationY={0} w={0.42} h={0.6} />
+      {/* back wall: the shop banner over the counter, Colts greats either side */}
+      <Framed material={art.banner} position={[0, 2.45, -3.97]} rotationY={0} w={1.5} h={0.6} />
+      <Framed material={art.manning} position={[-1.6, 2.4, -3.97]} rotationY={0} w={0.5} h={0.7} />
+      <Framed material={art.harrison} position={[1.6, 2.4, -3.97]} rotationY={0} w={0.47} h={0.7} />
+      {/* back-wall corners, outside the pennants: the pass rush */}
+      <Framed material={art.mathis} position={[-4.35, 2.45, -3.97]} rotationY={0} w={0.6} h={0.4} />
+      <Framed material={art.freeney} position={[4.3, 2.45, -3.97]} rotationY={0} w={0.7} h={0.375} />
     </group>
   );
 }

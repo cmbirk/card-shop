@@ -430,16 +430,6 @@ export function Shop() {
         <planeGeometry args={[1.6, 1]} />
       </mesh>
 
-      {/* wall clock */}
-      <group position={[0, 2.5, -D / 2 + 0.03]}>
-        <mesh material={MAT.cream}>
-          <circleGeometry args={[0.2, 24]} />
-        </mesh>
-        <mesh material={MAT.dark} position-z={0.005}>
-          <boxGeometry args={[0.02, 0.14, 0.005]} />
-        </mesh>
-      </group>
-
       {/* pennants on the back wall */}
       <Pennant x={-3.5} z={-D / 2 + 0.03} hue={215} rot={0} />
       <Pennant x={-2.6} z={-D / 2 + 0.03} hue={20} rot={0} />
