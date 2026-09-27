@@ -11,12 +11,13 @@ import { useAuthStore } from './stores/authStore';
 import { useDialogueStore } from './stores/dialogueStore';
 import { useShopkeeperStore } from './stores/shopkeeperStore';
 import { useMayaStore } from './stores/mayaStore';
+import { useLokiStore } from './stores/lokiStore';
 import { useBinStore } from './stores/binStore';
 import { reloadInventory, inventoryById } from './systems/inventory';
 
 if (import.meta.env.DEV) {
   // dev-only hooks for scripted smoke tests
-  Object.assign(window, { __nav: useNavStore, __inspect: useInspectStore, __basket: useBasketStore, __ui: useUIStore, __auth: useAuthStore, __dialogue: useDialogueStore, __keeper: useShopkeeperStore, __maya: useMayaStore, __bin: useBinStore, __reload: reloadInventory, __inventory: inventoryById });
+  Object.assign(window, { __nav: useNavStore, __inspect: useInspectStore, __basket: useBasketStore, __ui: useUIStore, __auth: useAuthStore, __dialogue: useDialogueStore, __keeper: useShopkeeperStore, __maya: useMayaStore, __loki: useLokiStore, __bin: useBinStore, __reload: reloadInventory, __inventory: inventoryById });
 }
 
 createRoot(document.getElementById('root')!).render(

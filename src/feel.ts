@@ -59,6 +59,12 @@ export const FEEL = {
   bubbleHoldMax: 12,
   mayaLineHold: 6, // s Maya's canned line stays up
 
+  // Loki (the shop dog)
+  lokiWalkSpeed: 0.9, // m/s — matched by eye to the walk clip's stride at his scale
+  lokiTurnLambda: 5, // yaw damp toward travel direction / the customer
+  lokiGaitLambda: 6, // walk clip timeScale damp: eases the stride in when he sets off
+  lokiGreetHold: 4, // s he stands at the door looking up at you before heading back
+
   // checkout
   counterFlyStagger: 0.08,
 } as const;

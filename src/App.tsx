@@ -9,6 +9,7 @@ import { WalkController } from './scene/WalkController';
 import { Waypoints } from './scene/Waypoints';
 import { Shopkeeper } from './scene/Shopkeeper';
 import { Maya } from './scene/Maya';
+import { Loki } from './scene/Loki';
 import { CardInHand } from './scene/cards/CardInHand';
 import { UIOverlay } from './ui/UIOverlay';
 import { loadInventory } from './systems/inventory';
@@ -65,6 +66,7 @@ export default function App() {
         <Shop />
         <Shopkeeper />
         <Maya />
+        <Loki />
         <CardInHand />
         <Waypoints />
         <StationController />

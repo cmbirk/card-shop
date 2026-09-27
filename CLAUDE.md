@@ -21,7 +21,7 @@ src/
   lib/supabase.ts  browser client (anon key); database.types.ts (generated)
   stores/          zustand: nav, basket, inspect, dialogue, ui, auth
   systems/         inventory (live Supabase read + bundled fallback), placement, rng, sfx
-  scene/           Shop, Facade, StationController (glide nav), fixtures/, cards/, Shopkeeper (Chris),
+  scene/           Shop, Facade, StationController (glide nav), fixtures/, cards/, Shopkeeper (Chris), Loki (shop dog: greets on entry, lokiStore),
                    Maya, Basket, BackOfficeDoor (STAFF ONLY → admin panel), ShowcaseRoom + ShowcaseDoor
                    ("The Collection" annex off the west wall; ANNEX/ANNEX_DOOR in shopLayout;
                    display name = ROOM_NAME in shared/data/showcase.ts), materials/pbr
