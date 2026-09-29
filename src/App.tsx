@@ -31,7 +31,9 @@ export default function App() {
 
   // the inline #boot screen in index.html covers everything until the scene is genuinely
   // ready: inventory loaded AND the asset loaders (GLBs, HDRI, textures) have gone quiet
-  const { active: assetsLoading } = useProgress();
+  // select `active` only: the whole store changes on every loader progress tick, and a burst of
+  // fast (CDN-cached) loads re-rendering App each tick trips React's nested-update limit (#185)
+  const assetsLoading = useProgress((s) => s.active);
   useEffect(() => {
     if (!ready || assetsLoading) return;
     const boot = document.getElementById('boot');
