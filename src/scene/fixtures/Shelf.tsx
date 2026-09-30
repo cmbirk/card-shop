@@ -2,6 +2,7 @@ import type { Fixture } from '@shared/types';
 import type { PlacedCard } from '../../systems/placement';
 import { MAT, ledStripMat, makeLabelMaterial } from '../materials';
 import { CardMesh } from '../cards/CardMesh';
+import { roundedBox } from '../geo';
 import { ProductRow } from './SealedProduct';
 
 const ROW_Y = [0.5, 0.9, 1.3, 1.7]; // glass shelf heights — must match SHELF_ROW_Y in systems/placement.ts
@@ -23,9 +24,7 @@ export function Shelf({ fixture, cards }: { fixture: Fixture; cards: PlacedCard[
   return (
     <group>
       {/* base plinth + dark kick */}
-      <mesh material={MAT.laminate} position={[0, BASE / 2 + 0.02, -0.01]} castShadow>
-        <boxGeometry args={[W, BASE - 0.04, D - 0.02]} />
-      </mesh>
+      <mesh material={MAT.laminate} geometry={roundedBox(W, BASE - 0.04, D - 0.02, 0.012)} position={[0, BASE / 2 + 0.02, -0.01]} castShadow />
       <mesh material={MAT.dark} position={[0, 0.02, 0]}>
         <boxGeometry args={[W - 0.04, 0.04, D - 0.06]} />
       </mesh>
@@ -34,9 +33,7 @@ export function Shelf({ fixture, cards }: { fixture: Fixture; cards: PlacedCard[
         <boxGeometry args={[W - 0.02, glassH, 0.015]} />
       </mesh>
       {/* header */}
-      <mesh material={MAT.laminate} position={[0, TOP + 0.04, -0.01]} castShadow>
-        <boxGeometry args={[W, 0.08, D - 0.02]} />
-      </mesh>
+      <mesh material={MAT.laminate} geometry={roundedBox(W, 0.08, D - 0.02, 0.012)} position={[0, TOP + 0.04, -0.01]} castShadow />
       {/* aluminium corner posts */}
       {([
         [-W / 2 + POST / 2, D / 2 - POST / 2],

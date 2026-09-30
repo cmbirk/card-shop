@@ -11,7 +11,8 @@ const SPORT_HUES: Record<Sport, number> = { baseball: 215, basketball: 20, footb
 
 const boxMatCache = new Map<string, THREE.Material[]>();
 
-function productMaterials(sport: Sport, variant: number): THREE.Material[] {
+/** Per-face materials for a sealed box (art on the +Z face), cached per sport + variant. */
+export function productMaterials(sport: Sport, variant: number): THREE.Material[] {
   const key = `${sport}-${variant}`;
   const cached = boxMatCache.get(key);
   if (cached) return cached;

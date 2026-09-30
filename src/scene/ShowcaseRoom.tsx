@@ -26,9 +26,12 @@ function canvasMaterial(w: number, h: number, draw: (ctx: CanvasRenderingContext
 
 /** A jersey laid flat in a shadowbox: body, sleeves, collar, big number. */
 function jerseyMaterial(num: string, home: boolean): THREE.MeshStandardMaterial {
+  return jerseyArt(num, home ? BLUE : WHITE, home ? WHITE : BLUE, home ? '#8fb4ff' : '#123a6b');
+}
+
+/** A jersey on black felt in any colours (generic — numbers only, no names or marks). */
+export function jerseyArt(num: string, body: string, trim: string, stroke: string): THREE.MeshStandardMaterial {
   return canvasMaterial(512, 640, (ctx) => {
-    const body = home ? BLUE : WHITE;
-    const trim = home ? WHITE : BLUE;
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(0, 0, 512, 640); // black felt backing
     ctx.fillStyle = body;
@@ -62,7 +65,7 @@ function jerseyMaterial(num: string, home: boolean): THREE.MeshStandardMaterial 
     ctx.textBaseline = 'middle';
     ctx.fillText(num, 256, 400);
     ctx.lineWidth = 8;
-    ctx.strokeStyle = home ? '#8fb4ff' : '#123a6b';
+    ctx.strokeStyle = stroke;
     ctx.strokeText(num, 256, 400);
   });
 }

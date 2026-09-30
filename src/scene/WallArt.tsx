@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { MAT, makeImageMaterial } from './materials';
+import { roundedBox } from './geo';
 import { SHOP_NAME } from '@shared/launch';
 
 const texLoader = new THREE.TextureLoader();
@@ -60,8 +61,11 @@ export function Framed({
   rotationY,
   w,
   h,
+  frame = MAT.walnut,
 }: {
   material: THREE.Material;
+  /** frame material (walnut picture frame by default; black for jersey shadowboxes) */
+  frame?: THREE.Material;
   position: [number, number, number];
   rotationY: number;
   w: number;
@@ -69,9 +73,7 @@ export function Framed({
 }) {
   return (
     <group position={position} rotation-y={rotationY}>
-      <mesh material={MAT.walnut} castShadow>
-        <boxGeometry args={[w + 0.08, h + 0.08, 0.035]} />
-      </mesh>
+      <mesh material={frame} geometry={roundedBox(w + 0.08, h + 0.08, 0.035, 0.008)} castShadow />
       <mesh material={matboard} position-z={0.019}>
         <planeGeometry args={[w + 0.03, h + 0.03]} />
       </mesh>

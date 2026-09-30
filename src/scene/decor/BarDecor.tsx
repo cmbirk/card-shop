@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { STOOLS, DIME_TABLE, TOWERS } from '@shared/data/obstacles';
+import { roundedBox } from '../geo';
 import { MAT } from '../materials';
 
 // Floor decor placed from the same constants the obstacle map uses (shared/data/obstacles.ts), so what
@@ -40,9 +41,7 @@ export function DimeTable() {
   const cz = (z0 + z1) / 2;
   return (
     <group position={[cx, 0, cz]}>
-      <mesh material={MAT.trim} position-y={0.74} raycast={noHit} castShadow>
-        <boxGeometry args={[w, 0.03, d]} />
-      </mesh>
+      <mesh material={MAT.trim} geometry={roundedBox(w, 0.03, d, 0.012)} position-y={0.74} raycast={noHit} castShadow />
       {[-1, 1].map((sx) =>
         [-1, 1].map((sz) => (
           <mesh key={`${sx}${sz}`} material={MAT.blackMetal} position={[sx * (w / 2 - 0.08), 0.365, sz * (d / 2 - 0.06)]} raycast={noHit}>
@@ -74,12 +73,8 @@ export function MemorabiliaTowers() {
   return (
     <group position={[cx, 0, cz]}>
       {/* base + header */}
-      <mesh material={MAT.laminate} position-y={0.12} raycast={noHit} castShadow>
-        <boxGeometry args={[w, 0.24, d]} />
-      </mesh>
-      <mesh material={MAT.laminate} position-y={1.93} raycast={noHit}>
-        <boxGeometry args={[w, 0.06, d]} />
-      </mesh>
+      <mesh material={MAT.laminate} geometry={roundedBox(w, 0.24, d, 0.012)} position-y={0.12} raycast={noHit} castShadow />
+      <mesh material={MAT.laminate} geometry={roundedBox(w, 0.06, d, 0.012)} position-y={1.93} raycast={noHit} />
       {/* glass box */}
       <mesh material={MAT.glass} position-y={1.07} raycast={noHit}>
         <boxGeometry args={[w, 1.66, d]} />

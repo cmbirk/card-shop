@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { BAR } from '@shared/data/obstacles';
 import { MAT, ledStripMat } from '../materials';
-import { metreBox } from '../geo';
+import { metreBox, roundedBox } from '../geo';
 import { inventory } from '../../systems/inventory';
 import { resinCardTexture } from '../decor/resinTop';
 import { HoldPile } from './HoldPile';
@@ -68,15 +68,17 @@ export function Counter() {
       </mesh>
       {/* register */}
       <group position={[-1, TOP_Y + TOP_T / 2, -0.05]}>
-        <mesh material={MAT.dark} position={[0, 0.12, 0]} castShadow>
-          <boxGeometry args={[0.35, 0.24, 0.3]} />
-        </mesh>
+        <mesh material={MAT.dark} geometry={roundedBox(0.35, 0.24, 0.3, 0.02)} position={[0, 0.12, 0]} castShadow />
         <mesh position={[0, 0.2, 0.14]} rotation-x={-0.35}>
           <planeGeometry args={[0.26, 0.12]} />
           <meshBasicMaterial color="#9fdca8" />
         </mesh>
       </group>
-      {/* the customer's picks, held up front */}
+      {/* the customer's picks, held up front on a black felt mat so they stand out from the card-collage top */}
+      {/* wide enough for a ~25-card pile (the fan steps FEEL.holdFanSpread to the right) */}
+      <mesh material={MAT.felt} position={[-0.2, TOP_Y + TOP_T / 2 + 0.001, 0.12]} receiveShadow raycast={noHit}>
+        <boxGeometry args={[0.84, 0.002, 0.2]} />
+      </mesh>
       <HoldPile />
       {/* supplies by the register: a stack of toploaders + a box of penny sleeves */}
       <mesh material={MAT.glass} position={[-1.45, TOP_Y + 0.05, 0.05]} raycast={noHit}>

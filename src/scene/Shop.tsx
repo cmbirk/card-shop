@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR, STOREFRONT } from '@shared/data/shopLayout';
 import { BAR, SHOWCASE_RUN_X } from '@shared/data/obstacles';
 import { BarStools, DimeTable, MemorabiliaTowers } from './decor/BarDecor';
+import { WaxWall } from './decor/WaxWall';
+import { JerseyWall } from './decor/JerseyWall';
 import type { Fixture } from '@shared/types';
 import { inventory, useInventoryVersion } from '../systems/inventory';
 import { assignCards } from '../systems/placement';
@@ -340,6 +342,9 @@ export function Shop() {
       <BarStools />
       <DimeTable />
       <MemorabiliaTowers />
+      {/* the wax wall + TV behind the bar, the jersey wall over the showcases */}
+      <WaxWall />
+      <JerseyWall />
 
       {/* the rest of the glass showcase run along the north wall (decor; the Good Stuff case is a fixture) */}
       {SHOWCASE_RUN_X.map((dx, i) => (

@@ -1,6 +1,7 @@
 import type { PlacedCard } from '../../systems/placement';
 import { MAT, ledStripMat, makeLabelMaterial } from '../materials';
 import { CardMesh } from '../cards/CardMesh';
+import { roundedBox } from '../geo';
 import { LOOK } from '../look';
 
 /** Low glass showcase: light-grey laminate base with a dark kick, glass box on top with a glass lid in an
@@ -23,9 +24,7 @@ export function DisplayCase({
   return (
     <group>
       {/* base + kick */}
-      <mesh material={MAT.laminate} position={[0, 0.27, 0]} castShadow>
-        <boxGeometry args={[1.6, 0.46, 0.6]} />
-      </mesh>
+      <mesh material={MAT.laminate} geometry={roundedBox(1.6, 0.46, 0.6, 0.012)} position={[0, 0.27, 0]} castShadow />
       <mesh material={MAT.dark} position={[0, 0.02, 0]}>
         <boxGeometry args={[1.56, 0.04, 0.56]} />
       </mesh>

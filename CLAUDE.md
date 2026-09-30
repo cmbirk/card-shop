@@ -22,7 +22,9 @@ src/
   lib/supabase.ts  browser client (anon key); database.types.ts (generated)
   stores/          zustand: nav, basket, inspect, dialogue, ui, auth
   systems/         inventory (live Supabase read + bundled fallback), placement, rng, sfx
-  scene/           Shop, Facade, StationController (glide nav), fixtures/, cards/, Shopkeeper (Chris), Loki (shop dog: greets on entry, lokiStore),
+  scene/           Shop, Facade, StationController (glide nav), fixtures/ (glass cabinets, glass showcases, the stone
+                   L-bar), decor/ (wax wall + TV, jersey wall, stools, dime table, memorabilia towers, resin bar top),
+                   Sunlight (sun, shafts, shadow sweep), RoomShell (ceiling cans, baseboards), cards/, Shopkeeper (Chris), Loki (shop dog: greets on entry, lokiStore),
                    Maya, Basket, BackOfficeDoor (STAFF ONLY → admin panel), ShowcaseRoom + ShowcaseDoor
                    ("The Collection" annex off the west wall; ANNEX/ANNEX_DOOR in shopLayout;
                    display name = ROOM_NAME in shared/data/showcase.ts), materials/pbr
@@ -45,6 +47,10 @@ src/
   the caller's token so anonymous users can't spend Anthropic tokens.
 - **Meshy GLB characters** (Chris, Maya) export `alphaMode=BLEND` + `doubleSided` → tearing/bleed.
   Sanitize on load: opaque + alphaTest, `FrontSide`, mipmaps off, roughness≥0.65 (see `Shopkeeper.tsx`).
+  The shipped GLBs are **compressed** (meshopt geometry + WebP textures, ~38 MB → ~4 MB). Recompress a new
+  export with `npx @gltf-transform/cli optimize in.glb public/models/x.glb --compress meshopt
+  --texture-compress webp --texture-size 2048 --simplify false --join false --flatten false --instance false
+  --palette false` — never let `optimize` simplify, join or flatten a skinned character.
 - **Stripe: the webhook is the only writer of `sold`.** `/api/checkout` snapshots prices from the DB
   (never the client), reserves via the `reserve_cards` SQL function (atomic, lapsed reservations
   count as available), and `/api/stripe-webhook` verifies the signature over `req.text()` — never

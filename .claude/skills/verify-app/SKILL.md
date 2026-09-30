@@ -41,8 +41,10 @@ used constantly during development.
   `goto,<station>` and `pickup,<id>` over pixel clicks — headless SwiftShader renders at ~5-10fps, so
   camera glides are slow (the script polls ~13s for arrival) and precise clicks during transit are
   ignored by design.
-- **Stations** (from `shared/data/shopLayout.ts`): `outside`, `entry`, `center`, `counter`, `case`,
-  `bins`, `shelf-baseball|basketball|football|hockey|tcg`.
+- **Stations** (from `shared/data/shopLayout.ts`): `outside`, `entry`, `center`, `counter` (the bar),
+  `case` (north-wall showcases), `bins` (dime boxes, front-left), `shelf-football|basketball|hockey|baseball`
+  (west-wall glass cabinets), `shelf-tcg` (east wall, past the bar), `collection-door`, `collection-case`,
+  `office-door`, `office` (office needs `adminFlag` first — non-admins are refused).
 - **The inspected card flies to the camera regardless of position** — you can `pickup,<id>` from any
   station to see a card up close.
 - **Cropping/zoom:** `sips` on macOS crops with `-c HEIGHT WIDTH` order and offsets are finicky —

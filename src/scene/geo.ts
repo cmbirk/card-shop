@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 /**
  * Re-project a geometry's UVs into metres by each vertex's dominant normal axis (box/triplanar style),
@@ -39,4 +40,18 @@ export function metreUVs(g: THREE.BufferGeometry, tile = 1, offset: readonly [nu
 /** A box with metre-scale UVs (see metreUVs). */
 export function metreBox(w: number, h: number, d: number, tile = 1, offset: readonly [number, number, number] = [0, 0, 0]) {
   return metreUVs(new THREE.BoxGeometry(w, h, d), tile, offset);
+}
+
+const roundedCache = new Map<string, THREE.BufferGeometry>();
+
+/** A box with softly rounded edges (so edges catch a highlight instead of reading as hard CG corners).
+ *  Cached and shared by size — never dispose the result. */
+export function roundedBox(w: number, h: number, d: number, radius = 0.008): THREE.BufferGeometry {
+  const key = `${w.toFixed(3)},${h.toFixed(3)},${d.toFixed(3)},${radius}`;
+  let g = roundedCache.get(key);
+  if (!g) {
+    g = new RoundedBoxGeometry(w, h, d, 2, Math.min(radius, w / 2, h / 2, d / 2));
+    roundedCache.set(key, g);
+  }
+  return g;
 }

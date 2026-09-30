@@ -6,7 +6,7 @@ import { planRoute } from '@shared/data/obstacles';
 export type LokiPose = 'home' | 'greeting' | 'waiting' | 'returning';
 
 export const LOKI_HOME: readonly [number, number] = [4.7, 3.0]; // by the south end of the bar, customer side
-export const LOKI_GREET: readonly [number, number] = [2.4, 5.0]; // in full view from the entry station
+export const LOKI_GREET: readonly [number, number] = [2.5, 3.7]; // ~2.7 m in front of the entry camera, in full view
 
 interface LokiState {
   pose: LokiPose;
