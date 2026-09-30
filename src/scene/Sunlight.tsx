@@ -3,7 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useInspectStore } from '../stores/inspectStore';
 import * as THREE from 'three';
 import { ROOM } from '@shared/data/shopLayout';
-import { MAT } from './materials';
+import { MAT, dropCeilingMat } from './materials';
+import { metreBox } from './geo';
 import { LOOK, SUN_DIR } from './look';
 
 // The golden-afternoon rig: a low sun outside the south wall, real window openings so it lands as
@@ -47,7 +48,7 @@ export function Sun() {
 }
 
 // the room shell must block the sun everywhere except the glass: walls and ceilings cast
-const SHELL = new Set<THREE.Material>([MAT.wall, MAT.wainscot, MAT.cream]);
+const SHELL = new Set<THREE.Material>([MAT.wall, MAT.wainscot, MAT.cream, MAT.barnwood, dropCeilingMat]);
 
 /** Every lit mesh receives the sun's shadow and every wall/ceiling casts one (both are per-object flags,
  *  not shader variants — no recompiles). Meshes mount late (GLB characters, re-placed cards), so
@@ -72,35 +73,37 @@ export function ShadowReceivers() {
 
 /** The south wall as real segments around the windows, so the sun only gets in where the glass is. */
 export function SouthWall() {
-  const W = ROOM.width;
-  const H = ROOM.height;
-  const z = ROOM.depth / 2 + WALL_T / 2;
-  // columns across the wall: [x0, x1, open-from-y, open-to-y] (open span has wall below and above)
-  const cols: [number, number, number, number][] = [];
-  const edges = [-W / 2, ...SOUTH_WINDOWS.flatMap((w) => [w.x0, w.x1]), W / 2].sort((a, b) => a - b);
-  const xs = [...new Set([...edges, DOOR.x0, DOOR.x1])].sort((a, b) => a - b);
-  for (let i = 0; i < xs.length - 1; i++) {
-    const a = xs[i];
-    const b = xs[i + 1];
-    const mid = (a + b) / 2;
-    const win = SOUTH_WINDOWS.find((w) => mid > w.x0 && mid < w.x1);
-    const door = mid > DOOR.x0 && mid < DOOR.x1;
-    cols.push(win ? [a, b, win.y0, win.y1] : door ? [a, b, 0, DOOR.y1] : [a, b, H, H]);
-  }
+  // built once: one metre-UV box per wall piece (barn wood lines up across segments)
+  const pieces = useMemo(() => {
+    const W = ROOM.width;
+    const H = ROOM.height;
+    const z = ROOM.depth / 2 + WALL_T / 2;
+    // columns across the wall: [x0, x1, open-from-y, open-to-y] (open span has wall below and above)
+    const xs = [...new Set([-W / 2, ...SOUTH_WINDOWS.flatMap((w) => [w.x0, w.x1]), DOOR.x0, DOOR.x1, W / 2])].sort((a, b) => a - b);
+    const out: { key: string; pos: [number, number, number]; geo: THREE.BufferGeometry }[] = [];
+    for (let i = 0; i < xs.length - 1; i++) {
+      const a = xs[i];
+      const b = xs[i + 1];
+      const mid = (a + b) / 2;
+      const win = SOUTH_WINDOWS.find((w) => mid > w.x0 && mid < w.x1);
+      const door = mid > DOOR.x0 && mid < DOOR.x1;
+      const [o0, o1] = win ? [win.y0, win.y1] : door ? [0, DOOR.y1] : [H, H];
+      const spans: [number, number][] = [];
+      if (o0 > 0) spans.push([0, o0]);
+      if (o1 < H) spans.push([o1, H]);
+      for (const [y0, y1] of spans) {
+        const pos: [number, number, number] = [mid, (y0 + y1) / 2, z];
+        out.push({ key: `${a}-${y0}`, pos, geo: metreBox(b - a, y1 - y0, WALL_T, 1.4, pos) });
+      }
+    }
+    return out;
+  }, []);
+  useEffect(() => () => pieces.forEach((p) => p.geo.dispose()), [pieces]);
   return (
     <group>
-      {cols.flatMap(([a, b, o0, o1]) => {
-        const w = b - a;
-        const x = (a + b) / 2;
-        const parts: [number, number][] = [];
-        if (o0 > 0) parts.push([0, o0]);
-        if (o1 < H) parts.push([o1, H]);
-        return parts.map(([y0, y1]) => (
-          <mesh key={`${a}-${y0}`} material={MAT.wall} position={[x, (y0 + y1) / 2, z]} castShadow>
-            <boxGeometry args={[w, y1 - y0, WALL_T]} />
-          </mesh>
-        ));
-      })}
+      {pieces.map((p) => (
+        <mesh key={p.key} material={MAT.barnwood} position={p.pos} geometry={p.geo} castShadow />
+      ))}
       {SOUTH_WINDOWS.map((w) => (
         <WindowGrid key={w.x0} {...w} />
       ))}

@@ -6,6 +6,10 @@ import { LOOK } from './look';
 // (see pbr.ts); accents stay flat-colored.
 export const MAT = {
   floor: PBR.floor,
+  carpet: PBR.carpet,
+  barnwood: PBR.barnwood,
+  stone: PBR.stone,
+  trim: new THREE.MeshStandardMaterial({ color: '#f1f2f0', roughness: 0.55 }),
   wall: PBR.wall,
   wainscot: PBR.wainscot,
   walnut: PBR.wood,
@@ -25,6 +29,34 @@ export const MAT = {
   skin: new THREE.MeshStandardMaterial({ color: '#e0b08c', roughness: 0.8 }),
   flannel: new THREE.MeshStandardMaterial({ color: '#a63d40', roughness: 0.95 }),
 };
+
+/** Black acoustic drop ceiling: 2x2 ft tiles in a dark T-bar grid (procedural — no texture file). */
+function dropCeilingTexture(): THREE.CanvasTexture {
+  const n = 512; // one canvas = 2 x 2 tiles = 1.22 m
+  const c = document.createElement('canvas');
+  c.width = c.height = n;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#1c1d20';
+  g.fillRect(0, 0, n, n);
+  // fissured-tile speckle
+  for (let i = 0; i < 9000; i++) {
+    const v = 22 + Math.random() * 16;
+    g.fillStyle = `rgb(${v},${v},${v + 2})`;
+    g.fillRect(Math.random() * n, Math.random() * n, 1 + Math.random() * 2, 1);
+  }
+  // T-bar grid, a touch lighter than the tiles
+  g.fillStyle = '#34363b';
+  for (const p of [0, n / 2]) {
+    g.fillRect(p, 0, 6, n);
+    g.fillRect(0, p, n, 6);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+export const dropCeilingMat = new THREE.MeshStandardMaterial({ map: dropCeilingTexture(), roughness: 0.95 });
 
 /** Shared LED-strip emitter (HDR colour > 1, so it blooms). Visual only — never a light. */
 export const ledStripMat = new THREE.MeshBasicMaterial({ color: LOOK.ledStrip });

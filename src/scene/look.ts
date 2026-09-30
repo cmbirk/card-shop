@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
 // Every lighting / post-processing / atmosphere constant lives here — tune the shop's look from one
-// file (game feel stays in feel.ts). Mood: golden afternoon — a low warm sun rakes through the south
-// windows; interior lamps are secondary.
+// file (game feel stays in feel.ts). Mood: a bright modern hobby shop — black drop ceiling full of
+// recessed cans, even neutral light — with a low warm sun through the front windows as the accent.
 //
 // Perf note (measured on an M1 Max): each local point/spot light costs roughly 3 fps across the whole
 // scene, far more than draw calls or pixels. Keep the local-light count small and FIXED — adding or
@@ -34,13 +34,14 @@ export const LOOK = {
   shadowCenter: [-2, 1, -1.5] as [number, number, number],
 
   // fill
-  ambient: 0.11,
-  ambientInspecting: 0.09, // the held card still has to read — dim only slightly
-  envIntensity: 0.45,
+  ambient: 0.32,
+  ambientColor: '#f3f5f8', // neutral-cool, like 4000K LED cans
+  ambientInspecting: 0.26, // the held card still has to read — dim only slightly
+  envIntensity: 0.85,
 
   // practicals (local lights — keep the count fixed)
-  counterLamp: { color: '#ffcf94', intensity: 2.2, distance: 5 },
-  wallWash: { color: '#ffe6c4', intensity: 1.7, distance: 6.5 }, // one per shelf wall
+  counterLamp: { color: '#ffe2bd', intensity: 2.4, distance: 5 },
+  wallWash: { color: '#f6f1ea', intensity: 2.2, distance: 7 }, // one per shelf wall
   officeBulb: { color: '#fff0d0', intensity: 1.6, distance: 6 },
   caseLight: { color: '#ffd9a0', intensity: 2.2, distance: 1.8 }, // The Good Stuff only — graded cards must read
   // neutral key that rides with the camera and fades up while a card is held, so card art reads true
@@ -51,6 +52,12 @@ export const LOOK = {
   // Loki is a black dog: without help he reads as a silhouette in the warm low light. A soft fur
   // sheen + extra environment reflection keeps his shape and coat detail visible.
   lokiCoat: { sheen: 0.8, sheenColor: '#b9a58c', sheenRoughness: 0.55, envBoost: 1.8 },
+
+  // ceiling (emitters only — the cans are not lights)
+  canSpacing: 1.6, // metres between recessed cans
+  canGlow: hdr('#fff6ec', 7),
+  panelGlow: hdr('#f4f7fb', 2.4),
+  troffers: [[-1.6, 1.4], [-1.6, -1.8]] as [number, number][],
 
   // emitters (bloom sources)
   windowGlow: hdr('#ffe7c2', 2.6),

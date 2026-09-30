@@ -1,12 +1,11 @@
-import { useMemo, useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useMemo, useState } from 'react';
 import { Environment, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
 import type { Fixture } from '@shared/types';
 import { inventory, useInventoryVersion } from '../systems/inventory';
 import { assignCards } from '../systems/placement';
-import { MAT, makeLabelMaterial } from './materials';
+import { MAT, dropCeilingMat, makeLabelMaterial } from './materials';
 import { Shelf } from './fixtures/Shelf';
 import { DisplayCase } from './fixtures/DisplayCase';
 import { Counter } from './fixtures/Counter';
@@ -20,6 +19,7 @@ import { BackOfficeDoor } from './BackOfficeDoor';
 import { ShowcaseRoom } from './ShowcaseRoom';
 import { ShowcaseDoor } from './ShowcaseDoor';
 import { LOOK } from './look';
+import { Baseboards, CeilingCans } from './RoomShell';
 import { InspectLight, Pendant, ShadowReceivers, SkyDome, SouthWall, Sun, SunDust, SunShafts } from './Sunlight';
 
 function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React.ReactNode }) {
@@ -42,27 +42,6 @@ function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React
       onPointerOut={() => setHovered(false)}
     >
       {children}
-    </group>
-  );
-}
-
-function CeilingFan() {
-  const ref = useRef<THREE.Group>(null!);
-  useFrame((_, dt) => {
-    ref.current.rotation.y += dt * 1.2;
-  });
-  return (
-    <group position={[0, ROOM.height - 0.25, 0]}>
-      <mesh material={MAT.dark}>
-        <cylinderGeometry args={[0.06, 0.06, 0.3]} />
-      </mesh>
-      <group ref={ref} position-y={-0.12}>
-        {[0, 1, 2, 3].map((i) => (
-          <mesh key={i} material={MAT.walnut} rotation-y={(i * Math.PI) / 2} position-x={0}>
-            <boxGeometry args={[1.2, 0.02, 0.14]} />
-          </mesh>
-        ))}
-      </group>
     </group>
   );
 }
@@ -261,22 +240,6 @@ function AnnexShell() {
   );
 }
 
-function Pennant({ x, z, hue, rot }: { x: number; z: number; hue: number; rot: number }) {
-  const mat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: `hsl(${hue}, 55%, 45%)`, side: THREE.DoubleSide, roughness: 0.9 }),
-    [hue],
-  );
-  const geo = useMemo(() => {
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0.12);
-    shape.lineTo(0, -0.12);
-    shape.lineTo(0.6, 0);
-    shape.closePath();
-    return new THREE.ShapeGeometry(shape);
-  }, []);
-  return <mesh geometry={geo} material={mat} position={[x, 2.5, z]} rotation-y={rot} />;
-}
-
 export function Shop() {
   const invVersion = useInventoryVersion((s) => s.version);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -292,7 +255,7 @@ export function Shop() {
       {/* image-based fill (kept at its native orientation — rotated, its bright side greys out the floor's sheen) */}
       <Environment files="/hdri/artist_workshop_1k.hdr" environmentIntensity={LOOK.envIntensity} />
       {/* ambient dims while inspecting to focus the eye */}
-      <ambientLight intensity={inspecting ? LOOK.ambientInspecting : LOOK.ambient} color="#fff2df" />
+      <ambientLight intensity={inspecting ? LOOK.ambientInspecting : LOOK.ambient} color={LOOK.ambientColor} />
       {/* low afternoon sun through the south windows — the only shadow caster */}
       <Sun />
       <ShadowReceivers />
@@ -306,8 +269,8 @@ export function Shop() {
       <Pendant x={-1.1} z={-3} />
       <Pendant x={1.1} z={-3} />
 
-      {/* floor */}
-      <mesh material={MAT.floor} rotation-x={-Math.PI / 2} receiveShadow>
+      {/* floor: charcoal commercial carpet */}
+      <mesh material={MAT.carpet} rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[W, D]} />
       </mesh>
 
@@ -320,42 +283,13 @@ export function Shop() {
       </mesh>
       {/* south wall: real openings so the sun only gets in through the glass */}
       <SouthWall />
-      {/* wainscot strips */}
-      {(() => {
-        const x0 = BACK_OFFICE_DOOR.position[0] - BACK_OFFICE_DOOR.width / 2;
-        const x1 = BACK_OFFICE_DOOR.position[0] + BACK_OFFICE_DOOR.width / 2;
-        return (
-          <>
-            <mesh material={MAT.wainscot} position={[(-W / 2 + x0) / 2, 0.45, -D / 2 + 0.01]}>
-              <planeGeometry args={[x0 + W / 2, 0.9]} />
-            </mesh>
-            <mesh material={MAT.wainscot} position={[(x1 + W / 2) / 2, 0.45, -D / 2 + 0.01]}>
-              <planeGeometry args={[W / 2 - x1, 0.9]} />
-            </mesh>
-          </>
-        );
-      })()}
-      {(() => {
-        const z0 = ANNEX_DOOR.z - ANNEX_DOOR.width / 2;
-        const z1 = ANNEX_DOOR.z + ANNEX_DOOR.width / 2;
-        return (
-          <>
-            <mesh material={MAT.wainscot} position={[-W / 2 + 0.01, 0.45, (-D / 2 + z0) / 2]} rotation-y={Math.PI / 2}>
-              <planeGeometry args={[z0 + D / 2, 0.9]} />
-            </mesh>
-            <mesh material={MAT.wainscot} position={[-W / 2 + 0.01, 0.45, (z1 + D / 2) / 2]} rotation-y={Math.PI / 2}>
-              <planeGeometry args={[D / 2 - z1, 0.9]} />
-            </mesh>
-          </>
-        );
-      })()}
-      <mesh material={MAT.wainscot} position={[W / 2 - 0.01, 0.45, 0]} rotation-y={-Math.PI / 2}>
-        <planeGeometry args={[D, 0.9]} />
-      </mesh>
-      {/* ceiling */}
-      <mesh material={MAT.cream} position={[0, H, 0]} rotation-x={Math.PI / 2}>
+      {/* white baseboards (the modern shop has no wainscot) */}
+      <Baseboards />
+      {/* black drop ceiling with recessed cans */}
+      <mesh material={dropCeilingMat} position={[0, H, 0]} rotation-x={Math.PI / 2}>
         <planeGeometry args={[W, D]} />
       </mesh>
+      <CeilingCans />
 
       {/* south windows: bright sunlit glass (HDR, so it blooms) + the closed front door */}
       {[-3, 3].map((x) => (
@@ -385,17 +319,6 @@ export function Shop() {
       {/* staff-only door to the back office */}
       <BackOfficeDoor />
 
-      {/* entry rug */}
-      <mesh material={MAT.green} position={[0, 0.012, 3.4]} rotation-x={-Math.PI / 2}>
-        <planeGeometry args={[1.6, 1]} />
-      </mesh>
-
-      {/* pennants on the back wall */}
-      <Pennant x={-3.5} z={-D / 2 + 0.03} hue={215} rot={0} />
-      <Pennant x={-2.6} z={-D / 2 + 0.03} hue={20} rot={0} />
-      <Pennant x={2.2} z={-D / 2 + 0.03} hue={140} rot={0} />
-      <Pennant x={3.1} z={-D / 2 + 0.03} hue={275} rot={0} />
-
       {/* boxes behind the counter */}
       <mesh material={MAT.cardboard} position={[-2, 0.2, -3.6]} castShadow>
         <boxGeometry args={[0.5, 0.4, 0.4]} />
@@ -408,7 +331,6 @@ export function Shop() {
       <OfficeShell />
       <ShowcaseRoom />
       <ShowcaseDoor />
-      <CeilingFan />
       <SunShafts />
       <SunDust />
       <WallArt />

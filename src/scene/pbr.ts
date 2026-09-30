@@ -42,7 +42,18 @@ export const PBR = {
   wood: pbr('wood', { nrm: true, rgh: true }, { repeat: [1.6, 1.6], color: '#8a6647' }),
   /** worn counter/shelf tops — same wood, lighter and glossier */
   woodTop: pbr('wood', { nrm: true, rgh: true }, { repeat: [2.2, 0.8], color: '#a87f58', roughness: 0.7 }),
-  wall: pbr('plaster', { nrm: true }, { repeat: [7, 2.2], color: '#ece1cb' }),
+  /** painted drywall — light blue-grey, the modern-shop base colour */
+  wall: pbr('plaster', { nrm: true }, { repeat: [7, 2.2], color: '#b9c4cd', normalScale: 0.35 }),
   wainscot: pbr('wood', { nrm: true, rgh: true }, { repeat: [6, 0.9], color: '#6b4a2f' }),
   brick: pbr('brick', { nrm: true }, { repeat: [4.5, 1.6], color: '#b07a62' }),
+  /** charcoal commercial carpet (main-room floor) */
+  carpet: pbr('carpet', { nrm: true, rgh: true }, { repeat: [10 / 1.1, 8 / 1.1], normalScale: 0.6 }),
+  // metre-UV sets (use with geo.ts metreUVs/metreBox; repeat 1 = one tile per `tile` metres)
+  /** reclaimed barn-wood accent wall */
+  barnwood: pbr('barnwood', { nrm: true, rgh: true }, { repeat: [1, 1], color: '#d8cabb' }),
+  /** stacked limestone (bar base) */
+  stone: pbr('stone', { nrm: true, rgh: true }, { repeat: [1, 1], color: '#efe6d6' }),
 };
+
+// the carpet scan is dark and navy-cast: lift it to a neutral mid charcoal (linear tint > 1 is fine)
+PBR.carpet.color.setRGB(2.5, 2.25, 1.7);
