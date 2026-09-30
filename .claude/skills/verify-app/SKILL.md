@@ -42,7 +42,7 @@ used constantly during development.
   camera glides are slow (the script polls ~13s for arrival) and precise clicks during transit are
   ignored by design.
 - **Stations** (from `shared/data/shopLayout.ts`): `outside`, `entry`, `center`, `counter` (the bar),
-  `case` (north-wall showcases), `bins` (dime boxes, front-left), `shelf-football|basketball|hockey|baseball`
+  `case` (north-wall showcases), `bins` (dime-box table, middle of the floor), `shelf-football|basketball|hockey|baseball`
   (west-wall glass cabinets), `shelf-tcg` (east wall, past the bar), `collection-door`, `collection-case`,
   `office-door`, `office` (office needs `adminFlag` first — non-admins are refused).
 - **The inspected card flies to the camera regardless of position** — you can `pickup,<id>` from any

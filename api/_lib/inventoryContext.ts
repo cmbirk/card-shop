@@ -68,7 +68,7 @@ const SHELF_LABEL: Record<string, string> = {
 function where(card: Card): string {
   if (card.status === 'personal') return `${ROOM_NAME} (through the doorway at the back of the left wall, beside the football cabinet) — Chris's PERSONAL collection, NOT FOR SALE`;
   if (card.featured) return 'the glass showcases along the back wall, under the jersey wall';
-  if (card.category.startsWith('budget-box')) return 'the dime boxes on the table under the front-left window';
+  if (card.category.startsWith('budget-box')) return 'the dime boxes on the white table in the middle of the shop';
   return SHELF_LABEL[card.sport];
 }
 

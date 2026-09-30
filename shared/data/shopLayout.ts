@@ -5,8 +5,8 @@ const D90 = Math.PI / 2;
 // 1 unit = 1m. Y up. +Z = entrance (south). Modern hobby-shop plan: every display is a glass cabinet
 // against a wall so the middle of the floor stays open — sport cabinets down the west wall, the Good
 // Stuff showcase on the north wall under the jersey wall, an L-bar down the east side (Chris works
-// behind it, wax wall on the east wall) with the TCG cabinet south of it, dime boxes under the
-// front-left window. Eye height 1.6m.
+// behind it, wax wall on the east wall) with the TCG cabinet south of it, and one low white table of
+// dime boxes in the middle — where the entry camera sees it first. Eye height 1.6m.
 // Main room: 14m wide (X -5…9) x 11m deep (Z -4…7), 3m ceiling. It is NOT centred on the origin — it grew
 // east and south so the west wall (Collection annex) and north wall (back office) stayed put. Use the
 // bounds / cx / cz, never ±width/2.
@@ -93,11 +93,11 @@ export const shopLayout: ShopLayout = {
       label: 'Trading Card Games',
     },
     {
-      // dime boxes on a table under the front-left window, fronts facing north toward the station
+      // dime boxes on a low white table in the middle of the floor, fronts facing the door
       id: 'bin-a',
       kind: 'bin',
-      position: [-1.9, 0, 6.35],
-      rotationY: Math.PI + (8 * Math.PI) / 180,
+      position: [0.72, 0, 1.22],
+      rotationY: (8 * Math.PI) / 180,
       accepts: { category: 'budget-box' },
       slots: { rows: 1, cols: 24, spacing: [0, 0.014] }, // a front-to-back stack; spacing[1] = card pitch
       stationId: 'bins',
@@ -106,8 +106,8 @@ export const shopLayout: ShopLayout = {
     {
       id: 'bin-b',
       kind: 'bin',
-      position: [-1.1, 0, 6.35],
-      rotationY: Math.PI - (6 * Math.PI) / 180,
+      position: [1.33, 0, 1.22],
+      rotationY: -(6 * Math.PI) / 180,
       accepts: { category: 'budget-box-b' },
       slots: { rows: 1, cols: 24, spacing: [0, 0.014] }, // a front-to-back stack; spacing[1] = card pitch
       stationId: 'bins',
@@ -136,7 +136,7 @@ export const shopLayout: ShopLayout = {
         ['shelf-football', -1.5, ['shelf-basketball', 'collection-door', 'office-door', 'center']],
         ['shelf-basketball', 0.8, ['shelf-football', 'shelf-hockey', 'center']],
         ['shelf-hockey', 3.1, ['shelf-basketball', 'shelf-baseball', 'center']],
-        ['shelf-baseball', 5.4, ['shelf-hockey', 'bins', 'entry']],
+        ['shelf-baseball', 5.4, ['shelf-hockey', 'entry']],
       ] as const
     ).map(([id, z, neighbors]) => ({
       id,
@@ -200,14 +200,14 @@ export const shopLayout: ShopLayout = {
       neighbors: ['entry', 'shelf-basketball', 'shelf-hockey', 'counter', 'case', 'shelf-tcg', 'bins'],
     },
     {
-      // dime-box table under the front-left window (camera looks south, toward the glass)
+      // the dime-box table in the middle (camera looks north over it at the showcases + jersey wall)
       id: 'bins',
-      position: [-1.5, 1.5, 5.25],
-      target: [-1.5, 0.85, 6.35],
+      position: [1.0, 1.5, 2.4],
+      target: [1.0, 0.85, 1.22],
       yawRange: 1.35,
       pitchRange: 0.45,
-      neighbors: ['entry', 'center', 'shelf-baseball'],
-      greetSpot: [0.4, 5.6],
+      neighbors: ['entry', 'center', 'case', 'shelf-basketball'],
+      greetSpot: [2.5, 1.0],
     },
     {
       id: 'case',
@@ -215,7 +215,7 @@ export const shopLayout: ShopLayout = {
       target: [ROOM.cx, 0.88, -3.55],
       yawRange: 1.15,
       pitchRange: 0.45,
-      neighbors: ['counter', 'office-door', 'center'],
+      neighbors: ['counter', 'office-door', 'center', 'bins'],
       greetSpot: [3.5, -2.4],
     },
     {

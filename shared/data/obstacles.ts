@@ -24,8 +24,8 @@ export const BAR = {
 /** Bar stools along the customer (west) face of the bar. */
 export const STOOLS = { x: 5.62, zs: [-2.5, -1.55, -0.6, 0.35, 1.3, 2.25] as const, radius: 0.22 } as const;
 
-/** Folding table under the dime boxes (bins), under the front-left window. */
-export const DIME_TABLE: Box = { x0: -2.5, x1: -0.5, z0: 6.0, z1: 6.7 };
+/** Low white table under the dime boxes (bins), in the middle of the floor where the entry camera sees it. */
+export const DIME_TABLE: Box = { x0: 0.3, x1: 1.75, z0: 0.95, z1: 1.5 };
 
 /** Glass memorabilia towers in the front-right corner. */
 export const TOWERS: Box = { x0: 8.3, x1: 8.95, z0: 6.0, z1: 6.95 };
@@ -82,10 +82,15 @@ export const WEST_WALL: Box[] = [
 ];
 
 /** Floor waypoints Chris can route through (world x, z): the gap at the bar's south end, the customer
- *  side past the stools, and either side of the Collection doorway. */
+ *  side past the stools, round the dime table, and either side of the Collection doorway. */
 export const NAV_NODES: [number, number][] = [
   [BAR.x + 1.0, BAR.z1 + 0.65], // staff aisle, just past the bar's south end
   [STOOLS.x - 0.55, BAR.z1 + 0.9], // customer side, south of the stools
+  // the dime-box table's corners (0.55 m out: its bins overhang the top a little)
+  [DIME_TABLE.x0 - 0.55, DIME_TABLE.z0 - 0.55],
+  [DIME_TABLE.x1 + 0.55, DIME_TABLE.z0 - 0.55],
+  [DIME_TABLE.x0 - 0.55, DIME_TABLE.z1 + 0.55],
+  [DIME_TABLE.x1 + 0.55, DIME_TABLE.z1 + 0.55],
   [ANNEX.xMax + 0.6, ANNEX_DOOR.z], // Collection doorway, main-room side
   [ANNEX.xMax - 0.6, ANNEX_DOOR.z], // Collection doorway, annex side
 ];
