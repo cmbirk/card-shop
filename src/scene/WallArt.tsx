@@ -104,19 +104,19 @@ export function WallArt() {
 
   return (
     <group>
-      {/* left wall, above the shelves */}
-      <Framed material={art.sanders} position={[-4.97, 2.45, -0.35]} rotationY={D90} w={0.5} h={0.67} />
-      <Framed material={art.grail} position={[-4.97, 2.45, 1.85]} rotationY={D90} w={0.5} h={0.66} />
-      {/* right wall */}
-      <Framed material={art.wayne} position={[4.97, 2.45, 1.85]} rotationY={-D90} w={0.56} h={0.56} />
-      <Framed material={art.trade} position={[4.97, 2.45, -0.2]} rotationY={-D90} w={0.5} h={0.66} />
-      {/* back wall: the shop banner over the counter, Colts greats either side */}
-      <Framed material={art.banner} position={[0, 2.45, -3.97]} rotationY={0} w={1.5} h={0.6} />
-      <Framed material={art.manning} position={[-1.6, 2.4, -3.97]} rotationY={0} w={0.5} h={0.7} />
-      <Framed material={art.harrison} position={[1.6, 2.4, -3.97]} rotationY={0} w={0.47} h={0.7} />
-      {/* back-wall corners, outside the pennants: the pass rush */}
-      <Framed material={art.mathis} position={[-4.35, 2.45, -3.97]} rotationY={0} w={0.6} h={0.4} />
-      <Framed material={art.freeney} position={[4.3, 2.45, -3.97]} rotationY={0} w={0.7} h={0.375} />
+      {/* west wall, above the gaps between the glass cabinets */}
+      <Framed material={art.sanders} position={[-4.97, 2.5, -0.35]} rotationY={D90} w={0.5} h={0.67} />
+      <Framed material={art.grail} position={[-4.97, 2.5, 1.95]} rotationY={D90} w={0.5} h={0.66} />
+      <Framed material={art.manning} position={[-4.97, 2.45, 4.25]} rotationY={D90} w={0.5} h={0.7} />
+      {/* north wall, west end (the jersey wall takes the rest) */}
+      <Framed material={art.trade} position={[-4.3, 2.3, -3.97]} rotationY={0} w={0.5} h={0.66} />
+      {/* east wall: the shop sign over the wax wall, behind Chris — seen from the entry */}
+      <Framed material={art.banner} position={[8.97, 2.55, -0.4]} rotationY={-D90} w={1.5} h={0.6} />
+      {/* south (barn-wood) wall, on the solid stretches between the windows and the door: Colts greats */}
+      <Framed material={art.harrison} position={[-3.8, 1.7, 6.97]} rotationY={Math.PI} w={0.47} h={0.7} />
+      <Framed material={art.wayne} position={[0.5, 1.7, 6.97]} rotationY={Math.PI} w={0.56} h={0.56} />
+      <Framed material={art.mathis} position={[3.5, 1.7, 6.97]} rotationY={Math.PI} w={0.6} h={0.4} />
+      <Framed material={art.freeney} position={[7.4, 1.7, 6.97]} rotationY={Math.PI} w={0.7} h={0.375} />
     </group>
   );
 }

@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html, useAnimations, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useDialogueStore, type MelGesture } from '../stores/dialogueStore';
-import { useShopkeeperStore, SHOPKEEPER_HOME } from '../stores/shopkeeperStore';
+import { useShopkeeperStore, SHOPKEEPER_HOME, SHOPKEEPER_HOME_YAW } from '../stores/shopkeeperStore';
 import { useSpeechStore } from '../stores/speechStore';
 import { FEEL } from '../feel';
 
@@ -45,7 +45,7 @@ export function Shopkeeper() {
   const speaking = useSpeechStore((s) => s.current?.speaker === 'chris'); // '…' dots anchor the voice to the body
   const pose = useShopkeeperStore((s) => s.pose);
   const walk = useRef({ legId: 0, idx: 0 }); // waypoint cursor for the store's current leg
-  const yaw = useRef(0);
+  const yaw = useRef(SHOPKEEPER_HOME_YAW);
   const current = useRef<THREE.AnimationAction | null>(null);
   const oneShot = useRef<THREE.AnimationAction | null>(null);
   const headBone = useRef<THREE.Bone | null>(null);
@@ -157,7 +157,7 @@ export function Shopkeeper() {
     const r = root.current;
     if (!r) return;
     const st = useShopkeeperStore.getState();
-    let targetYaw = 0; // rest: face +Z (the shop)
+    let targetYaw = SHOPKEEPER_HOME_YAW; // rest: face the customers across the bar
     if (st.pose === 'walkingOut' || st.pose === 'walkingBack') {
       const w = walk.current;
       if (w.legId !== st.legId) {

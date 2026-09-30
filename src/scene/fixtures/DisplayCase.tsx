@@ -3,63 +3,61 @@ import { MAT, ledStripMat, makeLabelMaterial } from '../materials';
 import { CardMesh } from '../cards/CardMesh';
 import { LOOK } from '../look';
 
-/** Glass display case for the good stuff: wood base, glass top box, LED strips inside. `glassTop` swaps the wood cap for a glass lid in a metal rim. */
+/** Low glass showcase: light-grey laminate base with a dark kick, glass box on top with a glass lid in an
+ *  aluminium rim, a dark felt riser for the back row, LED strips inside. Glass is raycast-transparent
+ *  so clicks reach the cards. */
 export function DisplayCase({
   cards,
   title = 'The Good Stuff',
-  glassTop = false,
   lit = false,
+  children,
 }: {
   cards: PlacedCard[];
-  title?: string;
-  glassTop?: boolean;
+  /** sign over the case; null = no sign (decorative cases in the showcase run) */
+  title?: string | null;
+  children?: React.ReactNode;
   /** give the case its own interior light (a fixed local light — see look.ts before adding more) */
   lit?: boolean;
 }) {
+  const noHit = () => null;
   return (
     <group>
-      {/* cabinet base */}
-      <mesh material={MAT.walnut} position={[0, 0.25, 0]} castShadow>
-        <boxGeometry args={[1.6, 0.5, 0.6]} />
+      {/* base + kick */}
+      <mesh material={MAT.laminate} position={[0, 0.27, 0]} castShadow>
+        <boxGeometry args={[1.6, 0.46, 0.6]} />
+      </mesh>
+      <mesh material={MAT.dark} position={[0, 0.02, 0]}>
+        <boxGeometry args={[1.56, 0.04, 0.56]} />
       </mesh>
       {/* glass box — raycast disabled so clicks reach the cards inside */}
-      <mesh material={MAT.glass} position={[0, 0.75, 0]} raycast={() => null}>
+      <mesh material={MAT.glass} position={[0, 0.75, 0]} raycast={noHit}>
         <boxGeometry args={[1.6, 0.5, 0.6]} />
       </mesh>
-      {/* glass shelf + velvet riser for the back row */}
-      <mesh material={MAT.glass} position={[0, 0.52, 0]} raycast={() => null}>
+      {/* glass shelf + felt riser for the back row */}
+      <mesh material={MAT.glass} position={[0, 0.52, 0]} raycast={noHit}>
         <boxGeometry args={[1.55, 0.012, 0.55]} />
       </mesh>
-      <mesh position={[0, 0.575, -0.09]}>
+      <mesh material={MAT.felt} position={[0, 0.575, -0.09]}>
         <boxGeometry args={[1.5, 0.11, 0.2]} />
-        <meshStandardMaterial color="#5e1f24" roughness={1} />
       </mesh>
-      {/* lid: a wood cap, or a glass pane held by a dark metal rim */}
-      {glassTop ? (
-        <>
-          <mesh material={MAT.glass} position={[0, 1.005, 0]} raycast={() => null}>
-            <boxGeometry args={[1.62, 0.012, 0.62]} />
-          </mesh>
-          {([0.31, -0.31] as const).map((z) => (
-            <mesh key={`rim-z${z}`} material={MAT.dark} position={[0, 1.01, z]}>
-              <boxGeometry args={[1.65, 0.025, 0.025]} />
-            </mesh>
-          ))}
-          {([0.8125, -0.8125] as const).map((x) => (
-            <mesh key={`rim-x${x}`} material={MAT.dark} position={[x, 1.01, 0]}>
-              <boxGeometry args={[0.025, 0.025, 0.645]} />
-            </mesh>
-          ))}
-        </>
-      ) : (
-        <mesh material={MAT.wornTop} position={[0, 1.01, 0]}>
-          <boxGeometry args={[1.64, 0.03, 0.64]} />
+      {/* glass lid in an aluminium rim */}
+      <mesh material={MAT.glass} position={[0, 1.005, 0]} raycast={noHit}>
+        <boxGeometry args={[1.62, 0.012, 0.62]} />
+      </mesh>
+      {([0.31, -0.31] as const).map((z) => (
+        <mesh key={`rim-z${z}`} material={MAT.alu} position={[0, 1.01, z]}>
+          <boxGeometry args={[1.65, 0.02, 0.02]} />
         </mesh>
-      )}
-      {/* dark metal frame along the glass edges */}
+      ))}
+      {([0.8125, -0.8125] as const).map((x) => (
+        <mesh key={`rim-x${x}`} material={MAT.alu} position={[x, 1.01, 0]}>
+          <boxGeometry args={[0.02, 0.02, 0.645]} />
+        </mesh>
+      ))}
+      {/* aluminium posts at the glass corners */}
       {([[-0.8, 0.3], [0.8, 0.3], [-0.8, -0.3], [0.8, -0.3]] as const).map(([x, z]) => (
-        <mesh key={`${x}${z}`} material={MAT.dark} position={[x, 0.75, z]}>
-          <boxGeometry args={[0.025, 0.52, 0.025]} />
+        <mesh key={`${x}${z}`} material={MAT.alu} position={[x, 0.75, z]}>
+          <boxGeometry args={[0.02, 0.5, 0.02]} />
         </mesh>
       ))}
       {lit && <pointLight position={[0, 0.95, 0]} intensity={LOOK.caseLight.intensity} distance={LOOK.caseLight.distance} color={LOOK.caseLight.color} />}
@@ -69,9 +67,10 @@ export function DisplayCase({
           <boxGeometry args={[1.5, 0.01, 0.015]} />
         </mesh>
       ))}
-      <mesh material={makeLabelMaterial(title, { bg: '#3b2a1a', fg: '#ffd97a', size: title.length > 14 ? 32 : 42 })} position={[0, 1.25, 0.1]}>
+      {title && <mesh material={makeLabelMaterial(title, { bg: '#1c1d20', fg: '#f4f5f7', size: title.length > 14 ? 32 : 42 })} position={[0, 1.25, 0.1]}>
         <planeGeometry args={[0.9, 0.22]} />
-      </mesh>
+      </mesh>}
+      {children}
       {cards.map(({ card, slot }) => (
         <CardMesh key={card.id} card={card} slot={slot} />
       ))}

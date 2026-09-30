@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { ROOM, ANNEX_DOOR, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
+import { ROOM, ANNEX_DOOR, BACK_OFFICE_DOOR, STOREFRONT } from '@shared/data/shopLayout';
 import { MAT, dropCeilingMat } from './materials';
 import { LOOK } from './look';
 
@@ -20,7 +20,8 @@ const panelMat = new THREE.MeshBasicMaterial({ color: LOOK.panelGlow });
 export function CeilingCans() {
   const spots = useMemo(() => {
     const out: [number, number][] = [];
-    for (let x = -3.9; x <= 3.95; x += LOOK.canSpacing) for (let z = -3.1; z <= 3.15; z += LOOK.canSpacing) out.push([x, z]);
+    for (let x = ROOM.xMin + 0.9; x <= ROOM.xMax - 0.5; x += LOOK.canSpacing)
+      for (let z = ROOM.zMin + 0.8; z <= ROOM.zMax - 0.5; z += LOOK.canSpacing) out.push([x, z]);
     return out;
   }, []);
   const { cans, rims } = useMemo(() => {
@@ -54,9 +55,10 @@ const BB_T = 0.015;
 
 /** White baseboards around the main room, broken at the doors. */
 export function Baseboards() {
-  const W = ROOM.width;
-  const D = ROOM.depth;
   const runs = useMemo(() => {
+    const { xMin, xMax, zMin, zMax, depth: D } = ROOM;
+    const d0 = STOREFRONT.doorX - STOREFRONT.doorWidth / 2;
+    const d1 = STOREFRONT.doorX + STOREFRONT.doorWidth / 2;
     const ox0 = BACK_OFFICE_DOOR.position[0] - BACK_OFFICE_DOOR.width / 2;
     const ox1 = BACK_OFFICE_DOOR.position[0] + BACK_OFFICE_DOOR.width / 2;
     const az0 = ANNEX_DOOR.z - ANNEX_DOOR.width / 2;
@@ -64,19 +66,19 @@ export function Baseboards() {
     // [x, z, length, rotationY]
     const r: [number, number, number, number][] = [
       // north wall (z = -D/2), split around the office door
-      [(-W / 2 + ox0) / 2, -D / 2 + BB_T / 2, ox0 + W / 2, 0],
-      [(ox1 + W / 2) / 2, -D / 2 + BB_T / 2, W / 2 - ox1, 0],
+      [(xMin + ox0) / 2, zMin + BB_T / 2, ox0 - xMin, 0],
+      [(ox1 + xMax) / 2, zMin + BB_T / 2, xMax - ox1, 0],
       // west wall, split around the Collection doorway
-      [-W / 2 + BB_T / 2, (-D / 2 + az0) / 2, az0 + D / 2, Math.PI / 2],
-      [-W / 2 + BB_T / 2, (az1 + D / 2) / 2, D / 2 - az1, Math.PI / 2],
+      [xMin + BB_T / 2, (zMin + az0) / 2, az0 - zMin, Math.PI / 2],
+      [xMin + BB_T / 2, (az1 + zMax) / 2, zMax - az1, Math.PI / 2],
       // east wall
-      [W / 2 - BB_T / 2, 0, D, Math.PI / 2],
+      [xMax - BB_T / 2, ROOM.cz, D, Math.PI / 2],
       // south wall, split around the front door
-      [(-W / 2 - 0.55) / 2, D / 2 - BB_T / 2, W / 2 - 0.55, 0],
-      [(W / 2 + 0.55) / 2, D / 2 - BB_T / 2, W / 2 - 0.55, 0],
+      [(xMin + d0) / 2, zMax - BB_T / 2, d0 - xMin, 0],
+      [(d1 + xMax) / 2, zMax - BB_T / 2, xMax - d1, 0],
     ];
     return r;
-  }, [W, D]);
+  }, []);
   return (
     <group>
       {runs.map(([x, z, len, ry], i) => (

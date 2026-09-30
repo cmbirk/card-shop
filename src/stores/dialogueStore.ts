@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import { logEvent } from '../systems/analytics';
 import type { ChatMessage, ChatRequest } from '@shared/types';
-import { shopLayout, ROOM, ANNEX, OFFICE } from '@shared/data/shopLayout';
+import { ROOM } from '@shared/data/shopLayout';
+import { greetSpot } from '../systems/greet';
+import { nudgeClear } from '@shared/data/obstacles';
 import { streamChat } from '../api/chat';
 import { useBasketStore } from './basketStore';
 import { useInspectStore } from './inspectStore';
@@ -38,35 +40,6 @@ interface DialogueState {
   askAbout: (cardId: string) => Promise<void>;
 }
 
-/** Where Chris stands to talk to a customer at `stationId`: off to the viewer's right, ~2 m away
- *  (a full figure fits the 55° fov there), facing the camera. The camera turns to him on arrival. */
-function greetSpot(stationId: string): { spot: [number, number]; facing: number } | null {
-  const st = shopLayout.stations.find((s) => s.id === stationId);
-  if (!st) return null;
-  const [cx, , cz] = st.position;
-  const [tx, , tz] = st.target;
-  const len = Math.hypot(tx - cx, tz - cz) || 1;
-  const fx = (tx - cx) / len;
-  const fz = (tz - cz) / len;
-  // viewer's right = forward rotated -90° about Y
-  const rx = -fz;
-  const rz = fx;
-  const spot: [number, number] = [cx + rx * 1.6 + fx * 1.0, cz + rz * 1.6 + fz * 1.0];
-  // keep him inside whichever room the customer is standing in
-  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-  if (cx < ANNEX.xMax) {
-    spot[0] = clamp(spot[0], ANNEX.xMin + 0.5, ANNEX.xMax - 0.5);
-    spot[1] = clamp(spot[1], ANNEX.zMin + 1.0, ANNEX.zMax - 0.5); // clear of the corner plinth
-  } else if (cz < OFFICE.zMax) {
-    spot[0] = clamp(spot[0], OFFICE.xMin + 0.5, OFFICE.xMax - 0.5);
-    spot[1] = clamp(spot[1], OFFICE.zMin + 0.8, OFFICE.zMax - 0.5);
-  } else {
-    spot[0] = clamp(spot[0], -ROOM.width / 2 + 0.5, ROOM.width / 2 - 0.5);
-    spot[1] = clamp(spot[1], -ROOM.depth / 2 + 0.5, ROOM.depth / 2 - 0.5);
-  }
-  const facing = Math.atan2(cx - spot[0], cz - spot[1]); // model faces +Z at rest
-  return { spot, facing };
-}
 
 let abort: AbortController | null = null;
 
@@ -132,9 +105,10 @@ export const useDialogueStore = create<DialogueState>((set, get) => ({
             const rz = Math.sin(walkPose.yaw);
             const spot: [number, number] = [walkPose.x + rx * 1.6 - Math.sin(walkPose.yaw) * 0.8, walkPose.z + rz * 1.6 - Math.cos(walkPose.yaw) * 0.8];
             const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-            spot[0] = clamp(spot[0], -ROOM.width / 2 + 0.5, ROOM.width / 2 - 0.5);
-            spot[1] = clamp(spot[1], -ROOM.depth / 2 + 0.5, ROOM.depth / 2 - 0.5);
-            return { spot, facing: Math.atan2(walkPose.x - spot[0], walkPose.z - spot[1]) };
+            spot[0] = clamp(spot[0], ROOM.xMin + 0.5, ROOM.xMax - 0.5);
+            spot[1] = clamp(spot[1], ROOM.zMin + 0.5, ROOM.zMax - 0.5);
+            const clear = nudgeClear(spot); // never park him inside a cabinet or the bar
+            return { spot: clear, facing: Math.atan2(walkPose.x - clear[0], walkPose.z - clear[1]) };
           })()
         : station === 'counter'
           ? null

@@ -83,7 +83,7 @@ export function Maya() {
   }, [line, lineId, actions]);
 
   // head tracks the player, layered on the animation (world pos of Maya is set below)
-  const MAYA = { x: 3.95, z: -2.2, faceY: -Math.PI / 2 };
+  const MAYA = { x: 7.3, z: -2.1, faceY: -Math.PI / 2 }; // behind the bar's north end, facing the customers
   useFrame((state, dt) => {
     const head = headBone.current;
     if (!head) return;

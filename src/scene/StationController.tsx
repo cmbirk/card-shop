@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
 import CameraControlsImpl from 'camera-controls';
 import * as THREE from 'three';
-import { shopLayout, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
+import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
 import type { Station, Vec3 } from '@shared/types';
 import { useNavStore } from '../stores/navStore';
 import { useShopkeeperStore } from '../stores/shopkeeperStore';
@@ -13,7 +13,7 @@ import { FEEL } from '../feel';
 import { sfx } from '../systems/sfx';
 
 const stations = new Map<string, Station>(shopLayout.stations.map((s) => [s.id, s]));
-const MIDPOINT: Vec3 = [0, 1.6, 1.2];
+const MIDPOINT: Vec3 = [ROOM.cx, 1.6, 2.4]; // the open middle of the floor
 const ANNEX_DOORWAY: Vec3 = [ANNEX.xMax, 1.6, ANNEX_DOOR.z];
 const OFFICE_DOORWAY: Vec3 = [BACK_OFFICE_DOOR.position[0], 1.6, OFFICE.zMax];
 
@@ -36,7 +36,7 @@ function waypoints(from: Station | undefined, to: Station): Vec3[] {
   // wall-to-wall hops swing through the open center aisle (a doorway counts as its wall)
   const fx = rf === 'main' ? from.position[0] : DOORWAY[rf][0];
   const tx = rt === 'main' ? to.position[0] : DOORWAY[rt][0];
-  const crossing = Math.abs(fx) >= 3 && Math.abs(tx) >= 3 && Math.sign(fx) !== Math.sign(tx);
+  const crossing = Math.abs(fx - ROOM.cx) >= 3 && Math.abs(tx - ROOM.cx) >= 3 && Math.sign(fx - ROOM.cx) !== Math.sign(tx - ROOM.cx);
   if (crossing) wps.push(MIDPOINT);
   if (rt !== 'main' && rf !== rt) wps.push(DOORWAY[rt]); // enter the side room through its door
   return wps;
@@ -76,7 +76,7 @@ export function StationController() {
         ? { x0: ANNEX.xMin, x1: ANNEX.xMax, z0: ANNEX.zMin, z1: ANNEX.zMax }
         : room === 'office'
           ? { x0: OFFICE.xMin, x1: OFFICE.xMax, z0: OFFICE.zMin, z1: OFFICE.zMax }
-          : { x0: -5, x1: 5, z0: -4, z1: st.id === 'outside' ? 99 : 4 }; // outside has no back wall
+          : { x0: ROOM.xMin, x1: ROOM.xMax, z0: ROOM.zMin, z1: st.id === 'outside' ? 99 : ROOM.zMax }; // outside has no back wall
     const m = 0.3; // wall margin
     const dir = _off.clone().normalize(); // target → camera
     let t = Infinity;

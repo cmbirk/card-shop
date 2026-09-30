@@ -11,7 +11,7 @@ import { useInspectStore } from '../../stores/inspectStore';
 import { FEEL } from '../../feel';
 import { sfx } from '../../systems/sfx';
 
-const BIN_SIGN = makeLabelMaterial('Bargain Bin', { bg: '#a63d40', size: 56 });
+const BIN_SIGN = makeLabelMaterial('Dime Box', { bg: '#1c1d20', fg: '#f4f5f7', size: 56 });
 const _target = new THREE.Vector3();
 const _ray = new THREE.Raycaster();
 const _hits: THREE.Intersection[] = [];
@@ -36,7 +36,7 @@ function canRiffle(): boolean {
  * each card its closed-stack rest pose; this animates offsets on top of that, refs only.
  */
 export function Bin({ fixtureId, cards }: { fixtureId: string; cards: PlacedCard[] }) {
-  const w = 0.22; // a long card box on legs — card-width, stack runs front to back
+  const w = 0.22; // a long white card box on the dime table — card-width, stack runs front to back
   const d = 0.5;
   const rim = 0.9;
   const boxH = 0.14; // shallow tray — card tops sit at the rim, like a real bin
@@ -144,37 +144,26 @@ export function Bin({ fixtureId, cards }: { fixtureId: string; cards: PlacedCard
 
   return (
     <group>
-      {/* legs */}
-      {[-1, 1].map((sx) =>
-        [-1, 1].map((sz) => (
-          <mesh key={`${sx}${sz}`} material={MAT.walnut} position={[(sx * (w - 0.06)) / 2, (rim - boxH) / 2, (sz * (d - 0.06)) / 2]}>
-            <boxGeometry args={[0.05, rim - boxH, 0.05]} />
-          </mesh>
-        )),
-      )}
       {/* box walls */}
-      <mesh material={MAT.walnut} position={[0, rim - boxH / 2, -d / 2]}>
+      <mesh material={MAT.cardboxWhite} position={[0, rim - boxH / 2, -d / 2]}>
         <boxGeometry args={[w, boxH, 0.02]} />
       </mesh>
-      <mesh material={MAT.walnut} position={[0, rim - boxH / 2, d / 2]}>
+      <mesh material={MAT.cardboxWhite} position={[0, rim - boxH / 2, d / 2]}>
         <boxGeometry args={[w, boxH, 0.02]} />
       </mesh>
-      <mesh material={MAT.walnut} position={[-w / 2, rim - boxH / 2, 0]}>
+      <mesh material={MAT.cardboxWhite} position={[-w / 2, rim - boxH / 2, 0]}>
         <boxGeometry args={[0.02, boxH, d]} />
       </mesh>
-      <mesh material={MAT.walnut} position={[w / 2, rim - boxH / 2, 0]}>
+      <mesh material={MAT.cardboxWhite} position={[w / 2, rim - boxH / 2, 0]}>
         <boxGeometry args={[0.02, boxH, d]} />
       </mesh>
       {/* bottom */}
-      <mesh material={MAT.walnut} position={[0, rim - boxH, 0]}>
+      <mesh material={MAT.cardboxWhite} position={[0, rim - boxH, 0]}>
         <boxGeometry args={[w, 0.02, d]} />
       </mesh>
-      {/* sign on a leg brace below the box, where there's room to read it */}
-      <mesh material={MAT.walnut} position={[0, rim - boxH - 0.2, d / 2 - 0.03]}>
-        <boxGeometry args={[w - 0.06, 0.02, 0.02]} />
-      </mesh>
-      <mesh material={BIN_SIGN} position={[0, rim - boxH - 0.32, d / 2 + 0.005]}>
-        <planeGeometry args={[0.32, 0.1]} />
+      {/* label on the box front */}
+      <mesh material={BIN_SIGN} position={[0, rim - boxH / 2, d / 2 + 0.012]} raycast={() => null}>
+        <planeGeometry args={[0.18, 0.06]} />
       </mesh>
       {/* wheel target over the mouth — raycast manually (see pointerOver); never an R3F event target */}
       <mesh ref={hitBox} position={[0, rim - boxH / 2 + 0.05, 0]} raycast={() => null}>

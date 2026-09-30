@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { easing } from 'maath';
-import { CARD_SIZE } from '@shared/data/shopLayout';
+import { CARD_SIZE, shopLayout } from '@shared/data/shopLayout';
 import { inventoryById } from '../../systems/inventory';
 import { getCardHome } from '../../systems/cardRegistry';
 import { HOLD_PILE_ID } from '../fixtures/HoldPile';
@@ -11,6 +11,13 @@ import { Slab } from './Slab';
 import { useInspectStore, type InspectMode } from '../../stores/inspectStore';
 import { useBasketStore } from '../../stores/basketStore';
 import { FEEL, easeOutBack, easeOutCubic, easeInOutQuad, easeInCubic } from '../../feel';
+
+// World position of the hold pile on the bar top (counter-local [-0.55, 1.05, 0.12]), for the rare toss
+// that happens before HoldPile has registered itself.
+const PILE_FALLBACK = (() => {
+  const c = shopLayout.fixtures.find((f) => f.kind === 'counter')!;
+  return new THREE.Vector3(-0.55, 1.05, 0.12).applyAxisAngle(new THREE.Vector3(0, 1, 0), c.rotationY).add(new THREE.Vector3(...c.position));
+})();
 import { sfx } from '../../systems/sfx';
 
 export function CardInHand() {
@@ -228,7 +235,7 @@ function HeldCard({ cardId }: { cardId: string }) {
           pile.getWorldQuaternion(_q);
           _q.multiply(_qFlat);
         } else {
-          _v.set(-0.55, 1.05, -3.08);
+          _v.copy(PILE_FALLBACK); // the pile isn't registered yet: aim for where it sits on the bar
           _q.copy(_qFlat);
         }
         g.position.lerpVectors(a.startPos, _v, k);

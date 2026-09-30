@@ -10,6 +10,18 @@ export const MAT = {
   barnwood: PBR.barnwood,
   stone: PBR.stone,
   trim: new THREE.MeshStandardMaterial({ color: '#f1f2f0', roughness: 0.55 }),
+  /** brushed aluminium (cabinet frames) */
+  alu: new THREE.MeshStandardMaterial({ color: '#c9ccd1', metalness: 0.85, roughness: 0.35 }),
+  /** dark stained wood (bar-top edge band) */
+  barEdge: new THREE.MeshStandardMaterial({ color: '#3a2a1f', roughness: 0.45 }),
+  /** white card-storage cardboard (dime boxes, sleeve boxes) */
+  cardboxWhite: new THREE.MeshStandardMaterial({ color: '#e9e6df', roughness: 0.9 }),
+  /** dark brown leather (bar-stool seats) */
+  leather: new THREE.MeshStandardMaterial({ color: '#3b2b22', roughness: 0.55 }),
+  /** black powder-coated metal (stool frames, table legs) */
+  blackMetal: new THREE.MeshStandardMaterial({ color: '#1f2023', roughness: 0.4, metalness: 0.6 }),
+  /** dark felt (showcase risers) */
+  felt: new THREE.MeshStandardMaterial({ color: '#2a2c31', roughness: 1 }),
   wall: PBR.wall,
   wainscot: PBR.wainscot,
   walnut: PBR.wood,
@@ -18,14 +30,17 @@ export const MAT = {
   cream: new THREE.MeshStandardMaterial({ color: '#efe6c8', roughness: 0.9 }),
   dark: new THREE.MeshStandardMaterial({ color: '#2b2b2b', roughness: 0.6 }),
   cardboard: new THREE.MeshStandardMaterial({ color: '#b08d5f', roughness: 1 }),
+  // cabinet glass: faint and front-face only, so cases read clear rather than milky
   glass: new THREE.MeshPhysicalMaterial({
-    color: '#cfe8e8',
+    color: '#eef6f6',
     transparent: true,
-    opacity: 0.14,
+    opacity: 0.08,
     roughness: 0.05,
     metalness: 0,
-    side: THREE.DoubleSide,
+    envMapIntensity: 0.5,
   }),
+  /** light-grey laminate for cabinet backs and bases (pure white blooms and washes the cards out) */
+  laminate: new THREE.MeshStandardMaterial({ color: '#c9cdd2', roughness: 0.6 }),
   skin: new THREE.MeshStandardMaterial({ color: '#e0b08c', roughness: 0.8 }),
   flannel: new THREE.MeshStandardMaterial({ color: '#a63d40', roughness: 0.95 }),
 };

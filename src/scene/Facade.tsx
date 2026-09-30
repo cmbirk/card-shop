@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCursor } from '@react-three/drei';
 import * as THREE from 'three';
-import { ROOM } from '@shared/data/shopLayout';
+import { ROOM, STOREFRONT } from '@shared/data/shopLayout';
 import { MAT, makeImageMaterial, makeLabelMaterial } from './materials';
 import { PBR } from './pbr';
 import { useNavStore } from '../stores/navStore';
@@ -85,10 +85,9 @@ function SignInSheet() {
 export function Facade() {
   const [doorHovered, setDoorHovered] = useState(false);
   useCursor(doorHovered);
-  const D = ROOM.depth;
-
   return (
-    <group position={[0, 0, D / 2 + 0.02]}>
+    // centred on the front door; children are in storefront-local x
+    <group position={[STOREFRONT.doorX, 0, ROOM.zMax + 0.02]}>
       {/* brick face */}
       <mesh material={brickMat} position={[0, ROOM.height / 2 + 0.25, 0]} onClick={block}>
         <planeGeometry args={[ROOM.width + 0.6, ROOM.height + 0.5]} />
@@ -107,7 +106,7 @@ export function Facade() {
       </mesh>
 
       {/* windows with warm glow + marketing posters */}
-      {[-3, 3].map((x, i) => (
+      {STOREFRONT.windowXs.map((wx) => wx - STOREFRONT.doorX).map((x, i) => (
         <group key={x} position={[x, 1.8, 0.02]}>
           <mesh material={glassGlowMat} onClick={block}>
             <planeGeometry args={[2.1, 1.5]} />

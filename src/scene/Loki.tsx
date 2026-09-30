@@ -9,7 +9,7 @@ import { LOOK } from './look';
 
 const MODEL_URL = '/models/loki.glb';
 const SCALE = 75; // the export is in centimetres (~1 cm long at scale 1); 75 ≈ a shepherd-sized dog
-const HOME_YAW = -0.5; // at the counter, angled out toward the room
+const HOME_YAW = -2.2; // by the bar's south end, looking out over the shop floor
 const STAND_T = 0.1; // s into the walk clip where all four feet are planted (sampled) — his standing pose
 const _q = new THREE.Quaternion();
 const _p = new THREE.Quaternion();

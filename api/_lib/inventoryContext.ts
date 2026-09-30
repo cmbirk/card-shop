@@ -56,18 +56,19 @@ export async function getInventory(): Promise<{ cards: Card[]; cardsById: Map<st
   return { cards, cardsById: byId };
 }
 
+// Where things sit (keep in step with shared/data/shopLayout.ts). Byte-stable: part of the cached prompt.
 const SHELF_LABEL: Record<string, string> = {
-  baseball: 'the Baseball shelf (right wall, toward the counter)',
-  basketball: 'the Basketball shelf (left wall, middle)',
-  football: 'the Football shelf (left wall, toward the counter)',
-  hockey: 'the Hockey shelf (left wall, nearest the entrance)',
-  tcg: 'the Trading Card Games shelf (right wall, nearest the entrance)',
+  baseball: 'the Baseball cabinet (left wall, nearest the front)',
+  basketball: 'the Basketball cabinet (left wall, second from the back)',
+  football: 'the Football cabinet (left wall, at the back)',
+  hockey: 'the Hockey cabinet (left wall, middle)',
+  tcg: 'the Trading Card Games cabinet (right wall, just past the bar)',
 };
 
 function where(card: Card): string {
-  if (card.status === 'personal') return `${ROOM_NAME} (through the doorway beside the football shelf) — Chris's PERSONAL collection, NOT FOR SALE`;
-  if (card.featured) return 'the glass display case (near the counter)';
-  if (card.category.startsWith('budget-box')) return 'the bargain bins (middle of the shop)';
+  if (card.status === 'personal') return `${ROOM_NAME} (through the doorway at the back of the left wall, beside the football cabinet) — Chris's PERSONAL collection, NOT FOR SALE`;
+  if (card.featured) return 'the glass showcases along the back wall, under the jersey wall';
+  if (card.category.startsWith('budget-box')) return 'the dime boxes on the table under the front-left window';
   return SHELF_LABEL[card.sport];
 }
 

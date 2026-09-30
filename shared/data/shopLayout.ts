@@ -1,10 +1,27 @@
-import type { ShopLayout } from '../types';
+import type { ShopLayout, Vec3 } from '../types';
 
 const D90 = Math.PI / 2;
 
-// 1 unit = 1m. Y up. +Z = entrance (south). Counter at the back (-Z).
-// Room: 10m wide (X) x 8m deep (Z), 3m ceiling. Eye height 1.6m.
-export const ROOM = { width: 10, depth: 8, height: 3 } as const;
+// 1 unit = 1m. Y up. +Z = entrance (south). Modern hobby-shop plan: every display is a glass cabinet
+// against a wall so the middle of the floor stays open — sport cabinets down the west wall, the Good
+// Stuff showcase on the north wall under the jersey wall, an L-bar down the east side (Chris works
+// behind it, wax wall on the east wall) with the TCG cabinet south of it, dime boxes under the
+// front-left window. Eye height 1.6m.
+// Main room: 14m wide (X -5…9) x 11m deep (Z -4…7), 3m ceiling. It is NOT centred on the origin — it grew
+// east and south so the west wall (Collection annex) and north wall (back office) stayed put. Use the
+// bounds / cx / cz, never ±width/2.
+export const ROOM = { xMin: -5, xMax: 9, zMin: -4, zMax: 7, width: 14, depth: 11, height: 3, cx: 2, cz: 1.5 } as const;
+
+/** Storefront (south wall, z = ROOM.zMax): front door centred on the room, a big window either side. */
+export const STOREFRONT = {
+  doorX: ROOM.cx,
+  doorWidth: 1.1,
+  doorHeight: 2.2,
+  windowXs: [ROOM.cx - 3.5, ROOM.cx + 3.5] as const,
+  windowWidth: 2,
+  windowY0: 1.1,
+  windowY1: 2.5,
+} as const;
 
 // The Collection: a small annex off the west wall (Chris's personal collection + memorabilia).
 // Reached through an open doorway beside the football shelf, next to the back-office door.
@@ -15,20 +32,22 @@ export const shopLayout: ShopLayout = {
   entry: 'outside',
   fixtures: [
     {
+      // the L-bar: long leg down the east side facing west (customers sit on stools on the west face)
       id: 'counter',
       kind: 'counter',
-      position: [0, 0, -3.2],
-      rotationY: 0,
+      position: [6.3, 0, -0.4],
+      rotationY: -D90,
       accepts: {},
       slots: { rows: 0, cols: 0, spacing: [0, 0] },
       stationId: 'counter',
       label: 'Checkout Counter',
     },
     {
+      // centre of the glass showcase run along the north wall, under the jersey wall
       id: 'case-premium',
       kind: 'displayCase',
-      position: [3.2, 0, -2.2],
-      rotationY: -D90,
+      position: [ROOM.cx, 0, -3.55],
+      rotationY: 0,
       accepts: { featured: true },
       slots: { rows: 2, cols: 5, spacing: [0.28, 0.25] },
       stationId: 'case',
@@ -44,40 +63,29 @@ export const shopLayout: ShopLayout = {
       stationId: 'collection-case',
       label: "Chris's Collection — Not for Sale",
     },
-    {
-      id: 'shelf-hockey',
-      kind: 'shelf',
-      position: [-4.6, 0, 2.9],
+    // west wall: four tall glass cabinets, north → south
+    ...(
+      [
+        ['shelf-football', 'football', 'Football', -1.5],
+        ['shelf-basketball', 'basketball', 'Basketball', 0.8],
+        ['shelf-hockey', 'hockey', 'Hockey', 3.1],
+        ['shelf-baseball', 'baseball', 'Baseball', 5.4],
+      ] as const
+    ).map(([id, sport, label, z]) => ({
+      id,
+      kind: 'shelf' as const,
+      position: [-4.6, 0, z] as Vec3,
       rotationY: D90,
-      accepts: { sport: 'hockey' },
-      slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
-      stationId: 'shelf-hockey',
-      label: 'Hockey',
-    },
+      accepts: { sport },
+      slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] as [number, number] },
+      stationId: id,
+      label,
+    })),
     {
-      id: 'shelf-football',
-      kind: 'shelf',
-      position: [-4.6, 0, -1.5],
-      rotationY: D90,
-      accepts: { sport: 'football' },
-      slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
-      stationId: 'shelf-football',
-      label: 'Football',
-    },
-    {
-      id: 'shelf-basketball',
-      kind: 'shelf',
-      position: [-4.6, 0, 0.8],
-      rotationY: D90,
-      accepts: { sport: 'basketball' },
-      slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
-      stationId: 'shelf-basketball',
-      label: 'Basketball',
-    },
-    {
+      // east wall, south of the bar
       id: 'shelf-tcg',
       kind: 'shelf',
-      position: [4.6, 0, 2.9],
+      position: [8.6, 0, 4.4],
       rotationY: -D90,
       accepts: { sport: 'tcg' },
       slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
@@ -85,68 +93,68 @@ export const shopLayout: ShopLayout = {
       label: 'Trading Card Games',
     },
     {
-      id: 'shelf-baseball',
-      kind: 'shelf',
-      position: [4.6, 0, 0.8],
-      rotationY: -D90,
-      accepts: { sport: 'baseball' },
-      slots: { rows: 4, cols: 8, spacing: [0.22, 0.4] },
-      stationId: 'shelf-baseball',
-      label: 'Baseball',
-    },
-    {
+      // dime boxes on a table under the front-left window, fronts facing north toward the station
       id: 'bin-a',
       kind: 'bin',
-      position: [-0.6, 0, -0.5],
-      rotationY: (15 * Math.PI) / 180,
+      position: [-1.9, 0, 6.35],
+      rotationY: Math.PI + (8 * Math.PI) / 180,
       accepts: { category: 'budget-box' },
       slots: { rows: 1, cols: 24, spacing: [0, 0.014] }, // a front-to-back stack; spacing[1] = card pitch
       stationId: 'bins',
-      label: 'Discount Bin',
+      label: 'Dime Boxes',
     },
     {
       id: 'bin-b',
       kind: 'bin',
-      position: [0.7, 0, -0.6],
-      rotationY: (-10 * Math.PI) / 180,
+      position: [-1.1, 0, 6.35],
+      rotationY: Math.PI - (6 * Math.PI) / 180,
       accepts: { category: 'budget-box-b' },
       slots: { rows: 1, cols: 24, spacing: [0, 0.014] }, // a front-to-back stack; spacing[1] = card pitch
       stationId: 'bins',
-      label: 'Discount Bin',
+      label: 'Dime Boxes',
     },
   ],
   stations: [
     {
       id: 'outside',
-      position: [0, 1.6, 9.2],
-      target: [0, 1.7, 4],
+      position: [ROOM.cx, 1.6, ROOM.zMax + 5.2],
+      target: [ROOM.cx, 1.7, ROOM.zMax],
       yawRange: 0.8,
       pitchRange: 0.25,
       neighbors: ['entry'],
     },
     {
       id: 'entry',
-      position: [0, 1.6, 3.4],
-      target: [0, 1.4, -1],
+      position: [ROOM.cx, 1.6, 6.4],
+      target: [ROOM.cx, 1.4, 0],
       yawRange: 1.1,
       pitchRange: 0.4,
-      neighbors: ['shelf-hockey', 'shelf-tcg', 'bins'],
+      neighbors: ['shelf-baseball', 'center', 'bins', 'shelf-tcg'],
     },
-    {
-      id: 'shelf-hockey',
-      position: [-3.1, 1.5, 2.9],
-      target: [-4.6, 1.35, 2.9],
+    ...(
+      [
+        ['shelf-football', -1.5, ['shelf-basketball', 'collection-door', 'office-door', 'center']],
+        ['shelf-basketball', 0.8, ['shelf-football', 'shelf-hockey', 'center']],
+        ['shelf-hockey', 3.1, ['shelf-basketball', 'shelf-baseball', 'center']],
+        ['shelf-baseball', 5.4, ['shelf-hockey', 'bins', 'entry']],
+      ] as const
+    ).map(([id, z, neighbors]) => ({
+      id,
+      position: [-3.1, 1.5, z] as Vec3,
+      target: [-4.6, 1.35, z] as Vec3,
       yawRange: 1.15,
       pitchRange: 0.4,
-      neighbors: ['shelf-basketball', 'entry', 'bins'],
-    },
+      neighbors: [...neighbors],
+      greetSpot: [-3.7, z - 1.15] as [number, number], // just north of the camera, clear of the next cabinet
+    })),
     {
       id: 'office-door',
       position: [-3, 1.6, -2.6],
       target: [-3, 1.4, -5],
       yawRange: 0.8,
       pitchRange: 0.35,
-      neighbors: ['counter', 'shelf-football', 'collection-door', 'office'],
+      neighbors: ['case', 'shelf-football', 'collection-door', 'office'],
+      greetSpot: [-1.7, -2.75],
     },
     {
       id: 'office',
@@ -162,7 +170,7 @@ export const shopLayout: ShopLayout = {
       target: [-7, 1.4, -3.2],
       yawRange: 0.9,
       pitchRange: 0.35,
-      neighbors: ['shelf-football', 'counter', 'collection-case'],
+      neighbors: ['shelf-football', 'office-door', 'collection-case'],
     },
     {
       id: 'collection-case',
@@ -173,79 +181,63 @@ export const shopLayout: ShopLayout = {
       neighbors: ['collection-door'],
     },
     {
-      id: 'shelf-football',
-      position: [-3.1, 1.5, -1.5],
-      target: [-4.6, 1.35, -1.5],
-      yawRange: 1.15,
-      pitchRange: 0.4,
-      neighbors: ['shelf-basketball', 'bins', 'counter', 'collection-door'],
-    },
-    {
-      id: 'shelf-basketball',
-      position: [-3.1, 1.5, 0.8],
-      target: [-4.6, 1.35, 0.8],
-      yawRange: 1.15,
-      pitchRange: 0.4,
-      neighbors: ['shelf-football', 'shelf-hockey', 'bins'],
-    },
-    {
+      // TCG cabinet on the east wall, south of the bar
       id: 'shelf-tcg',
-      position: [3.1, 1.5, 2.9],
-      target: [4.6, 1.35, 2.9],
+      position: [7.1, 1.5, 4.4],
+      target: [8.6, 1.35, 4.4],
       yawRange: 1.15,
       pitchRange: 0.4,
-      neighbors: ['shelf-baseball', 'entry', 'bins'],
+      neighbors: ['counter', 'entry', 'center'],
+      greetSpot: [6.2, 5.6],
     },
     {
-      id: 'shelf-baseball',
-      position: [3.1, 1.5, 0.8],
-      target: [4.6, 1.35, 0.8],
-      yawRange: 1.15,
-      pitchRange: 0.4,
-      neighbors: ['shelf-tcg', 'case', 'bins'],
-    },
-    {
+      // the open middle of the floor
       id: 'center',
-      position: [0, 1.6, 1.6],
-      target: [0, 1.35, -1.5],
+      position: [ROOM.cx, 1.6, 3.4],
+      target: [ROOM.cx, 1.35, -1.0],
       yawRange: Math.PI,
       pitchRange: 0.4,
-      neighbors: ['entry', 'bins', 'counter', 'case'],
+      neighbors: ['entry', 'shelf-basketball', 'shelf-hockey', 'counter', 'case', 'shelf-tcg', 'bins'],
     },
     {
+      // dime-box table under the front-left window (camera looks south, toward the glass)
       id: 'bins',
-      position: [0.05, 1.5, 0.7],
-      target: [0.05, 0.85, -0.55],
+      position: [-1.5, 1.5, 5.25],
+      target: [-1.5, 0.85, 6.35],
       yawRange: 1.35,
       pitchRange: 0.45,
-      neighbors: ['entry', 'counter', 'case', 'shelf-football', 'shelf-baseball'],
+      neighbors: ['entry', 'center', 'shelf-baseball'],
+      greetSpot: [0.4, 5.6],
     },
     {
       id: 'case',
-      position: [2.05, 1.5, -2.2],
-      target: [3.2, 0.88, -2.2],
+      position: [ROOM.cx, 1.5, -2.2],
+      target: [ROOM.cx, 0.88, -3.55],
       yawRange: 1.15,
       pitchRange: 0.45,
-      neighbors: ['shelf-tcg', 'counter', 'bins'],
+      neighbors: ['counter', 'office-door', 'center'],
+      greetSpot: [3.5, -2.4],
     },
     {
+      // customer side of the bar, looking over it at Chris and the wax wall
       id: 'counter',
-      position: [0, 1.6, -1.9],
-      target: [0, 1.3, -3.6],
+      position: [4.5, 1.6, -1.3],
+      target: [6.4, 1.25, -0.9],
       yawRange: 1.1,
       pitchRange: 0.35,
-      neighbors: ['bins', 'case', 'shelf-football', 'collection-door', 'office-door'],
+      neighbors: ['case', 'center', 'shelf-tcg'],
     },
   ],
 };
+
 
 // Standard trading card: 2.5" x 3.5" — chunkier fake thickness so edges catch light.
 export const CARD_SIZE = { w: 0.064, h: 0.089, t: 0.002 } as const;
 export const SLAB_SIZE = { w: 0.085, h: 0.135, t: 0.01 } as const;
 
 // "Staff Only" door to the back office, on the north wall left of the counter.
-export const BACK_OFFICE_DOOR = { position: [-3.0, 0, -ROOM.depth / 2] as const, width: 1.0, height: 2.2 } as const;
+export const BACK_OFFICE_DOOR = { position: [-3.0, 0, ROOM.zMin] as const, width: 1.0, height: 2.2 } as const;
 
 // The back office itself: a small room behind the north wall, straight through the STAFF ONLY door.
 // Admin-only (the door gate); the desk computer opens the admin panel.
-export const OFFICE = { xMin: -4.6, xMax: -1.4, zMin: -7.2, zMax: -ROOM.depth / 2, height: 3 } as const;
+export const OFFICE = { xMin: -4.6, xMax: -1.4, zMin: -7.2, zMax: ROOM.zMin, height: 3 } as const;

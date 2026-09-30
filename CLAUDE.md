@@ -64,8 +64,14 @@ src/
   (`case-collection`); `InspectHud`/`inspectStore` hide price + basket; grounding lists them without a
   price. Memorabilia is data too (`shared/data/showcase.ts`) so Chris can talk about it.
 - **Three rooms (main / annex / office): glides route through the room's doorway**
-  (`StationController.roomOf` + `waypoints`); Chris's walk path goes through the annex door
-  (`pathToSpot`). `navStore.goTo('office')` is refused for non-admins (the door gate).
+  (`StationController.roomOf` + `waypoints`). `navStore.goTo('office')` is refused for non-admins (the door gate).
+- **The main room is NOT centred on the origin** (`ROOM` has xMin/xMax/zMin/zMax/cx/cz; it grew east and
+  south so the annex/office stayed put). Never use ±width/2. Displays are glass cabinets against the walls;
+  the middle of the floor stays open.
+- **`shared/data/obstacles.ts` is the one floor map**: walk collision, Chris's and Loki's routes
+  (`planRoute`, Dijkstra over `NAV_NODES`), `nudgeClear`. Decor that blocks the floor (bar, stools,
+  dime table, towers) is *drawn from* those constants. Move something → move its constant;
+  `src/systems/layout.test.ts` fails if a station, talk spot (`greetSpot` override) or route clips furniture.
 - **No 3D basket.** Picks fly to the `HoldPile` on the counter (registered as `hold-pile` in
   `cardRegistry`); `basketStore` still holds the ids. Don't register pile cards per-id — that
   clobbers the shelf card's registry entry and breaks its next pickup/return.

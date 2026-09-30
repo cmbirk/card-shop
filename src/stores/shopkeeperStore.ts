@@ -1,13 +1,14 @@
 import { create } from 'zustand';
-import { ANNEX, ANNEX_DOOR } from '@shared/data/shopLayout';
+import { planRoute } from '@shared/data/obstacles';
 
 // Where Chris is. Pure state — <Shopkeeper/> does the actual locomotion and
 // reports arrivals; dialogueStore.askAbout() drives the visit.
 
 export type ShopkeeperPose = 'counter' | 'walkingOut' | 'visiting' | 'walkingBack';
 
-/** Chris's rest position behind the counter (world x, z). */
-export const SHOPKEEPER_HOME: readonly [number, number] = [0, -3.7];
+/** Chris's rest position behind the bar (world x, z), facing west across it at the customers. */
+export const SHOPKEEPER_HOME: readonly [number, number] = [7.3, -0.4];
+export const SHOPKEEPER_HOME_YAW = -Math.PI / 2;
 
 interface ShopkeeperState {
   pose: ShopkeeperPose;
@@ -52,18 +53,8 @@ export const useShopkeeperStore = create<ShopkeeperState>((set, get) => ({
   },
 }));
 
-/**
- * Waypoints from the counter to `spot`, going around the near end of the counter
- * (counter spans x ±1.5, z −3.5…−2.9). Reverse for the walk home.
- */
+/** Waypoints from behind the bar to `spot`: out the bar's south end, and through the Collection
+ *  doorway as needed (planned on the shared obstacle map). Reverse for the walk home. */
 export function pathToSpot(spot: readonly [number, number]): [number, number][] {
-  const side = spot[0] < 0 ? -2.0 : 2.0;
-  const path: [number, number][] = [
-    [side, SHOPKEEPER_HOME[1]],
-    [side, -2.4],
-  ];
-  // the Collection annex is through the doorway on the west wall
-  if (spot[0] < ANNEX.xMax) path.push([ANNEX.xMax + 0.6, ANNEX_DOOR.z], [ANNEX.xMax - 0.6, ANNEX_DOOR.z]);
-  path.push([spot[0], spot[1]]);
-  return path;
+  return planRoute(SHOPKEEPER_HOME, spot);
 }

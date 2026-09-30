@@ -30,8 +30,8 @@ export const LOOK = {
   shadowMapSize: 2048,
   shadowRadius: 4, // PCF softening (texels)
   shadowNormalBias: 0.02,
-  shadowFrustum: 9, // half-extent of the ortho shadow camera, metres — covers main room + annex + office
-  shadowCenter: [-2, 1, -1.5] as [number, number, number],
+  shadowFrustum: 12.5, // half-extent of the ortho shadow camera, metres — covers main room + annex + office
+  shadowCenter: [0, 1, 0] as [number, number, number],
 
   // fill
   ambient: 0.32,
@@ -41,7 +41,8 @@ export const LOOK = {
 
   // practicals (local lights — keep the count fixed)
   counterLamp: { color: '#ffe2bd', intensity: 2.4, distance: 5 },
-  wallWash: { color: '#f6f1ea', intensity: 2.2, distance: 7 }, // one per shelf wall
+  wallWash: { color: '#f6f1ea', intensity: 2.2, distance: 7 },
+  washes: [[-3.3, 1.9], [6.9, 4.4]] as [number, number][], // over the west-wall cabinets, over the TCG cabinet
   officeBulb: { color: '#fff0d0', intensity: 1.6, distance: 6 },
   caseLight: { color: '#ffd9a0', intensity: 2.2, distance: 1.8 }, // The Good Stuff only — graded cards must read
   // neutral key that rides with the camera and fades up while a card is held, so card art reads true
@@ -56,8 +57,8 @@ export const LOOK = {
   // ceiling (emitters only — the cans are not lights)
   canSpacing: 1.6, // metres between recessed cans
   canGlow: hdr('#fff6ec', 7),
-  panelGlow: hdr('#f4f7fb', 2.4),
-  troffers: [[-1.6, 1.4], [-1.6, -1.8]] as [number, number][],
+  panelGlow: hdr('#f4f7fb', 1.6),
+  troffers: [[0.2, 3.2], [0.2, -0.8], [3.8, 3.2]] as [number, number][],
 
   // emitters (bloom sources)
   windowGlow: hdr('#ffe7c2', 2.6),

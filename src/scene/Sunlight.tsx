@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useInspectStore } from '../stores/inspectStore';
 import * as THREE from 'three';
-import { ROOM } from '@shared/data/shopLayout';
+import { ROOM, STOREFRONT } from '@shared/data/shopLayout';
 import { MAT, dropCeilingMat } from './materials';
 import { metreBox } from './geo';
 import { LOOK, SUN_DIR } from './look';
@@ -10,9 +10,14 @@ import { LOOK, SUN_DIR } from './look';
 // The golden-afternoon rig: a low sun outside the south wall, real window openings so it lands as
 // window-grid patches on the floor, fake volumetric shafts, and dust that only shows inside the beam.
 
-/** South-wall openings (interior face at z = ROOM.depth/2). The door is closed, so it's not an opening. */
-export const SOUTH_WINDOWS = [-3, 3].map((x) => ({ x0: x - 1, x1: x + 1, y0: 1.1, y1: 2.5 }));
-const DOOR = { x0: -0.55, x1: 0.55, y1: 2.2 };
+/** South-wall openings (interior face at z = ROOM.zMax). The door is closed, so it's not an opening. */
+export const SOUTH_WINDOWS = STOREFRONT.windowXs.map((x) => ({
+  x0: x - STOREFRONT.windowWidth / 2,
+  x1: x + STOREFRONT.windowWidth / 2,
+  y0: STOREFRONT.windowY0,
+  y1: STOREFRONT.windowY1,
+}));
+const DOOR = { x0: STOREFRONT.doorX - STOREFRONT.doorWidth / 2, x1: STOREFRONT.doorX + STOREFRONT.doorWidth / 2, y1: STOREFRONT.doorHeight };
 const WALL_T = 0.015; // thin enough to stay behind the facade plane (z = D/2 + 0.02)
 
 const TRAVEL = SUN_DIR.clone().negate(); // direction the light travels (into the room)
@@ -75,11 +80,10 @@ export function ShadowReceivers() {
 export function SouthWall() {
   // built once: one metre-UV box per wall piece (barn wood lines up across segments)
   const pieces = useMemo(() => {
-    const W = ROOM.width;
     const H = ROOM.height;
-    const z = ROOM.depth / 2 + WALL_T / 2;
+    const z = ROOM.zMax + WALL_T / 2;
     // columns across the wall: [x0, x1, open-from-y, open-to-y] (open span has wall below and above)
-    const xs = [...new Set([-W / 2, ...SOUTH_WINDOWS.flatMap((w) => [w.x0, w.x1]), DOOR.x0, DOOR.x1, W / 2])].sort((a, b) => a - b);
+    const xs = [...new Set([ROOM.xMin, ...SOUTH_WINDOWS.flatMap((w) => [w.x0, w.x1]), DOOR.x0, DOOR.x1, ROOM.xMax])].sort((a, b) => a - b);
     const out: { key: string; pos: [number, number, number]; geo: THREE.BufferGeometry }[] = [];
     for (let i = 0; i < xs.length - 1; i++) {
       const a = xs[i];
@@ -113,7 +117,7 @@ export function SouthWall() {
 
 /** Frame + muntins: four panes, and the cross that turns the sun patch into a window shape. */
 function WindowGrid({ x0, x1, y0, y1 }: { x0: number; x1: number; y0: number; y1: number }) {
-  const z = ROOM.depth / 2 - 0.03;
+  const z = ROOM.zMax - 0.03;
   const cx = (x0 + x1) / 2;
   const cy = (y0 + y1) / 2;
   const w = x1 - x0;
@@ -163,7 +167,7 @@ export function SunShafts() {
   const { geometry, material } = useMemo(() => {
     const pos: number[] = [];
     const uv: number[] = [];
-    const z = ROOM.depth / 2;
+    const z = ROOM.zMax;
     const L = TRAVEL.clone().multiplyScalar(LOOK.beamLength);
     const quad = (a: THREE.Vector3, b: THREE.Vector3) => {
       // a→b spans the window edge; both ends swept along the beam
@@ -259,7 +263,7 @@ export function SunDust() {
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     const arr = (ref.current.geometry.getAttribute('position') as THREE.BufferAttribute).array as Float32Array;
-    const z = ROOM.depth / 2;
+    const z = ROOM.zMax;
     for (let i = 0; i < LOOK.dustCount; i++) {
       const w = SOUTH_WINDOWS[seeds[i * 4]];
       const u = seeds[i * 4 + 1] + Math.sin(t * 0.13 + i) * 0.04;

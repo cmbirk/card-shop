@@ -113,6 +113,9 @@ export interface Station {
   yawRange: number; // radians, +/- around pose azimuth
   pitchRange: number; // radians, +/- around pose polar
   neighbors: string[];
+  /** Where Chris stands to talk to a customer here (world x, z). Overrides the default
+   *  "1.6 m to the viewer's right" spot when furniture would be in the way. */
+  greetSpot?: [number, number];
 }
 
 export interface ShopLayout {

@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Environment, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
-import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
+import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR, STOREFRONT } from '@shared/data/shopLayout';
+import { BAR, SHOWCASE_RUN_X } from '@shared/data/obstacles';
+import { BarStools, DimeTable, MemorabiliaTowers } from './decor/BarDecor';
 import type { Fixture } from '@shared/types';
 import { inventory, useInventoryVersion } from '../systems/inventory';
 import { assignCards } from '../systems/placement';
 import { MAT, dropCeilingMat, makeLabelMaterial } from './materials';
 import { Shelf } from './fixtures/Shelf';
 import { DisplayCase } from './fixtures/DisplayCase';
+import { ProductRow } from './fixtures/SealedProduct';
 import { Counter } from './fixtures/Counter';
 import { Bin } from './fixtures/Bin';
 import { Desk } from './fixtures/Desk';
@@ -48,16 +51,15 @@ function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React
 
 /** Main-room west wall with an opening for the Collection doorway (plus header + trim). */
 function WestWall() {
-  const D = ROOM.depth;
   const H = ROOM.height;
-  const x = -ROOM.width / 2;
+  const x = ROOM.xMin;
   const z0 = ANNEX_DOOR.z - ANNEX_DOOR.width / 2;
   const z1 = ANNEX_DOOR.z + ANNEX_DOOR.width / 2;
-  const northLen = z0 + D / 2; // from the north corner to the door
-  const southLen = D / 2 - z1; // from the door to the south corner
+  const northLen = z0 - ROOM.zMin; // from the north corner to the door
+  const southLen = ROOM.zMax - z1; // from the door to the south corner
   return (
     <group>
-      <mesh material={MAT.wall} position={[x, H / 2, -D / 2 + northLen / 2]} rotation-y={Math.PI / 2}>
+      <mesh material={MAT.wall} position={[x, H / 2, ROOM.zMin + northLen / 2]} rotation-y={Math.PI / 2}>
         <planeGeometry args={[northLen, H]} />
       </mesh>
       <mesh material={MAT.wall} position={[x, H / 2, z1 + southLen / 2]} rotation-y={Math.PI / 2}>
@@ -82,18 +84,17 @@ function WestWall() {
 
 /** Main-room north wall with an opening for the back-office door (the door + frame are BackOfficeDoor). */
 function NorthWall() {
-  const W = ROOM.width;
   const H = ROOM.height;
-  const z = -ROOM.depth / 2;
+  const z = ROOM.zMin;
   const x0 = BACK_OFFICE_DOOR.position[0] - BACK_OFFICE_DOOR.width / 2;
   const x1 = BACK_OFFICE_DOOR.position[0] + BACK_OFFICE_DOOR.width / 2;
   return (
     <group>
-      <mesh material={MAT.wall} position={[(-W / 2 + x0) / 2, H / 2, z]}>
-        <planeGeometry args={[x0 + W / 2, H]} />
+      <mesh material={MAT.wall} position={[(ROOM.xMin + x0) / 2, H / 2, z]}>
+        <planeGeometry args={[x0 - ROOM.xMin, H]} />
       </mesh>
-      <mesh material={MAT.wall} position={[(x1 + W / 2) / 2, H / 2, z]}>
-        <planeGeometry args={[W / 2 - x1, H]} />
+      <mesh material={MAT.wall} position={[(x1 + ROOM.xMax) / 2, H / 2, z]}>
+        <planeGeometry args={[ROOM.xMax - x1, H]} />
       </mesh>
       <mesh material={MAT.wall} position={[BACK_OFFICE_DOOR.position[0], (H + BACK_OFFICE_DOOR.height) / 2, z]}>
         <planeGeometry args={[BACK_OFFICE_DOOR.width, H - BACK_OFFICE_DOOR.height]} />
@@ -190,7 +191,7 @@ function AnnexShell() {
   const cx = (ANNEX.xMin + ANNEX.xMax) / 2;
   const cz = (ANNEX.zMin + ANNEX.zMax) / 2;
   const H = ANNEX.height;
-  const D = ROOM.depth;
+  const N = ROOM.zMin; // the main room's north wall line
   return (
     <group>
       <mesh material={MAT.floor} position={[cx, 0, cz]} rotation-x={-Math.PI / 2} receiveShadow>
@@ -211,13 +212,13 @@ function AnnexShell() {
         <planeGeometry args={[w, H]} />
       </mesh>
       {/* east wall: the main room's west wall seen from inside, plus the stretch past the main room's north corner */}
-      {ANNEX.zMin < -D / 2 && (
-        <mesh material={MAT.wall} position={[ANNEX.xMax, H / 2, (ANNEX.zMin + -D / 2) / 2]} rotation-y={-Math.PI / 2}>
-          <planeGeometry args={[-D / 2 - ANNEX.zMin, H]} />
+      {ANNEX.zMin < N && (
+        <mesh material={MAT.wall} position={[ANNEX.xMax, H / 2, (ANNEX.zMin + N) / 2]} rotation-y={-Math.PI / 2}>
+          <planeGeometry args={[N - ANNEX.zMin, H]} />
         </mesh>
       )}
-      <mesh material={MAT.wall} position={[ANNEX.xMax - 0.005, H / 2, (-D / 2 + ANNEX_DOOR.z - ANNEX_DOOR.width / 2) / 2]} rotation-y={-Math.PI / 2}>
-        <planeGeometry args={[ANNEX_DOOR.z - ANNEX_DOOR.width / 2 + D / 2, H]} />
+      <mesh material={MAT.wall} position={[ANNEX.xMax - 0.005, H / 2, (N + ANNEX_DOOR.z - ANNEX_DOOR.width / 2) / 2]} rotation-y={-Math.PI / 2}>
+        <planeGeometry args={[ANNEX_DOOR.z - ANNEX_DOOR.width / 2 - N, H]} />
       </mesh>
       <mesh material={MAT.wall} position={[ANNEX.xMax - 0.005, H / 2, (ANNEX_DOOR.z + ANNEX_DOOR.width / 2 + ANNEX.zMax) / 2]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[ANNEX.zMax - (ANNEX_DOOR.z + ANNEX_DOOR.width / 2), H]} />
@@ -246,9 +247,7 @@ export function Shop() {
   const placed = useMemo(() => assignCards(inventory, shopLayout), [invVersion]);
   const inspecting = useInspectStore((s) => s.mode !== 'idle');
 
-  const W = ROOM.width;
-  const D = ROOM.depth;
-  const H = ROOM.height;
+  const { width: W, depth: D, height: H, cx, cz } = ROOM;
 
   return (
     <group>
@@ -260,17 +259,18 @@ export function Shop() {
       <Sun />
       <ShadowReceivers />
       <SkyDome />
-      {/* local lights: a FIXED set (see look.ts) — counter lamp + one warm wash per shelf wall */}
-      <pointLight position={[0, 2.25, -3]} intensity={LOOK.counterLamp.intensity} distance={LOOK.counterLamp.distance} color={LOOK.counterLamp.color} />
-      {[-3.3, 3.3].map((x) => (
-        <pointLight key={x} position={[x, 2.5, -0.3]} intensity={LOOK.wallWash.intensity} distance={LOOK.wallWash.distance} color={LOOK.wallWash.color} />
+      {/* local lights: a FIXED set (see look.ts) — bar lamp + a wash over the west shelves and the gondola */}
+      <pointLight position={[BAR.x, 2.3, (BAR.z0 + BAR.z1) / 2]} intensity={LOOK.counterLamp.intensity} distance={LOOK.counterLamp.distance} color={LOOK.counterLamp.color} />
+      {LOOK.washes.map(([x, z]) => (
+        <pointLight key={`${x},${z}`} position={[x, 2.5, z]} intensity={LOOK.wallWash.intensity} distance={LOOK.wallWash.distance} color={LOOK.wallWash.color} />
       ))}
       <InspectLight />
-      <Pendant x={-1.1} z={-3} />
-      <Pendant x={1.1} z={-3} />
+      {[BAR.z0 + 1.0, (BAR.z0 + BAR.z1) / 2, BAR.z1 - 1.0].map((z) => (
+        <Pendant key={z} x={BAR.x} z={z} />
+      ))}
 
       {/* floor: charcoal commercial carpet */}
-      <mesh material={MAT.carpet} rotation-x={-Math.PI / 2} receiveShadow>
+      <mesh material={MAT.carpet} position={[cx, 0, cz]} rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[W, D]} />
       </mesh>
 
@@ -278,7 +278,7 @@ export function Shop() {
       <NorthWall />
       {/* west wall, split around the Collection doorway */}
       <WestWall />
-      <mesh material={MAT.wall} position={[W / 2, H / 2, 0]} rotation-y={-Math.PI / 2}>
+      <mesh material={MAT.wall} position={[ROOM.xMax, H / 2, cz]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[D, H]} />
       </mesh>
       {/* south wall: real openings so the sun only gets in through the glass */}
@@ -286,22 +286,22 @@ export function Shop() {
       {/* white baseboards (the modern shop has no wainscot) */}
       <Baseboards />
       {/* black drop ceiling with recessed cans */}
-      <mesh material={dropCeilingMat} position={[0, H, 0]} rotation-x={Math.PI / 2}>
+      <mesh material={dropCeilingMat} position={[cx, H, cz]} rotation-x={Math.PI / 2}>
         <planeGeometry args={[W, D]} />
       </mesh>
       <CeilingCans />
 
       {/* south windows: bright sunlit glass (HDR, so it blooms) + the closed front door */}
-      {[-3, 3].map((x) => (
-        <mesh key={x} position={[x, 1.8, D / 2 - 0.02]} rotation-y={Math.PI}>
-          <planeGeometry args={[2, 1.4]} />
+      {STOREFRONT.windowXs.map((x) => (
+        <mesh key={x} position={[x, (STOREFRONT.windowY0 + STOREFRONT.windowY1) / 2, ROOM.zMax - 0.02]} rotation-y={Math.PI}>
+          <planeGeometry args={[STOREFRONT.windowWidth, STOREFRONT.windowY1 - STOREFRONT.windowY0]} />
           <meshBasicMaterial color={LOOK.windowGlow} />
         </mesh>
       ))}
       <mesh
         material={MAT.walnut}
         castShadow
-        position={[0, 1.1, D / 2 - 0.02]}
+        position={[STOREFRONT.doorX, STOREFRONT.doorHeight / 2, ROOM.zMax - 0.02]}
         rotation-y={Math.PI}
         onClick={(e) => {
           const nav = useNavStore.getState();
@@ -310,20 +310,20 @@ export function Shop() {
           nav.goTo('outside');
         }}
       >
-        <planeGeometry args={[1.1, 2.2]} />
+        <planeGeometry args={[STOREFRONT.doorWidth, STOREFRONT.doorHeight]} />
       </mesh>
-      <mesh material={makeLabelMaterial('Thanks! Come again', { bg: '#efe6c8', fg: '#3b2a1a', size: 40 })} position={[0, 1.9, D / 2 - 0.04]} rotation-y={Math.PI}>
+      <mesh material={makeLabelMaterial('Thanks! Come again', { bg: '#efe6c8', fg: '#3b2a1a', size: 40 })} position={[STOREFRONT.doorX, 1.9, ROOM.zMax - 0.04]} rotation-y={Math.PI}>
         <planeGeometry args={[0.6, 0.16]} />
       </mesh>
 
       {/* staff-only door to the back office */}
       <BackOfficeDoor />
 
-      {/* boxes behind the counter */}
-      <mesh material={MAT.cardboard} position={[-2, 0.2, -3.6]} castShadow>
+      {/* stock boxes in the staff corner behind the bar */}
+      <mesh material={MAT.cardboard} position={[7.5, 0.2, -3.6]} castShadow>
         <boxGeometry args={[0.5, 0.4, 0.4]} />
       </mesh>
-      <mesh material={MAT.cardboard} position={[-2.05, 0.55, -3.62]} rotation-y={0.2} castShadow>
+      <mesh material={MAT.cardboard} position={[7.45, 0.55, -3.62]} rotation-y={0.2} castShadow>
         <boxGeometry args={[0.4, 0.3, 0.35]} />
       </mesh>
 
@@ -336,6 +336,20 @@ export function Shop() {
       <WallArt />
       <Facade />
 
+      {/* bar stools, the dime-box table, memorabilia towers (decor, placed from the obstacle map) */}
+      <BarStools />
+      <DimeTable />
+      <MemorabiliaTowers />
+
+      {/* the rest of the glass showcase run along the north wall (decor; the Good Stuff case is a fixture) */}
+      {SHOWCASE_RUN_X.map((dx, i) => (
+        <group key={dx} position={[ROOM.cx + dx, 0, -3.55]}>
+          <DisplayCase cards={[]} title={null}>
+            <ProductRow sport={(['baseball', 'basketball', 'football'] as const)[i]} y={0.53} seed={900 + i * 13} />
+          </DisplayCase>
+        </group>
+      ))}
+
       {/* fixtures + stock */}
       {shopLayout.fixtures.map((f) => (
         <FixtureGroup key={f.id} fixture={f}>
@@ -344,7 +358,6 @@ export function Shop() {
             <DisplayCase
               cards={placed.get(f.id) ?? []}
               title={f.id === 'case-collection' ? "Chris's Collection" : f.id === 'case-consign' ? 'On Consignment' : undefined}
-              glassTop={f.id === 'case-premium'}
               lit={f.id === 'case-premium'}
             />
           )}
