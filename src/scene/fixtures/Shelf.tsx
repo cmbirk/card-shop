@@ -3,6 +3,7 @@ import type { PlacedCard } from '../../systems/placement';
 import { MAT, makeLabelMaterial } from '../materials';
 import { CardMesh } from '../cards/CardMesh';
 import { ProductRow } from './SealedProduct';
+import { ledStripMat } from '../materials';
 
 const ROW_Y = [0.5, 0.9, 1.3, 1.7];
 
@@ -43,8 +44,10 @@ export function Shelf({ fixture, cards }: { fixture: Fixture; cards: PlacedCard[
       <mesh material={makeLabelMaterial(fixture.label, { bg: '#2e5e4e' })} position={[0, 2.05, 0.05]}>
         <planeGeometry args={[1.2, 0.3]} />
       </mesh>
-      {/* warm aisle light so card faces read — the key light can't reach them */}
-      <pointLight position={[0, 2.3, 1.1]} intensity={1.6} distance={3.8} color="#fff0d8" />
+      {/* LED strip under the crown — an emitter for bloom only; the wall wash in Shop.tsx does the lighting */}
+      <mesh material={ledStripMat} position={[0, 1.885, 0.2]} raycast={() => null}>
+        <boxGeometry args={[1.9, 0.012, 0.02]} />
+      </mesh>
       {cards.map(({ card, slot }) => (
         <CardMesh key={card.id} card={card} slot={slot} />
       ))}

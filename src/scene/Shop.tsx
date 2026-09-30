@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { ContactShadows, Environment, useCursor } from '@react-three/drei';
+import { Environment, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { shopLayout, ROOM, ANNEX, ANNEX_DOOR, OFFICE, BACK_OFFICE_DOOR } from '@shared/data/shopLayout';
 import type { Fixture } from '@shared/types';
@@ -19,6 +19,8 @@ import { WallArt } from './WallArt';
 import { BackOfficeDoor } from './BackOfficeDoor';
 import { ShowcaseRoom } from './ShowcaseRoom';
 import { ShowcaseDoor } from './ShowcaseDoor';
+import { LOOK } from './look';
+import { InspectLight, Pendant, ShadowReceivers, SkyDome, SouthWall, Sun, SunDust, SunShafts } from './Sunlight';
 
 function FixtureGroup({ fixture, children }: { fixture: Fixture; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false);
@@ -62,39 +64,6 @@ function CeilingFan() {
         ))}
       </group>
     </group>
-  );
-}
-
-function DustMotes() {
-  const ref = useRef<THREE.Points>(null!);
-  const { positions, speeds } = useMemo(() => {
-    const n = 100;
-    const positions = new Float32Array(n * 3);
-    const speeds = new Float32Array(n);
-    for (let i = 0; i < n; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 5;
-      positions[i * 3 + 1] = 0.3 + Math.random() * 2.2;
-      positions[i * 3 + 2] = 1 + Math.random() * 2.6;
-      speeds[i] = 0.02 + Math.random() * 0.05;
-    }
-    return { positions, speeds };
-  }, []);
-  useFrame((state) => {
-    const pos = ref.current.geometry.getAttribute('position') as THREE.BufferAttribute;
-    const t = state.clock.elapsedTime;
-    for (let i = 0; i < speeds.length; i++) {
-      pos.array[i * 3 + 1] = 0.3 + ((positions[i * 3 + 1] - 0.3 + t * speeds[i]) % 2.2);
-      pos.array[i * 3] = positions[i * 3] + Math.sin(t * 0.3 + i) * 0.08;
-    }
-    pos.needsUpdate = true;
-  });
-  return (
-    <points ref={ref} raycast={() => null}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions.slice(), 3]} />
-      </bufferGeometry>
-      <pointsMaterial size={0.012} color="#ffe9c4" transparent opacity={0.35} sizeAttenuation depthWrite={false} />
-    </points>
   );
 }
 
@@ -194,12 +163,12 @@ function OfficeShell() {
       {/* bare bulb */}
       <mesh position={[cx, H - 0.25, cz]}>
         <sphereGeometry args={[0.04, 12, 12]} />
-        <meshBasicMaterial color="#fff4d6" />
+        <meshBasicMaterial color={LOOK.bulbGlow} />
       </mesh>
       <mesh material={MAT.dark} position={[cx, H - 0.12, cz]}>
         <cylinderGeometry args={[0.01, 0.01, 0.24, 6]} />
       </mesh>
-      <pointLight position={[cx, H - 0.3, cz]} intensity={1.6} distance={6} color="#fff0d0" />
+      <pointLight position={[cx, H - 0.3, cz]} intensity={LOOK.officeBulb.intensity} distance={LOOK.officeBulb.distance} color={LOOK.officeBulb.color} />
       {/* the desk against the far wall, facing the door */}
       <Desk position={[-3, 0, OFFICE.zMin + 0.45]} rotationY={0} />
       {/* filing cabinet + boxes */}
@@ -285,10 +254,9 @@ function AnnexShell() {
           <meshStandardMaterial color="#123a6b" roughness={0.85} />
         </mesh>
       ))}
-      {/* lighting: cool ambient wash + a warm spot on the case */}
-      <pointLight position={[cx, 2.6, cz]} intensity={0.9} distance={6} color="#cfe0ff" />
+      {/* lighting: one warm spot on the case (the room's cool fill comes from the environment) */}
       <primitive object={caseTarget} position={[-8.5, 0.8, -3.2]} />
-      <spotLight target={caseTarget} position={[-7.6, 2.8, -3.2]} angle={0.5} penumbra={0.6} intensity={6} distance={5} color="#ffe3b0" />
+      <spotLight target={caseTarget} position={[-7.6, 2.8, -3.2]} angle={0.62} penumbra={0.7} intensity={LOOK.annexSpot.intensity} distance={6} color={LOOK.annexSpot.color} />
     </group>
   );
 }
@@ -321,35 +289,27 @@ export function Shop() {
 
   return (
     <group>
-      {/* image-based lighting — most of the material realism comes from this */}
-      <Environment files="/hdri/artist_workshop_1k.hdr" environmentIntensity={0.55} />
+      {/* image-based fill (kept at its native orientation — rotated, its bright side greys out the floor's sheen) */}
+      <Environment files="/hdri/artist_workshop_1k.hdr" environmentIntensity={LOOK.envIntensity} />
       {/* ambient dims while inspecting to focus the eye */}
-      <ambientLight intensity={inspecting ? 0.12 : 0.2} color="#fff2df" />
-      {/* warm key from the south windows — the only shadow caster */}
-      <directionalLight
-        position={[2.5, 2.6, 5]}
-        intensity={1.1}
-        color="#ffd9a0"
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-normalBias={0.02}
-        shadow-camera-left={-6}
-        shadow-camera-right={6}
-        shadow-camera-top={6}
-        shadow-camera-bottom={-6}
-        shadow-camera-near={0.5}
-        shadow-camera-far={15}
-      />
-      {/* counter lamp */}
-      <pointLight position={[0, 2.4, -3]} intensity={1.4} distance={4} color="#ffd9a0" />
-      {/* central fill over the bins/aisle */}
-      <pointLight position={[0, 2.5, 0.6]} intensity={1.0} distance={5} color="#fff0d8" />
+      <ambientLight intensity={inspecting ? LOOK.ambientInspecting : LOOK.ambient} color="#fff2df" />
+      {/* low afternoon sun through the south windows — the only shadow caster */}
+      <Sun />
+      <ShadowReceivers />
+      <SkyDome />
+      {/* local lights: a FIXED set (see look.ts) — counter lamp + one warm wash per shelf wall */}
+      <pointLight position={[0, 2.25, -3]} intensity={LOOK.counterLamp.intensity} distance={LOOK.counterLamp.distance} color={LOOK.counterLamp.color} />
+      {[-3.3, 3.3].map((x) => (
+        <pointLight key={x} position={[x, 2.5, -0.3]} intensity={LOOK.wallWash.intensity} distance={LOOK.wallWash.distance} color={LOOK.wallWash.color} />
+      ))}
+      <InspectLight />
+      <Pendant x={-1.1} z={-3} />
+      <Pendant x={1.1} z={-3} />
 
       {/* floor */}
       <mesh material={MAT.floor} rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[W, D]} />
       </mesh>
-      <ContactShadows position={[0, 0.005, 0]} scale={12} far={2} blur={2.5} opacity={0.35} frames={1} />
 
       {/* walls (north wall is split around the back-office door) */}
       <NorthWall />
@@ -358,9 +318,8 @@ export function Shop() {
       <mesh material={MAT.wall} position={[W / 2, H / 2, 0]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[D, H]} />
       </mesh>
-      <mesh material={MAT.wall} position={[0, H / 2, D / 2]} rotation-y={Math.PI}>
-        <planeGeometry args={[W, H]} />
-      </mesh>
+      {/* south wall: real openings so the sun only gets in through the glass */}
+      <SouthWall />
       {/* wainscot strips */}
       {(() => {
         const x0 = BACK_OFFICE_DOOR.position[0] - BACK_OFFICE_DOOR.width / 2;
@@ -398,15 +357,16 @@ export function Shop() {
         <planeGeometry args={[W, D]} />
       </mesh>
 
-      {/* south windows (glowing planes) + door */}
+      {/* south windows: bright sunlit glass (HDR, so it blooms) + the closed front door */}
       {[-3, 3].map((x) => (
         <mesh key={x} position={[x, 1.8, D / 2 - 0.02]} rotation-y={Math.PI}>
           <planeGeometry args={[2, 1.4]} />
-          <meshBasicMaterial color="#ffe9c4" />
+          <meshBasicMaterial color={LOOK.windowGlow} />
         </mesh>
       ))}
       <mesh
         material={MAT.walnut}
+        castShadow
         position={[0, 1.1, D / 2 - 0.02]}
         rotation-y={Math.PI}
         onClick={(e) => {
@@ -449,7 +409,8 @@ export function Shop() {
       <ShowcaseRoom />
       <ShowcaseDoor />
       <CeilingFan />
-      <DustMotes />
+      <SunShafts />
+      <SunDust />
       <WallArt />
       <Facade />
 
@@ -461,8 +422,8 @@ export function Shop() {
             <DisplayCase
               cards={placed.get(f.id) ?? []}
               title={f.id === 'case-collection' ? "Chris's Collection" : f.id === 'case-consign' ? 'On Consignment' : undefined}
-              glow={f.id === 'case-collection' ? '#cfe0ff' : undefined}
               glassTop={f.id === 'case-premium'}
+              lit={f.id === 'case-premium'}
             />
           )}
           {f.kind === 'bin' && <Bin fixtureId={f.id} cards={placed.get(f.id) ?? []} />}

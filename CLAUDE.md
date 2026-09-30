@@ -18,6 +18,7 @@ api/               Vercel serverless (see the Vercel gotcha below)
 supabase/          schema in migrations/ (apply with npm run db:push); seed.mjs; SETUP.md
 src/
   feel.ts          EVERY animation duration/ease constant — tune game feel in one file
+  scene/look.ts    EVERY lighting / post / atmosphere constant (golden-afternoon mood) — tune the look in one file
   lib/supabase.ts  browser client (anon key); database.types.ts (generated)
   stores/          zustand: nav, basket, inspect, dialogue, ui, auth
   systems/         inventory (live Supabase read + bundled fallback), placement, rng, sfx
@@ -80,6 +81,11 @@ src/
 - **Card art is procedural, real scans override.** `card.images.front` paints over the atlas cell;
   everything works without real images.
 - **All animation constants live in `feel.ts`.** No magic durations/eases in components.
+- **Lighting lives in `look.ts` + `scene/Sunlight.tsx`.** The sun (through real south-wall openings) is the only
+  shadow caster; `ShadowReceivers` flags every opaque mesh to receive and every wall/ceiling to cast. **Local
+  lights are a small FIXED set** — each costs ~3 fps (measured; far more than draw calls), and adding/removing one at
+  runtime recompiles every material. Need glow? Use an HDR emitter (`hdr()` / `ledStripMat`, colour > 1 so it
+  blooms), not a light. The composer forces renderer tone mapping off; tone mapping is its `ToneMapping` (NEUTRAL).
 - **Per-frame code mutates refs, never React state.** Read zustand via `getState()` in `useFrame`.
 - **Chris's whereabouts live in `shopkeeperStore`** (pose + spot); `Shopkeeper.tsx` does the walking,
   `StationController` turns the camera on `visiting`. Situational chat context (held card, station)

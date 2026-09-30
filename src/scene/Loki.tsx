@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { FEEL } from '../feel';
 import { LOKI_HOME, useLokiStore } from '../stores/lokiStore';
 import { useNavStore } from '../stores/navStore';
+import { LOOK } from './look';
 
 const MODEL_URL = '/models/loki.glb';
 const SCALE = 75; // the export is in centimetres (~1 cm long at scale 1); 75 ≈ a shepherd-sized dog
@@ -54,6 +55,13 @@ export function Loki() {
         if (s.specularColor) s.specularColor.setRGB(1, 1, 1);
         s.roughness = Math.max(s.roughness ?? 1, 0.75);
         s.metalness = Math.min(s.metalness ?? 0, 0.05);
+        // black fur: sheen + env boost so he never goes to a flat silhouette (look.ts)
+        s.envMapIntensity = LOOK.lokiCoat.envBoost;
+        if (s.isMeshPhysicalMaterial) {
+          s.sheen = LOOK.lokiCoat.sheen;
+          s.sheenColor.set(LOOK.lokiCoat.sheenColor);
+          s.sheenRoughness = LOOK.lokiCoat.sheenRoughness;
+        }
         for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap'] as const) {
           const tex = s[key] as THREE.Texture | null;
           if (tex) {

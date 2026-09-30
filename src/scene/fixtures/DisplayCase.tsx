@@ -1,18 +1,20 @@
 import type { PlacedCard } from '../../systems/placement';
-import { MAT, makeLabelMaterial } from '../materials';
+import { MAT, ledStripMat, makeLabelMaterial } from '../materials';
 import { CardMesh } from '../cards/CardMesh';
+import { LOOK } from '../look';
 
-/** Glass display case for the good stuff: wood base, glass top box, interior warm light. `glassTop` swaps the wood cap for a glass lid in a metal rim. */
+/** Glass display case for the good stuff: wood base, glass top box, LED strips inside. `glassTop` swaps the wood cap for a glass lid in a metal rim. */
 export function DisplayCase({
   cards,
   title = 'The Good Stuff',
-  glow = '#ffd9a0',
   glassTop = false,
+  lit = false,
 }: {
   cards: PlacedCard[];
   title?: string;
-  glow?: string;
   glassTop?: boolean;
+  /** give the case its own interior light (a fixed local light — see look.ts before adding more) */
+  lit?: boolean;
 }) {
   return (
     <group>
@@ -60,8 +62,13 @@ export function DisplayCase({
           <boxGeometry args={[0.025, 0.52, 0.025]} />
         </mesh>
       ))}
-      {/* interior glow — the good stuff literally glows */}
-      <pointLight position={[0, 0.95, 0]} intensity={2} distance={1.6} color={glow} />
+      {lit && <pointLight position={[0, 0.95, 0]} intensity={LOOK.caseLight.intensity} distance={LOOK.caseLight.distance} color={LOOK.caseLight.color} />}
+      {/* LED strips along the top front/back edges — the good stuff literally glows (emitters only, no light) */}
+      {([0.27, -0.27] as const).map((z) => (
+        <mesh key={`led${z}`} material={ledStripMat} position={[0, 0.985, z]} raycast={() => null}>
+          <boxGeometry args={[1.5, 0.01, 0.015]} />
+        </mesh>
+      ))}
       <mesh material={makeLabelMaterial(title, { bg: '#3b2a1a', fg: '#ffd97a', size: title.length > 14 ? 32 : 42 })} position={[0, 1.25, 0.1]}>
         <planeGeometry args={[0.9, 0.22]} />
       </mesh>

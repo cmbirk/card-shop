@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { useProgress } from '@react-three/drei';
-import { AdaptiveDpr } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
+import { AdaptiveDpr, PerformanceMonitor } from '@react-three/drei';
+import { EffectComposer, Bloom, N8AO, Noise, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing';
+import { ToneMappingMode } from 'postprocessing';
+import { LOOK } from './scene/look';
 import { Shop } from './scene/Shop';
 import { StationController } from './scene/StationController';
 import { WalkController } from './scene/WalkController';
@@ -20,6 +22,11 @@ import { handleArrival } from './systems/arrival';
 
 export default function App() {
   const [ready, setReady] = useState(false);
+  // quality tier: drops to 'low' once if the frame rate can't hold — never changes the light count
+  const [lowQuality, setLowQuality] = useState(false);
+  // arm the monitor only once loading has settled: shader compiles, GLB/HDR loads and the walk-in
+  // dip the frame rate for a few seconds and would otherwise drop a capable machine to low for good
+  const [perfArmed, setPerfArmed] = useState(false);
   useEffect(() => {
     useAuthStore.getState().init(); // restore persisted session, watch auth changes
     loadInventory().then(() => {
@@ -49,22 +56,28 @@ export default function App() {
     );
     return () => cancelAnimationFrame(raf);
   }, [ready, assetsLoading]);
+  useEffect(() => {
+    if (!ready || assetsLoading || perfArmed) return;
+    const t = setTimeout(() => setPerfArmed(true), LOOK.perfArmDelayMs);
+    return () => clearTimeout(t);
+  }, [ready, assetsLoading, perfArmed]);
 
   if (!ready) return null; // #boot is showing
 
   return (
     <ErrorBoundary>
       <Canvas
-        shadows
-        dpr={[1, 2]}
+        shadows="percentage"
+        dpr={lowQuality ? [1, 1.5] : [1, 2]}
         camera={{ fov: 55, near: 0.05, far: 50, position: [0, 1.6, 9.2] }}
         style={{ position: 'fixed', inset: 0 }}
         onCreated={(st) => {
+          st.gl.toneMappingExposure = LOOK.exposure; // tone mapping itself runs in the composer (it forces the renderer's off)
           if (import.meta.env.DEV) (window as unknown as { __three?: unknown }).__three = st; // scene probe for verify.mjs `eval`
         }}
       >
-        <color attach="background" args={['#241a10']} />
-        <fog attach="fog" args={['#241a10', 10, 24]} />
+        <color attach="background" args={[LOOK.sky.horizon]} />
+        <fog attach="fog" args={[LOOK.fog.color, LOOK.fog.near, LOOK.fog.far]} />
         <Shop />
         <Shopkeeper />
         <Maya />
@@ -74,9 +87,26 @@ export default function App() {
         <StationController />
         <WalkController />
         <AdaptiveDpr pixelated />
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.95} intensity={0.35} mipmapBlur />
-          <Vignette eskil={false} offset={0.25} darkness={0.55} />
+        {perfArmed && <PerformanceMonitor onDecline={() => setLowQuality(true)} />}
+        <EffectComposer multisampling={0}>
+          <N8AO
+            enabled={!lowQuality}
+            halfRes
+            quality="medium"
+            aoRadius={LOOK.ao.radius}
+            distanceFalloff={LOOK.ao.distanceFalloff}
+            intensity={LOOK.ao.intensity}
+          />
+          <Bloom
+            luminanceThreshold={LOOK.bloom.threshold}
+            luminanceSmoothing={LOOK.bloom.smoothing}
+            intensity={LOOK.bloom.intensity}
+            mipmapBlur
+          />
+          <ToneMapping mode={ToneMappingMode.NEUTRAL} />
+          <Vignette eskil={false} offset={LOOK.vignette.offset} darkness={LOOK.vignette.darkness} />
+          <Noise premultiply opacity={LOOK.grain} />
+          <SMAA />
         </EffectComposer>
       </Canvas>
       <UIOverlay />

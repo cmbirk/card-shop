@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PBR } from './pbr';
+import { LOOK } from './look';
 
 // Cozy hobby-shop palette. Structural surfaces use CC0 PBR texture sets
 // (see pbr.ts); accents stay flat-colored.
@@ -24,6 +25,9 @@ export const MAT = {
   skin: new THREE.MeshStandardMaterial({ color: '#e0b08c', roughness: 0.8 }),
   flannel: new THREE.MeshStandardMaterial({ color: '#a63d40', roughness: 0.95 }),
 };
+
+/** Shared LED-strip emitter (HDR colour > 1, so it blooms). Visual only — never a light. */
+export const ledStripMat = new THREE.MeshBasicMaterial({ color: LOOK.ledStrip });
 
 const labelCache = new Map<string, THREE.MeshBasicMaterial>();
 

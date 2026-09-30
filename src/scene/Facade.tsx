@@ -11,7 +11,7 @@ import { supabaseConfigured } from '../lib/supabase';
 
 const brickMat = PBR.brick;
 const trimMat = new THREE.MeshStandardMaterial({ color: '#24483c', roughness: 0.9 });
-const sidewalkMat = new THREE.MeshStandardMaterial({ color: '#5a5a60', roughness: 1 });
+const sidewalkMat = new THREE.MeshStandardMaterial({ color: '#a39d93', roughness: 1 }); // sunlit concrete
 const glassGlowMat = new THREE.MeshBasicMaterial({ color: '#ffdfae' });
 
 function block(e: { stopPropagation: () => void }) {
@@ -138,7 +138,7 @@ export function Facade() {
             <planeGeometry args={[1.15, 0.28]} />
           </mesh>
           {/* awning */}
-          <mesh material={trimMat} position={[0, 0.95, 0.3]} rotation-x={0.5}>
+          <mesh material={trimMat} position={[0, 0.95, 0.3]} rotation-x={0.5} castShadow>
             <boxGeometry args={[2.4, 0.06, 0.75]} />
           </mesh>
         </group>
@@ -200,9 +200,6 @@ export function Facade() {
       <mesh material={MAT.green} position={[0, 0.006, 0.45]} rotation-x={-Math.PI / 2}>
         <planeGeometry args={[1.3, 0.7]} />
       </mesh>
-
-      {/* warm light over the door */}
-      <pointLight position={[0, 2.6, 1]} intensity={1.6} distance={6} color="#ffd9a0" />
     </group>
   );
 }
